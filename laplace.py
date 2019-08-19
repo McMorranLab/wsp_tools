@@ -67,9 +67,9 @@ def dblRes(V,x,y,z):
     xmin,xmax = np.min(x),np.max(x)
     ymin,ymax = np.min(y),np.max(y)
     zmin,zmax = np.min(z),np.max(z)
-    xnew = np.linspace(xmin,xmax,2*xres-1,dtype='float32')
-    ynew = np.linspace(ymin,ymax,2*yres-1,dtype='float32')
-    znew = np.linspace(zmin,zmax,2*zres-1,dtype='float32')
+    xnew = np.linspace(xmin,xmax,2*xres,dtype='float32')
+    ynew = np.linspace(ymin,ymax,2*yres,dtype='float32')
+    znew = np.linspace(zmin,zmax,2*zres,dtype='float32')
     newSol = np.zeros((V.shape[0]*2,V.shape[1]*2,V.shape[2]*2),dtype='float32')
     newSol[::2,::2,::2] = V
 
@@ -111,6 +111,9 @@ def dblRes(V,x,y,z):
     # Cuts off the endpoints in each dimension
     # Automatically fills in remaining boundary points with VN conditions
     newSol = newSol[:-1,:-1,:-1]
+    xnew = xnew[:-1]
+    ynew = ynew[:-1]
+    znew = znew[:-1]
     newSol[0,:,:] = newSol[1,:,:]; newSol[-1,:,:] = newSol[-2,:,:]
     newSol[:,0,:] = newSol[:,1,:]; newSol[:,-1,:] = newSol[:,-2,:]
     newSol[:,:,0] = newSol[:,:,1]; newSol[:,:,-1] = newSol[:,:,-2]
