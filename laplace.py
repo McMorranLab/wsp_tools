@@ -176,8 +176,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='parse some arguments')
     parser.add_argument('-filename',default='dummy')
-    parser.add_argument('-numDub',default=2)
-    parser.add_argument('-numsRuns',default=[2**7,2**6,2**5],nargs='*')
+    parser.add_argument('-numDub',default=2,type=int)
+    parser.add_argument('-numsRuns',default=[2**7,2**6,2**5],type=float,nargs='*')
     ############################################################################
     ### Add arguments for main() ###############################################
     ############################################################################
