@@ -77,7 +77,7 @@ def w(z,w0,k):
 
 def R(z, w0, k):
     """Radius of curvature as a function of z, w0, k"""
-    if z=0:
+    if z==0:
         return(np.infty)
     return(z*(1 + (zR(k,w0)/z)**2))
 
