@@ -77,9 +77,7 @@ def w(z,w0,k):
 
 def R(z, w0, k):
     """Radius of curvature as a function of z, w0, k"""
-    if z==0:
-        return(np.infty)
-    return(z*(1 + (zR(k,w0)/z)**2))
+    return(z*(1 + (np.divide(zR(k,w0),z))**2))
 
 def LG(x, y, z = 0, l = 0, p = 0, w_0 = 2e-6 * m, lam = 1.97e-12 * m):
     r, theta = np.sqrt(x**2 + y**2), np.arctan2(y,x)
