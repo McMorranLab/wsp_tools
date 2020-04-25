@@ -66,6 +66,21 @@ def besselPacket(t = 0, l = 0,
     mode = np.fft.ifftshift(np.fft.ifftn(np.fft.fftshift(spec)))
     return(mode)
 
+def zR(k, w0):
+    """Rayleigh range as a function of k, beam waist"""
+    lam = 2*pi/k
+    return(pi * w0**2 / lam)
+
+def w(z,w0,k):
+    """Beam waist as a function of z, beam waist at z=0, and k"""
+    return(w0 * np.sqrt(1 + (z/zR(k,w0))**2))
+
+def R(z, w0, k):
+    """Radius of curvature as a function of z, w0, k"""
+    if z=0:
+        return(np.infty)
+    return(z*(1 + (zR(k,w0)/z)**2))
+
 def LG(x, y, z = 0, l = 0, p = 0, w_0 = 2e-6 * m, lam = 1.97e-12 * m):
     r, theta = np.sqrt(x**2 + y**2), np.arctan2(y,x)
     Clp = np.sqrt(2*factorial(p)/np.pi/factorial(p+np.abs(l)))
