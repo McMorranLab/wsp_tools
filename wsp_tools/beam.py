@@ -95,4 +95,5 @@ def LG(x, y, z = 0, l = 0, p = 0, w_0 = 2e-6 * m, lam = 1.97e-12 * m):
             * np.exp(-1j * 2 * np.pi / lam * r**2 * z/ 2 /(z**2 + z_r**2)) \
             * np.exp(-1j * l * theta) \
             * np.exp(1j * (1 + np.abs(l) * 2*p))
+    mode /= np.max(np.abs(mode))
     return(mode)
