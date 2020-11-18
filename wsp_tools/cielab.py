@@ -18,10 +18,10 @@ def cielab_image(data, alpha):
     rgb_image_components[:,:,0] = (r * value).astype(np.uint8)
     rgb_image_components[:,:,1] = (g * value).astype(np.uint8)
     rgb_image_components[:,:,2] = (b * value).astype(np.uint8)
-    rgb_image_components[:,:,3] = np.full(data.shape, fill_value=255, dtype=np.uint8)
+    rgb_image_components[:,:,3] = value
     return(rgb_image_components)
 
-def rgba(mode, cmap = 'uniform', alpha = 'intensity'):
+def rgba(mode, cmap = 'uniform', alpha = 'opaque'):
     mode /= np.max(np.abs(mode))
     if cmap == 'uniform':
         out = cielab_image(mode, alpha)
@@ -32,5 +32,6 @@ def rgba(mode, cmap = 'uniform', alpha = 'intensity'):
     return(out)
 
 # %%
-a = np.linspace(0,1,10)
-a, b = np.meshgrid(a, a)
+# a = np.array([True, True, 0.5])
+# a, b = np.meshgrid(a, a)
+# rgba(a.astype(float))
