@@ -36,7 +36,6 @@ def sertopng(fname, fdir=None, outname=None, outdir='.'):
 	print(os.path.join(outdir,outname))
 	imsave(arr=data, vmin=vmin, vmax=vmax, fname=os.path.join(outdir, outname+'.png'))
 
-
 ##################################################
 # %%
 # testing

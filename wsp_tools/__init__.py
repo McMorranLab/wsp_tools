@@ -1,3 +1,4 @@
 from .constants import setUnits
-from .cielab import rgba
+from .cielab import *
 from .ncempywrap import *
+from .beam import *

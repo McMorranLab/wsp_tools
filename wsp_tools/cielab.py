@@ -1,8 +1,6 @@
 import numpy as np
 from scipy.special import eval_genlaguerre, factorial
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-mpl.rcParams['image.origin'] = 'lower'
+from matplotlib.pyplot import cm
 
 def cielab_image(data, alpha):
     rgb_image_components = np.zeros(np.append(data.shape, 4),dtype=np.uint8)
@@ -23,12 +21,16 @@ def cielab_image(data, alpha):
     rgb_image_components[:,:,3] = np.full(data.shape, fill_value=255, dtype=np.uint8)
     return(rgb_image_components)
 
-def rgba(mode, cmap = 'uniform'):
+def rgba(mode, cmap = 'uniform', alpha = 'intensity'):
     mode /= np.max(np.abs(mode))
     if cmap == 'uniform':
         out = cielab_image(mode, alpha)
         return(out)
-    colormap = plt.cm.ScalarMappable(cmap=cmap)
+    colormap = cm.ScalarMappable(cmap=cmap)
     out = colormap.to_rgba(np.angle(mode))
     out[:,:,-1] = np.abs(mode)**2/np.max(np.abs(mode)**2)
     return(out)
+
+# %%
+a = np.linspace(0,1,10)
+a, b = np.meshgrid(a, a)
