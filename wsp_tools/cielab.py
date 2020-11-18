@@ -23,7 +23,7 @@ def cielab_image(data, alpha):
     rgb_image_components[:,:,3] = np.full(data.shape, fill_value=255, dtype=np.uint8)
     return(rgb_image_components)
 
-def rgba(mode, cmap = 'uniform', alpha = 'intensity'):
+def rgba(mode, cmap = 'uniform'):
     mode /= np.max(np.abs(mode))
     if cmap == 'uniform':
         out = cielab_image(mode, alpha)
