@@ -15,7 +15,7 @@ def crop_pixel_values(image, sigma=10):
 	vmax = avg + sigma*std
 	image[image < vmin] = vmin
 	image[image > vmax] = vmax
-	return(data)
+	return(image)
 
 def high_pass(image, sigma=50):
 	X = np.linspace(-image.shape[0]/2, image.shape[0]/2, image.shape[0])
