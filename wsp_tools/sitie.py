@@ -5,8 +5,8 @@ import scipy.ndimage as ndi
 np.seterr(divide='ignore')
 
 ############################## Pre-processing ####################
-def blur(image, sigma=5):
-	return(ndi.gaussian_filter(image, sigma))
+def blur(image, sigma=5, mode='wrap', cval=0.0):
+	return(ndi.gaussian_filter(image, sigma, mode=mode, cval=cval))
 
 def crop_pixel_values(image, sigma=10):
 	avg = np.mean(image)
