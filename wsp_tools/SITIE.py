@@ -9,7 +9,7 @@ np.seterr(divide='ignore')
 def blur(image, sigma=5):
 	return(ndi.gaussian_filter(image, sigma))
 
-def crop_pixel_values(image, sigma=10):
+def crop_pixel_values(data, sigma=10):
 	avg = np.mean(image)
 	std = np.std(image)
 	vmin = avg - sigma*std
