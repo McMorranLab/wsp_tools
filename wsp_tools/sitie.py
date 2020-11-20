@@ -4,7 +4,6 @@ import numpy as np
 import scipy.ndimage as ndi
 np.seterr(divide='ignore')
 
-
 ############################## Pre-processing ####################
 def blur(image, sigma=5):
 	return(ndi.gaussian_filter(image, sigma))
