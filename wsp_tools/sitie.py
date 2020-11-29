@@ -13,7 +13,8 @@ import json
 
 class lorentz:
 	def __init__(self, fdir, fname):
-		dm3file = dm.dmReader(os.path.join(fdir, fname))
+		self.source = os.path.join(fdir, fname)
+		dm3file = dm.dmReader(self.source)
 		self.rawData = dm3file['data']
 		self.data = dm3file['data']
 		self.fname = os.path.splitext(dm3file['filename'])[0]
@@ -125,7 +126,7 @@ class lorentz:
 		savefig(os.path.join(outdir, "BField.png"))
 
 		if savedm3:
-			copy(os.path.join(fdir, fname), os.path.join(outdir, fname))
+			copy(self.source, os.path.join(outdir, self.fname+'.dm3'))
 
 		self.metadata.update(metadata)
 
