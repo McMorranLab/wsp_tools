@@ -3,3 +3,5 @@ __pycache__
 *.ser
 *.png
 *.dm3
+venv
+testing.py
