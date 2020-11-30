@@ -57,13 +57,18 @@ class lorentz:
 
 	def preview(self, window=((0,-1),(0,-1))):
 		((xmin, xmax), (ymin, ymax)) = window
+		if xmax == -1:
+			xmax = self.data.shape[0]
+		if ymax == -1:
+			ymax = self.data.shape[1]
 		self.crop_pixel_counts()
-		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6))
+		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
 		data = self.data[ymin:ymax, xmin:xmax]
+		extent = [xmin,xmax,ymin,ymax]
 		ax.set_title("Intensity - {:}".format(self.fname))
 		ax.set_xlabel("x (px)")
 		ax.set_ylabel("y (px)")
-		ax.imshow(data, origin="lower")
+		ax.imshow(data, origin="lower", extent=extent)
 		tight_layout()
 		show()
 
@@ -75,23 +80,24 @@ class lorentz:
 			xmax = self.data.shape[0]
 		if ymax == -1:
 			ymax = self.data.shape[1]
+		extent=[xmin,xmax,ymin,ymax]
 		xrange = np.arange(xmin,xmax,quiver_step)
 		yrange = np.arange(ymin,ymax,quiver_step)
 		data = self.data[ymin:ymax, xmin:xmax]
 		phase = self.phase[ymin:ymax, xmin:xmax]
 		Bx, By = self.Bx[ymin:ymax, xmin:xmax], self.By[ymin:ymax, xmin:xmax]
-		fig, ax = subplots(nrows=3, ncols=1, sharex=True, sharey=True, figsize=(6,18))
+		fig, ax = subplots(nrows=3, ncols=1, sharex=True, sharey=True, figsize=(6,3*6*(ymax-ymin)/(xmax-xmin)))
 		(ax1, ax2, ax3) = ax
 		ax1.set_title("Intensity - {:}".format(self.fname))
 		ax1.set_ylabel("y (px)")
-		ax1.imshow(data, origin='lower')
+		ax1.imshow(data, origin='lower',extent=extent)
 		ax2.set_title("Phase")
 		ax2.set_ylabel("y (px)")
-		ax2.imshow(phase, origin='lower')
+		ax2.imshow(phase, origin='lower', extent=extent)
 		ax3.set_title("Phase")
 		ax3.set_xlabel("x (px)")
 		ax3.set_ylabel("y (px)")
-		ax3.imshow(rgba(Bx+1j*By), origin='lower')
+		ax3.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
 		ax3.quiver(xrange, yrange, By[::quiver_step,::quiver_step], Bx[::quiver_step,::quiver_step], color='white')
 		tight_layout()
 		show()
@@ -105,6 +111,7 @@ class lorentz:
 			xmax = self.data.shape[0]
 		if ymax == -1:
 			ymax = self.data.shape[1]
+		extent = [xmin,xmax,ymin,ymax]
 		xrange = np.arange(xmin,xmax,quiver_step)
 		yrange = np.arange(ymin,ymax,quiver_step)
 		data = self.data[ymin:ymax, xmin:xmax]
@@ -119,27 +126,27 @@ class lorentz:
 			except OSError as e:
 				if e.errno != errno.EEXIST:
 					raise
-		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6))
+		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
 		ax.set_title("Intensity - {:}".format(self.fname))
 		ax.set_xlabel("x (px)")
 		ax.set_ylabel("y (px)")
-		ax.imshow(data, origin='lower')
+		ax.imshow(data, origin='lower', extent=extent)
 		tight_layout()
 		savefig(os.path.join(outdir, "intensity.png"))
 
-		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6))
+		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
 		ax.set_title("Phase - {:}".format(self.fname))
 		ax.set_xlabel("x (px)")
 		ax.set_ylabel("y (px)")
-		ax.imshow(phase, origin='lower')
+		ax.imshow(phase, origin='lower', extent=extent)
 		tight_layout()
 		savefig(os.path.join(outdir, "phase.png"))
 
-		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6))
+		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
 		ax.set_title("B Field - {:}".format(self.fname))
 		ax.set_xlabel("x (px)")
 		ax.set_ylabel("y (px)")
-		ax.imshow(rgba(Bx+1j*By), origin='lower')
+		ax.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
 		ax.quiver(xrange, yrange, By[::quiver_step,::quiver_step], Bx[::quiver_step,::quiver_step], color='white')
 		tight_layout()
 		savefig(os.path.join(outdir, "BField.png"))
