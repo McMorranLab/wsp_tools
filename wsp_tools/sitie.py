@@ -30,6 +30,9 @@ class lorentz:
 		self.phase = None
 		self.Bx, self.By = None, None
 
+	def reset(self):
+		self.data = self.rawData
+
 	def sitie(self, defocus, wavelength=1.96e-12):
 		self.metadata.update({'defocus': defocus})
 		dummy = sitie_RHS(self.data, defocus, wavelength)
