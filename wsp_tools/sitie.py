@@ -156,7 +156,7 @@ class lorentz:
 		self.metadata.update(metadata)
 
 		with open(os.path.join(outdir, 'metadata.json'), 'w') as fp:
-			json.dump(self.metadata, fp)
+			json.dump(self.metadata, fp, indent="")
 
 ############################## Pre-processing ####################
 def blur(image, sigma=5, mode='wrap', cval=0.0):
