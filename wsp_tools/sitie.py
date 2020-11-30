@@ -61,7 +61,6 @@ class lorentz:
 			xmax = self.data.shape[0]
 		if ymax == -1:
 			ymax = self.data.shape[1]
-		self.crop_pixel_counts()
 		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
 		data = self.data[ymin:ymax, xmin:xmax]
 		extent = [xmin,xmax,ymin,ymax]
