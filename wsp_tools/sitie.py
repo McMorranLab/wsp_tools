@@ -126,7 +126,7 @@ class lorentz:
 				if e.errno != errno.EEXIST:
 					raise
 		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
-		ax.set_title("Intensity - {:}".format(self.fname))
+		ax.set_title("Intensity", fontsize=30)
 		ax.set_xlabel("x (px)")
 		ax.set_ylabel("y (px)")
 		ax.imshow(data, origin='lower', extent=extent)
@@ -134,7 +134,7 @@ class lorentz:
 		savefig(os.path.join(outdir, "intensity.png"))
 
 		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
-		ax.set_title("Phase - {:}".format(self.fname))
+		ax.set_title("Phase", fontsize=30)
 		ax.set_xlabel("x (px)")
 		ax.set_ylabel("y (px)")
 		ax.imshow(phase, origin='lower', extent=extent)
@@ -142,7 +142,7 @@ class lorentz:
 		savefig(os.path.join(outdir, "phase.png"))
 
 		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
-		ax.set_title("B Field - {:}".format(self.fname))
+		ax.set_title("B Field", fontsize=30)
 		ax.set_xlabel("x (px)")
 		ax.set_ylabel("y (px)")
 		ax.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
