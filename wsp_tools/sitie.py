@@ -6,19 +6,23 @@ import scipy.ndimage as ndi
 np.seterr(divide='ignore')
 from matplotlib.pyplot import subplots, imshow, quiver, show, tight_layout, savefig
 import os
-import ncempy.io.dm as dm
 import errno
 from shutil import copy
 import json
 
 class lorentz:
-	def __init__(self, fdir, fname):
-		self.source = os.path.join(fdir, fname)
-		dm3file = dm.dmReader(self.source)
+	def __init__(self, dm3file):
+		"""
+		dictionary-like dm3file with required keys:
+			- data
+			- filename
+			- pixelUnit
+			- pixelSize
+		"""
 		self.rawData = dm3file['data']
 		self.data = dm3file['data']
 		self.fname = os.path.splitext(dm3file['filename'])[0]
-		if dm3file['pixelUnit'] == 'µm':
+		if dm3file['pixelUnit'] == '\u00b5m':
 			self.pixelSize = dm3file['pixelSize'][0] * 1e-6
 		elif dm3file['pixelUnit'] == 'nm':
 			self.pixelSize = dm3file['pixelSize'][0] * 1e-9
@@ -26,7 +30,10 @@ class lorentz:
 			self.pixelSize = dm3file['pixelSize'][0] * 1e-3
 		else:
 			self.pixelSize = dm3file['pixelSize'][0]
-		self.metadata = {'pixelSize':float(self.pixelSize)}
+		self.metadata = {
+							'pixelSize':float(dm3file['pixelSize'][0]),
+							'pixelUnit':dm3file['pixelUnit'][0]
+						}
 		self.phase = None
 		self.Bx, self.By = None, None
 
@@ -101,8 +108,8 @@ class lorentz:
 		tight_layout()
 		show()
 
-	def save(self, window=((0,-1), (0, -1)), quiver_step=32, outdir=None,
-			savedm3=False, metadata={}):
+	def save(self, window=((0,-1), (0, -1)), quiver_step=32, outdir=None, outname=None,
+			savedm3=False, metadata={}, titles=True, axes=True, separate=True, vertical=True):
 		if self.phase is None:
 			self.sitie(1e-3)
 		((xmin, xmax), (ymin, ymax)) = window
@@ -110,45 +117,113 @@ class lorentz:
 			xmax = self.data.shape[0]
 		if ymax == -1:
 			ymax = self.data.shape[1]
+		self.metadata.update({"xmin":xmin,"xmax":xmax,"ymin":ymin,"ymax":ymax})
 		extent = [xmin,xmax,ymin,ymax]
 		xrange = np.arange(xmin,xmax,quiver_step)
 		yrange = np.arange(ymin,ymax,quiver_step)
 		data = self.data[ymin:ymax, xmin:xmax]
 		phase = self.phase[ymin:ymax, xmin:xmax]
 		Bx, By = self.Bx[ymin:ymax, xmin:xmax], self.By[ymin:ymax, xmin:xmax]
+
 		if outdir is None:
 			outdir = os.getcwd()
-		outdir = os.path.join(outdir, self.fname+"_x_{:}_{:}_y_{:}_{:}".format(xmin,xmax,ymin,ymax))
+		if outname is None:
+			outdir = os.path.join(outdir, self.fname+"_x_{:}_{:}_y_{:}_{:}".format(xmin,xmax,ymin,ymax))
+		else:
+			outdir = os.path.join(outdir, outname)
 		if not os.path.exists(outdir):
 			try:
 				os.makedirs(outdir, 0o700)
 			except OSError as e:
 				if e.errno != errno.EEXIST:
 					raise
-		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
-		ax.set_title("Intensity", fontsize=30)
-		ax.set_xlabel("x (px)")
-		ax.set_ylabel("y (px)")
-		ax.imshow(data, origin='lower', extent=extent)
-		tight_layout()
-		savefig(os.path.join(outdir, "intensity.png"))
 
-		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
-		ax.set_title("Phase", fontsize=30)
-		ax.set_xlabel("x (px)")
-		ax.set_ylabel("y (px)")
-		ax.imshow(phase, origin='lower', extent=extent)
-		tight_layout()
-		savefig(os.path.join(outdir, "phase.png"))
+		if (window[0][0]!=0) or (window[0][1]!=-1) or (window[1][0]!=0) or (window[1][1]!=-1):
+			fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
+			ax.imshow(self.data, origin='lower', extent=(0,self.data.shape[0],0,self.data.shape[1]))
+			ax.plot(np.zeros(100)+xmin, np.arange(ymin,ymax), 'white')
+			ax.plot(np.zeros(100)+xmax, np.arange(ymin,ymax), 'white')
+			ax.plot(np.arange(xmin,xmax), np.zeros(100)+ymin, 'white')
+			ax.plot(np.arange(xmin,xmax), np.zeros(100)+ymax, 'white')
+			if axes:
+				ax.set_xlabel("x (px)")
+				ax.set_ylabel("y (px)")
+			else:
+				ax.set_xticks([])
+				ax.set_yticks([])
+			tight_layout()
+			savefig(os.path.join(outdir, "full.png"))
 
-		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
-		ax.set_title("B Field", fontsize=30)
-		ax.set_xlabel("x (px)")
-		ax.set_ylabel("y (px)")
-		ax.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
-		ax.quiver(xrange, yrange, By[::quiver_step,::quiver_step], Bx[::quiver_step,::quiver_step], color='white')
-		tight_layout()
-		savefig(os.path.join(outdir, "BField.png"))
+		if separate:
+			fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
+			if titles: ax.set_title("Intensity", fontsize=30)
+			if axes:
+				ax.set_xlabel("x (px)")
+				ax.set_ylabel("y (px)")
+			else:
+				ax.set_xticks([])
+				ax.set_yticks([])
+			ax.imshow(data, origin='lower', extent=extent)
+			tight_layout()
+			savefig(os.path.join(outdir, "intensity.png"))
+
+			fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
+			if titles: ax.set_title("Phase", fontsize=30)
+			if axes:
+				ax.set_xlabel("x (px)")
+				ax.set_ylabel("y (px)")
+			else:
+				ax.set_xticks([])
+				ax.set_yticks([])
+			ax.imshow(phase, origin='lower', extent=extent)
+			tight_layout()
+			savefig(os.path.join(outdir, "phase.png"))
+
+			fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
+			if titles: ax.set_title("B Field", fontsize=30)
+			if axes:
+				ax.set_xlabel("x (px)")
+				ax.set_ylabel("y (px)")
+			else:
+				ax.set_xticks([])
+				ax.set_yticks([])
+			ax.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
+			ax.quiver(xrange, yrange, By[::quiver_step,::quiver_step], Bx[::quiver_step,::quiver_step], color='white')
+			tight_layout()
+			savefig(os.path.join(outdir, "BField.png"))
+
+		if not separate:
+			if vertical:
+				fig, (ax1,ax2,ax3) = subplots(nrows=3, ncols=1, figsize=(6,3*6*(ymax-ymin)/(xmax-xmin)))
+			else:
+				fig, (ax1,ax2,ax3) = subplots(nrows=1, ncols=3, figsize=(3*6*(ymax-ymin)/(xmax-xmin), 6))
+			if titles: ax1.set_title("Intensity", fontsize=30)
+			if axes:
+				ax1.set_ylabel("y (px)")
+			else:
+				ax1.set_xticks([])
+				ax1.set_yticks([])
+			ax1.imshow(data, origin='lower', extent=extent)
+
+			if titles: ax2.set_title("Phase", fontsize=30)
+			if axes:
+				ax2.set_ylabel("y (px)")
+			else:
+				ax2.set_yticks([])
+				ax2.set_xticks([])
+			ax2.imshow(phase, origin='lower', extent=extent)
+
+			if titles: ax3.set_title("B Field", fontsize=30)
+			if axes:
+				ax3.set_xlabel("x (px)")
+				ax3.set_ylabel("y (px)")
+			else:
+				ax3.set_xticks([])
+				ax3.set_yticks([])
+			ax3.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
+			ax3.quiver(xrange, yrange, By[::quiver_step,::quiver_step], Bx[::quiver_step,::quiver_step], color='white')
+			tight_layout()
+			savefig(os.path.join(outdir, "combined.png"))
 
 		if savedm3:
 			copy(self.source, os.path.join(outdir, self.fname+'.dm3'))
