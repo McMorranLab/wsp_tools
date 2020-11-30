@@ -54,6 +54,7 @@ class lorentz:
 		self.data = blur(self.data, sigma, mode, cval)
 
 	def preview(self, window=((0,-1),(0,-1))):
+		((xmin, xmax), (ymin, ymax)) = window
 		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6))
 		data = self.data[ymin:ymax, xmin:xmax]
 		ax.set_title("Intensity - {:}".format(self.fname))
