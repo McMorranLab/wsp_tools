@@ -26,7 +26,6 @@ class lorentz:
 			self.pixelSize = dm3file['pixelSize'][0] * 1e-3
 		else:
 			self.pixelSize = dm3file['pixelSize'][0]
-		self.rawSITIE = SITIE(self.rawData, 1e-3, self.pixelSize)
 		self.metadata = {'pixelSize':float(self.pixelSize)}
 		self.phase = None
 		self.Bx, self.By = None, None
@@ -55,6 +54,7 @@ class lorentz:
 
 	def preview(self, window=((0,-1),(0,-1))):
 		((xmin, xmax), (ymin, ymax)) = window
+		self.crop_pixel_counts()
 		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6))
 		data = self.data[ymin:ymax, xmin:xmax]
 		ax.set_title("Intensity - {:}".format(self.fname))
