@@ -28,7 +28,8 @@ class lorentz:
 			self.pixelSize = dm3file['pixelSize'][0]
 		self.rawSITIE = SITIE(self.rawData, 1e-3, self.pixelSize)
 		self.metadata = {'pixelSize':float(self.pixelSize)}
-		self.sitie(1e-3)
+		self.phase = None
+		self.Bx, self.By = None, None
 
 	def sitie(self, defocus, wavelength=1.96e-12):
 		self.metadata.update({'defocus': defocus})
@@ -52,7 +53,19 @@ class lorentz:
 		self.metadata.update({'blur sigma': sigma})
 		self.data = blur(self.data, sigma, mode, cval)
 
+	def preview(self, window=((0,-1),(0,-1))):
+		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6))
+		data = self.data[ymin:ymax, xmin:xmax]
+		ax.set_title("Intensity - {:}".format(self.fname))
+		ax.set_xlabel("x (px)")
+		ax.set_ylabel("y (px)")
+		ax.imshow(data, origin="lower")
+		tight_layout()
+		show()
+
 	def show(self, window=((0,-1), (0, -1)), quiver_step=32):
+		if self.phase is None:
+			self.sitie(1e-3)
 		((xmin, xmax), (ymin, ymax)) = window
 		if xmax == -1:
 			xmax = self.data.shape[0]
@@ -81,6 +94,8 @@ class lorentz:
 
 	def save(self, window=((0,-1), (0, -1)), quiver_step=32, outdir=None,
 			savedm3=False, metadata={}):
+		if self.phase is None:
+			self.sitie(1e-3)
 		((xmin, xmax), (ymin, ymax)) = window
 		if xmax == -1:
 			xmax = self.data.shape[0]
