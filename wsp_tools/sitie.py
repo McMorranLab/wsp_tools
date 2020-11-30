@@ -43,7 +43,7 @@ class lorentz:
 		self.metadata.update({'crop pixel sigma': sigma})
 		self.data = crop_pixel_values(self.data, sigma=sigma)
 
-	def high_pass(self, sigma=50):
+	def high_pass(self, sigma=20):
 		self.metadata.update({'high pass sigma': sigma})
 		self.data = high_pass(self.data, sigma=sigma)
 
