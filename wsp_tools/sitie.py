@@ -64,7 +64,7 @@ class lorentz:
 		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
 		data = self.data[ymin:ymax, xmin:xmax]
 		extent = [xmin,xmax,ymin,ymax]
-		ax.set_title("Intensity - {:}".format(self.fname))
+		ax.set_title("Intensity", fontsize=30)
 		ax.set_xlabel("x (px)")
 		ax.set_ylabel("y (px)")
 		ax.imshow(data, origin="lower", extent=extent)
@@ -87,13 +87,13 @@ class lorentz:
 		Bx, By = self.Bx[ymin:ymax, xmin:xmax], self.By[ymin:ymax, xmin:xmax]
 		fig, ax = subplots(nrows=3, ncols=1, sharex=True, sharey=True, figsize=(6,3*6*(ymax-ymin)/(xmax-xmin)))
 		(ax1, ax2, ax3) = ax
-		ax1.set_title("Intensity - {:}".format(self.fname))
+		ax1.set_title("Intensity", fontsize=30)
 		ax1.set_ylabel("y (px)")
 		ax1.imshow(data, origin='lower',extent=extent)
-		ax2.set_title("Phase")
+		ax2.set_title("Phase", fontsize=30)
 		ax2.set_ylabel("y (px)")
 		ax2.imshow(phase, origin='lower', extent=extent)
-		ax3.set_title("Phase")
+		ax3.set_title("B Field", fontsize=30)
 		ax3.set_xlabel("x (px)")
 		ax3.set_ylabel("y (px)")
 		ax3.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
