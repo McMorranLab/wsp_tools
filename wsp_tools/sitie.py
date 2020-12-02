@@ -104,7 +104,7 @@ class lorentz:
 		ax3.set_xlabel("x (px)")
 		ax3.set_ylabel("y (px)")
 		ax3.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
-		ax3.quiver(xrange, yrange, By[::quiver_step,::quiver_step], Bx[::quiver_step,::quiver_step], color='white')
+		ax3.quiver(xrange, yrange, Bx[::quiver_step,::quiver_step], By[::quiver_step,::quiver_step], color='white')
 		tight_layout()
 		show()
 
@@ -188,7 +188,7 @@ class lorentz:
 				ax.set_xticks([])
 				ax.set_yticks([])
 			ax.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
-			ax.quiver(xrange, yrange, By[::quiver_step,::quiver_step], Bx[::quiver_step,::quiver_step], color='white')
+			ax.quiver(xrange, yrange, Bx[::quiver_step,::quiver_step], By[::quiver_step,::quiver_step], color='white')
 			tight_layout()
 			savefig(os.path.join(outdir, "BField.png"))
 
@@ -221,7 +221,7 @@ class lorentz:
 				ax3.set_xticks([])
 				ax3.set_yticks([])
 			ax3.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
-			ax3.quiver(xrange, yrange, By[::quiver_step,::quiver_step], Bx[::quiver_step,::quiver_step], color='white')
+			ax3.quiver(xrange, yrange, Bx[::quiver_step,::quiver_step], By[::quiver_step,::quiver_step], color='white')
 			tight_layout()
 			savefig(os.path.join(outdir, "combined.png"))
 
@@ -266,7 +266,7 @@ def low_pass(image, sigma=50):
 
 ################################## SITIE #######################################
 def B_from_phase(phase, thickness=1):
-	dpdx, dpdy = np.gradient(phase)
+	dpdy, dpdx = np.gradient(phase)
 	Bx = hbar/e/thickness * dpdy
 	By = -hbar/e/thickness * dpdx
 	return(Bx, By)
