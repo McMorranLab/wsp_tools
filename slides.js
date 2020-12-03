@@ -1,3 +1,23 @@
+var styles = `
+	#title, #author, #date {
+		text-align: center;
+	}
+	#title {
+		padding-top: 100px;
+	}
+	.slide {
+		margin: 60px;
+	}
+	.hide {
+		display: none;
+	}
+`;
+
+var styleSheet = document.createElement("style");
+styleSheet.type = "text/css";
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
+
 var currentSlide = 0;
 var slides = document.getElementsByClassName("slide");
 var currentAnimation = [];
