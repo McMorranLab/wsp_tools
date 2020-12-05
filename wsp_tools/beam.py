@@ -1,5 +1,4 @@
-import numpy as np
-from scipy.special import eval_genlaguerre, factorial
+from . import np, plt, eval_genlaguerre, factorial
 from .constants import *
 
 def E(T_eV):

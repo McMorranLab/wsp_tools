@@ -6,3 +6,5 @@ __pycache__
 venv
 testingsitie.py
 testingAB.py
+testingimports.py
+testingplots.py

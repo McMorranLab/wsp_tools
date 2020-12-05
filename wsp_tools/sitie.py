@@ -1,13 +1,6 @@
-from .beam import dB
+from . import dB, rgba, np, ndi, plt, os
 from .constants import *
-from .cielab import rgba
-import numpy as np
-import scipy.ndimage as ndi
 np.seterr(divide='ignore')
-from matplotlib.pyplot import subplots, imshow, quiver, show, tight_layout, savefig
-import os
-import errno
-from shutil import copy
 import json
 
 class lorentz:
@@ -21,15 +14,10 @@ class lorentz:
 		"""
 		self.rawData = dm3file['data']
 		self.data = dm3file['data']
-		self.fname = os.path.splitext(dm3file['filename'])[0]
-		if dm3file['pixelUnit'] == '\u00b5m':
-			self.pixelSize = dm3file['pixelSize'][0] * 1e-6
-		elif dm3file['pixelUnit'] == 'nm':
-			self.pixelSize = dm3file['pixelSize'][0] * 1e-9
-		elif dm3file['pixelUnit'] == 'mm':
-			self.pixelSize = dm3file['pixelSize'][0] * 1e-3
-		else:
-			self.pixelSize = dm3file['pixelSize'][0]
+		self.pixelSize = dm3file['pixelSize'][0]
+		self.pixelUnit = dm3file['pixelUnit'][0]
+		self.x = np.arange(0,self.data.shape[1]) * self.pixelSize
+		self.y = np.arange(0,self.data.shape[0]) * self.pixelSize
 		self.metadata = {
 							'pixelSize':float(dm3file['pixelSize'][0]),
 							'pixelUnit':dm3file['pixelUnit'][0]
@@ -48,7 +36,7 @@ class lorentz:
 
 	def crop_pixel_counts(self, sigma=10):
 		self.metadata.update({'crop pixel sigma': sigma})
-		self.data = crop_pixel_values(self.data, sigma=sigma)
+		self.data = crop_pixel_counts(self.data, sigma=sigma)
 
 	def high_pass(self, sigma=20):
 		self.metadata.update({'high pass sigma': sigma})
@@ -65,171 +53,20 @@ class lorentz:
 	def preview(self, window=((0,-1),(0,-1))):
 		((xmin, xmax), (ymin, ymax)) = window
 		if xmax == -1:
-			xmax = self.data.shape[0]
+			xmax = self.data.shape[0] - 1
 		if ymax == -1:
-			ymax = self.data.shape[1]
-		fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
+			ymax = self.data.shape[1] - 1
+		fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)), tight_layout=True)
 		data = self.data[ymin:ymax, xmin:xmax]
-		extent = [xmin,xmax,ymin,ymax]
+		data = crop_pixel_counts(data, sigma=10)
+		extent = [self.x[xmin],self.x[xmax],self.y[ymin],self.y[ymax]]
 		ax.set_title("Intensity", fontsize=30)
 		ax.set_xlabel("x (px)")
 		ax.set_ylabel("y (px)")
 		ax.imshow(data, origin="lower", extent=extent)
-		tight_layout()
-		show()
+		plt.show()
 
-	def show(self, window=((0,-1), (0, -1)), quiver_step=32):
-		if self.phase is None:
-			self.sitie(1e-3)
-		((xmin, xmax), (ymin, ymax)) = window
-		if xmax == -1:
-			xmax = self.data.shape[0]
-		if ymax == -1:
-			ymax = self.data.shape[1]
-		extent=[xmin,xmax,ymin,ymax]
-		xrange = np.arange(xmin,xmax,quiver_step)
-		yrange = np.arange(ymin,ymax,quiver_step)
-		data = self.data[ymin:ymax, xmin:xmax]
-		phase = self.phase[ymin:ymax, xmin:xmax]
-		Bx, By = self.Bx[ymin:ymax, xmin:xmax], self.By[ymin:ymax, xmin:xmax]
-		fig, ax = subplots(nrows=3, ncols=1, sharex=True, sharey=True, figsize=(6,3*6*(ymax-ymin)/(xmax-xmin)))
-		(ax1, ax2, ax3) = ax
-		ax1.set_title("Intensity", fontsize=30)
-		ax1.set_ylabel("y (px)")
-		ax1.imshow(data, origin='lower',extent=extent)
-		ax2.set_title("Phase", fontsize=30)
-		ax2.set_ylabel("y (px)")
-		ax2.imshow(phase, origin='lower', extent=extent)
-		ax3.set_title("B Field", fontsize=30)
-		ax3.set_xlabel("x (px)")
-		ax3.set_ylabel("y (px)")
-		ax3.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
-		ax3.quiver(xrange, yrange, Bx[::quiver_step,::quiver_step], By[::quiver_step,::quiver_step], color='white')
-		tight_layout()
-		show()
-
-	def save(self, window=((0,-1), (0, -1)), quiver_step=32, outdir=None, outname=None,
-			savedm3=False, metadata={}, titles=True, axes=True, separate=True, vertical=True):
-		if self.phase is None:
-			self.sitie(1e-3)
-		((xmin, xmax), (ymin, ymax)) = window
-		if xmax == -1:
-			xmax = self.data.shape[0]
-		if ymax == -1:
-			ymax = self.data.shape[1]
-		self.metadata.update({"xmin":xmin,"xmax":xmax,"ymin":ymin,"ymax":ymax})
-		extent = [xmin,xmax,ymin,ymax]
-		xrange = np.arange(xmin,xmax,quiver_step)
-		yrange = np.arange(ymin,ymax,quiver_step)
-		data = self.data[ymin:ymax, xmin:xmax]
-		phase = self.phase[ymin:ymax, xmin:xmax]
-		Bx, By = self.Bx[ymin:ymax, xmin:xmax], self.By[ymin:ymax, xmin:xmax]
-
-		if outdir is None:
-			outdir = os.getcwd()
-		if outname is None:
-			outdir = os.path.join(outdir, self.fname+"_x_{:}_{:}_y_{:}_{:}".format(xmin,xmax,ymin,ymax))
-		else:
-			outdir = os.path.join(outdir, outname)
-		if not os.path.exists(outdir):
-			try:
-				os.makedirs(outdir, 0o700)
-			except OSError as e:
-				if e.errno != errno.EEXIST:
-					raise
-
-		if (window[0][0]!=0) or (window[0][1]!=-1) or (window[1][0]!=0) or (window[1][1]!=-1):
-			fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
-			ax.imshow(self.data, origin='lower', extent=(0,self.data.shape[0],0,self.data.shape[1]))
-			ax.plot(np.zeros(100)+xmin, np.arange(ymin,ymax), 'white')
-			ax.plot(np.zeros(100)+xmax, np.arange(ymin,ymax), 'white')
-			ax.plot(np.arange(xmin,xmax), np.zeros(100)+ymin, 'white')
-			ax.plot(np.arange(xmin,xmax), np.zeros(100)+ymax, 'white')
-			if axes:
-				ax.set_xlabel("x (px)")
-				ax.set_ylabel("y (px)")
-			else:
-				ax.set_xticks([])
-				ax.set_yticks([])
-			tight_layout()
-			savefig(os.path.join(outdir, "full.png"))
-
-		if separate:
-			fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
-			if titles: ax.set_title("Intensity", fontsize=30)
-			if axes:
-				ax.set_xlabel("x (px)")
-				ax.set_ylabel("y (px)")
-			else:
-				ax.set_xticks([])
-				ax.set_yticks([])
-			ax.imshow(data, origin='lower', extent=extent)
-			tight_layout()
-			savefig(os.path.join(outdir, "intensity.png"))
-
-			fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
-			if titles: ax.set_title("Phase", fontsize=30)
-			if axes:
-				ax.set_xlabel("x (px)")
-				ax.set_ylabel("y (px)")
-			else:
-				ax.set_xticks([])
-				ax.set_yticks([])
-			ax.imshow(phase, origin='lower', extent=extent)
-			tight_layout()
-			savefig(os.path.join(outdir, "phase.png"))
-
-			fig, ax = subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)))
-			if titles: ax.set_title("B Field", fontsize=30)
-			if axes:
-				ax.set_xlabel("x (px)")
-				ax.set_ylabel("y (px)")
-			else:
-				ax.set_xticks([])
-				ax.set_yticks([])
-			ax.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
-			ax.quiver(xrange, yrange, Bx[::quiver_step,::quiver_step], By[::quiver_step,::quiver_step], color='white')
-			tight_layout()
-			savefig(os.path.join(outdir, "BField.png"))
-
-		if not separate:
-			if vertical:
-				fig, (ax1,ax2,ax3) = subplots(nrows=3, ncols=1, figsize=(6,3*6*(ymax-ymin)/(xmax-xmin)))
-			else:
-				fig, (ax1,ax2,ax3) = subplots(nrows=1, ncols=3, figsize=(3*6*(ymax-ymin)/(xmax-xmin), 6))
-			if titles: ax1.set_title("Intensity", fontsize=30)
-			if axes:
-				ax1.set_ylabel("y (px)")
-			else:
-				ax1.set_xticks([])
-				ax1.set_yticks([])
-			ax1.imshow(data, origin='lower', extent=extent)
-
-			if titles: ax2.set_title("Phase", fontsize=30)
-			if axes:
-				ax2.set_ylabel("y (px)")
-			else:
-				ax2.set_yticks([])
-				ax2.set_xticks([])
-			ax2.imshow(phase, origin='lower', extent=extent)
-
-			if titles: ax3.set_title("B Field", fontsize=30)
-			if axes:
-				ax3.set_xlabel("x (px)")
-				ax3.set_ylabel("y (px)")
-			else:
-				ax3.set_xticks([])
-				ax3.set_yticks([])
-			ax3.imshow(rgba(Bx+1j*By), origin='lower', extent=extent)
-			ax3.quiver(xrange, yrange, Bx[::quiver_step,::quiver_step], By[::quiver_step,::quiver_step], color='white')
-			tight_layout()
-			savefig(os.path.join(outdir, "combined.png"))
-
-		if savedm3:
-			copy(self.source, os.path.join(outdir, self.fname+'.dm3'))
-
-		self.metadata.update(metadata)
-
+	def saveMeta(self, outdir=''):
 		with open(os.path.join(outdir, 'metadata.json'), 'w') as fp:
 			json.dump(self.metadata, fp, indent="")
 
@@ -237,7 +74,7 @@ class lorentz:
 def blur(image, sigma=5, mode='wrap', cval=0.0):
 	return(ndi.gaussian_filter(image, sigma, mode=mode, cval=cval))
 
-def crop_pixel_values(image, sigma=10):
+def crop_pixel_counts(image, sigma=10):
 	avg = np.mean(image)
 	std = np.std(image)
 	vmin = avg - sigma*std

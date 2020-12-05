@@ -1,6 +1,5 @@
+from . import np, plt
 import numpy as np
-from scipy.special import eval_genlaguerre, factorial
-from matplotlib.pyplot import cm
 
 def cielab_image(data, alpha):
     rgb_image_components = np.zeros(np.append(data.shape, 4),dtype=np.uint8)
@@ -30,8 +29,3 @@ def rgba(mode, cmap = 'uniform', alpha = 'intensity'):
     out = colormap.to_rgba(np.angle(mode))
     out[:,:,-1] = np.abs(mode)**2/np.max(np.abs(mode)**2)
     return(out)
-
-# %%
-a = np.array([True, True, 0.5])
-a, b = np.meshgrid(a, a)
-rgba(a.astype(float), alpha='intensity')
