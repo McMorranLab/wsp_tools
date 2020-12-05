@@ -74,9 +74,9 @@ class singleFig():
 		self.ax.plot(np.zeros(100)+window[1], np.linspace(window[2],window[3],100), color=color)
 
 def subplots(
-		nrows=1,ncols=1,sharex=False,sharey=False,squeeze=False,
+		rc=11,sharex=False,sharey=False,squeeze=False,
 		subplot_kw=None,gridspec_kw=None,**fig_kw):
-		fig, ax = plt.subplots(nrows=nrows,ncols=ncols,
+		fig, ax = plt.subplots(nrows=rc//10,ncols=rc%10,
 							sharex=sharex,sharey=sharey,squeeze=squeeze,
 							subplot_kw=subplot_kw,gridspec_kw=gridspec_kw,
 							tight_layout=True,**fig_kw)
