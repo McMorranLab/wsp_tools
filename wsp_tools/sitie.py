@@ -4,14 +4,15 @@ np.seterr(divide='ignore')
 import json
 
 class lorentz:
+	"""Class that contains sitie information about a lorentz image.
+
+dictionary-like dm3file with required keys:
+	- data
+	- filename
+	- pixelUnit
+	- pixelSize
+	"""
 	def __init__(self, dm3file):
-		"""
-		dictionary-like dm3file with required keys:
-			- data
-			- filename
-			- pixelUnit
-			- pixelSize
-		"""
 		self.rawData = dm3file['data']
 		self.data = dm3file['data']
 		self.pixelSize = dm3file['pixelSize'][0]
