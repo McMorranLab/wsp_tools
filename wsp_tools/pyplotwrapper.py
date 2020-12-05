@@ -65,7 +65,7 @@ class singleFig():
 	def rgba(self, data, step=1, alpha='intensity', **kwargs):
 		x, y, data = self.prePlot(data)
 		data = rgba(data,alpha=alpha)
-		self.ax.imshow(data, extent=self.extent)
+		self.ax.imshow(data, extent=self.extent, origin='lower')
 
 	def inset(self, window=None, color='white'):
 		self.ax.plot(np.linspace(window[0],window[1],100), np.zeros(100)+window[2], color=color)
