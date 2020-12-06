@@ -1,4 +1,4 @@
-from .constants import *
+from . import constants as _
 from . import np
 
 def abphase2d(mx, my, mz, Lx=1e-6, Ly=1e-6, p=np.array([0,0,1]), t=60e-9):

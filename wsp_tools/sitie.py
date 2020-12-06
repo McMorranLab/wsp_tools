@@ -1,5 +1,5 @@
 from . import dB, rgba, np, ndi, plt, os
-from .constants import *
+from . import constants as _
 np.seterr(divide='ignore')
 import json
 
@@ -105,8 +105,8 @@ def low_pass(image, sigma=50):
 ################################## SITIE #######################################
 def B_from_phase(phase, thickness=1):
 	dpdy, dpdx = np.gradient(phase)
-	Bx = hbar/e/thickness * dpdy
-	By = -hbar/e/thickness * dpdx
+	Bx = _.hbar/_.e/thickness * dpdy
+	By = -_.hbar/_.e/thickness * dpdx
 	return(Bx, By)
 
 def SITIE(image, defocus, pixel_size, wavelength=1.97e-12):
@@ -115,7 +115,7 @@ def SITIE(image, defocus, pixel_size, wavelength=1.97e-12):
 	return(np.real(phase))
 
 def sitie_RHS(I, defocus, wavelength=dB(3e5)):
-	return(2*pi/defocus * (1 - I/np.mean(I)))
+	return(2*_.pi/defocus * (1 - I/np.mean(I)))
 
 def inverse_laplacian(f, pixel_size):
 
