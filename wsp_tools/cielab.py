@@ -1,4 +1,4 @@
-"""Module to generate rgba data from numpy.2darrays. 
+"""Module to generate rgba data from numpy.2darrays.
 """
 from . import np, plt
 import numpy as np
@@ -58,3 +58,8 @@ def rgba(mode, cmap = 'uniform', alpha = 'intensity'):
 	out = colormap.to_rgba(np.angle(mode))
 	out[:,:,-1] = np.abs(mode)**2/np.max(np.abs(mode)**2)
 	return(out)
+
+def whatIsC():
+	"""Used for testing the constants functionality of the module.
+	"""
+	return(_.c)

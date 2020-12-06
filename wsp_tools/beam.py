@@ -45,7 +45,7 @@ def bessel(x, y, z = 0, l = 0, kz0 = k(3e5),
 		phi_n = 2*np.pi*n/N
 		kxn, kyn, kzn = kperp*np.cos(phi_n) + dkperp, kperp*np.sin(phi_n), kz0
 		w_n = np.sqrt(w_0**2 + dkperp**2 * _.c**2 + 2*kxn*dkperp*_.c**2)
-		mode += np.exp(1j*(-w_n*t + kxn*x + kyn*y + kzn*z + l*phi_n))
+		mode += np.exp(1j*(kxn*x + kyn*y + kzn*z + l*phi_n))
 	mode *= 1/np.sqrt(N)
 	return(mode)
 
