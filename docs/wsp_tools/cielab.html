@@ -27,7 +27,7 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;Module to generate rgba data from numpy.2darrays. 
+<pre><code class="python">&#34;&#34;&#34;Module to generate rgba data from numpy.2darrays.
 &#34;&#34;&#34;
 from . import np, plt
 import numpy as np
@@ -86,7 +86,12 @@ def rgba(mode, cmap = &#39;uniform&#39;, alpha = &#39;intensity&#39;):
         colormap = plt.cm.ScalarMappable(cmap=cmap)
         out = colormap.to_rgba(np.angle(mode))
         out[:,:,-1] = np.abs(mode)**2/np.max(np.abs(mode)**2)
-        return(out)</code></pre>
+        return(out)
+
+def whatIsC():
+        &#34;&#34;&#34;Used for testing the constants functionality of the module.
+        &#34;&#34;&#34;
+        return(_.c)</code></pre>
 </details>
 </section>
 <section>
@@ -183,6 +188,21 @@ will be constant. If complex, the color will reflect the complex angle.</p>
         return(out)</code></pre>
 </details>
 </dd>
+<dt id="wsp_tools.cielab.whatIsC"><code class="name flex">
+<span>def <span class="ident">whatIsC</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used for testing the constants functionality of the module.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def whatIsC():
+        &#34;&#34;&#34;Used for testing the constants functionality of the module.
+        &#34;&#34;&#34;
+        return(_.c)</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -203,6 +223,7 @@ will be constant. If complex, the color will reflect the complex angle.</p>
 <ul class="">
 <li><code><a title="wsp_tools.cielab.cielab_image" href="#wsp_tools.cielab.cielab_image">cielab_image</a></code></li>
 <li><code><a title="wsp_tools.cielab.rgba" href="#wsp_tools.cielab.rgba">rgba</a></code></li>
+<li><code><a title="wsp_tools.cielab.whatIsC" href="#wsp_tools.cielab.whatIsC">whatIsC</a></code></li>
 </ul>
 </li>
 </ul>
