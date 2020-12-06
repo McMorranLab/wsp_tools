@@ -1,14 +1,16 @@
 """Wrapper for the scipy.constants module that allows unit scaling.
 
-To see all available constants, print(wsp_tools.constants.__all__).
+To see all available constants, `print(wsp_tools.constants.__all__)`.
 
 To set units:
 
+```python
 import wsp_tools as wt
 wt.setUnits(meter = 1e-3) # set km as base unit for length
 from wsp_tools.constants import *
 
 print(c) # outputs 299792.458
+```
 
 Note that all other modules should update automatically as well.
 """

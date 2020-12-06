@@ -23,12 +23,14 @@
 </header>
 <section id="section-intro">
 <p>Wrapper for the scipy.constants module that allows unit scaling.</p>
-<p>To see all available constants, print(wsp_tools.constants.<strong>all</strong>).</p>
+<p>To see all available constants, <code>print(wsp_tools.constants.__all__)</code>.</p>
 <p>To set units:</p>
-<p>import wsp_tools as wt
+<pre><code class="language-python">import wsp_tools as wt
 wt.setUnits(meter = 1e-3) # set km as base unit for length
-from wsp_tools.constants import *</p>
-<p>print(c) # outputs 299792.458</p>
+from wsp_tools.constants import *
+
+print(c) # outputs 299792.458
+</code></pre>
 <p>Note that all other modules should update automatically as well.</p>
 <details class="source">
 <summary>
@@ -36,15 +38,17 @@ from wsp_tools.constants import *</p>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Wrapper for the scipy.constants module that allows unit scaling.
 
-To see all available constants, print(wsp_tools.constants.__all__).
+To see all available constants, `print(wsp_tools.constants.__all__)`.
 
 To set units:
 
+```python
 import wsp_tools as wt
 wt.setUnits(meter = 1e-3) # set km as base unit for length
 from wsp_tools.constants import *
 
 print(c) # outputs 299792.458
+```
 
 Note that all other modules should update automatically as well.
 &#34;&#34;&#34;

@@ -31,10 +31,11 @@ class lorentz:
 
 	Input:
 
-	* dm3file: a dictionary-like object with the following keys:
-		* data: numpy.2darray() containing the electron counts
-		* pixelSize: [scalar, scalar] containing the x and y pixel sizes
-		* pixelUnit: [string, string] containing the unit of the pixel sizes
+	dm3file: a dictionary-like object with the following keys:
+
+	* data: numpy.2darray() containing the electron counts
+	* pixelSize: [scalar, scalar] containing the x and y pixel sizes
+	* pixelUnit: [string, string] containing the unit of the pixel sizes
 	"""
 	def __init__(self, dm3file):
 		self.rawData = dm3file['data']

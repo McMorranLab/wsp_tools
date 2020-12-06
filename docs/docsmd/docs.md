@@ -259,14 +259,18 @@ Used for testing the constants functionality of the module.
 
 Wrapper for the scipy.constants module that allows unit scaling.
 
-To see all available constants, print(wsp\_tools.constants.\_\_all\_\_).
+To see all available constants,
+<code>print(wsp\_tools.constants.\_\_all\_\_)</code>.
 
 To set units:
 
-import wsp\_tools as wt wt.setUnits(meter = 1e-3) \# set km as base unit
-for length from wsp\_tools.constants import \*
+``` python
+import wsp_tools as wt
+wt.setUnits(meter = 1e-3) # set km as base unit for length
+from wsp_tools.constants import *
 
-print(c) \# outputs 299792.458
+print(c) # outputs 299792.458
+```
 
 Note that all other modules should update automatically as well.
 
@@ -803,10 +807,11 @@ Class that contains sitie information about a lorentz image.
 
 Input:
 
-  - dm3file: a dictionary-like object with the following keys: \* data:
-    numpy.2darray() containing the electron counts \* pixelSize:
-    \[scalar, scalar\] containing the x and y pixel sizes \* pixelUnit:
-    \[string, string\] containing the unit of the pixel sizes
+dm3file: a dictionary-like object with the following keys:
+
+  - data: numpy.2darray() containing the electron counts
+  - pixelSize: \[scalar, scalar\] containing the x and y pixel sizes
+  - pixelUnit: \[string, string\] containing the unit of the pixel sizes
 
 #### Methods
 

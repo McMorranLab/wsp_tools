@@ -77,10 +77,11 @@ class lorentz:
 
         Input:
 
-        * dm3file: a dictionary-like object with the following keys:
-                * data: numpy.2darray() containing the electron counts
-                * pixelSize: [scalar, scalar] containing the x and y pixel sizes
-                * pixelUnit: [string, string] containing the unit of the pixel sizes
+        dm3file: a dictionary-like object with the following keys:
+
+        * data: numpy.2darray() containing the electron counts
+        * pixelSize: [scalar, scalar] containing the x and y pixel sizes
+        * pixelUnit: [string, string] containing the unit of the pixel sizes
         &#34;&#34;&#34;
         def __init__(self, dm3file):
                 self.rawData = dm3file[&#39;data&#39;]
@@ -390,11 +391,11 @@ def inverse_laplacian(f, pixel_size):
 <dd>
 <div class="desc"><p>Class that contains sitie information about a lorentz image.</p>
 <p>Input:</p>
+<p>dm3file: a dictionary-like object with the following keys:</p>
 <ul>
-<li>dm3file: a dictionary-like object with the following keys:
-* data: numpy.2darray() containing the electron counts
-* pixelSize: [scalar, scalar] containing the x and y pixel sizes
-* pixelUnit: [string, string] containing the unit of the pixel sizes</li>
+<li>data: numpy.2darray() containing the electron counts</li>
+<li>pixelSize: [scalar, scalar] containing the x and y pixel sizes</li>
+<li>pixelUnit: [string, string] containing the unit of the pixel sizes</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -405,10 +406,11 @@ def inverse_laplacian(f, pixel_size):
 
         Input:
 
-        * dm3file: a dictionary-like object with the following keys:
-                * data: numpy.2darray() containing the electron counts
-                * pixelSize: [scalar, scalar] containing the x and y pixel sizes
-                * pixelUnit: [string, string] containing the unit of the pixel sizes
+        dm3file: a dictionary-like object with the following keys:
+
+        * data: numpy.2darray() containing the electron counts
+        * pixelSize: [scalar, scalar] containing the x and y pixel sizes
+        * pixelUnit: [string, string] containing the unit of the pixel sizes
         &#34;&#34;&#34;
         def __init__(self, dm3file):
                 self.rawData = dm3file[&#39;data&#39;]
