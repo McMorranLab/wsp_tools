@@ -11,3 +11,5 @@ testingplots.py
 testingdocs.py
 testingconstants.py
 tests
+*.sh
+*.zsh

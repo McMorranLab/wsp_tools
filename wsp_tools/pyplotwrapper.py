@@ -24,8 +24,8 @@ class singleAx():
 	plt.show()
 	```
 
-	More commonly, this class is returned by
-	```wsp_tools.pyplotwrapper.subplots```.
+	More commonly, this class is returned by ```wsp_tools.pyplotwrapper.subplots```.
+
 	"""
 	def __init__(self, ax, title='', xlabel='', ylabel=''):
 		self.ax = ax
