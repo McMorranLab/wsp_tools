@@ -1,3 +1,5 @@
+"""Module to generate rgba data from numpy.2darrays. 
+"""
 from . import np, plt
 import numpy as np
 from . import constants as _

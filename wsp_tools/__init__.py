@@ -8,8 +8,8 @@ Features:
 * spatial mode implementations
 * a matplotlib.pyplot wrapper
 * an implementation of the cielab colorspace
-* a constants module that wraps scipy.constants and allows unit conversions
-(i.e., using nanometers instead of meters)
+* a scipy.constants wrapper that allows unit scaling (i.e., using nanometers
+instead of meters)
 """
 import numpy as np
 import matplotlib.pyplot as plt

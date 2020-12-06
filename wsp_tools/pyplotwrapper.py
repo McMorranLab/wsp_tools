@@ -1,3 +1,5 @@
+"""A wrapper for matplotlib.pyplot containing common plotting routines.
+"""
 from . import plt, np, rgba
 
 class singleAx():

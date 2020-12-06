@@ -1,3 +1,6 @@
+"""Module to generate spatial modes and beam parameters.
+"""
+
 from . import np, plt, eval_genlaguerre, factorial
 from . import constants as _
 

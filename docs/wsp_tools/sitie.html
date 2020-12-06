@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
 <title>wsp_tools.sitie API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Contains utilities for reconstructing phase and magnetization from Lorentz images …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,23 +22,65 @@
 <h1 class="title">Module <code>wsp_tools.sitie</code></h1>
 </header>
 <section id="section-intro">
+<p>Contains utilities for reconstructing phase and magnetization from Lorentz images.</p>
+<p>The most common use case is to generate a lorentz object from a <code>.dm3</code> file.
+Then one can analyze using high_pass(), sitie(), crop_pixel_counts(), etc.</p>
+<p>Example:</p>
+<pre><code class="language-python">import ncempy.io.dm as dm
+
+fdir = '/path/to/data'
+fname = 'lorentzImage.dm3'
+file = dm.dmReader(os.path.join(fdir, fname))
+
+img = wsp_tools.lorentz(dm3file)
+img.crop_pixel_counts()
+img.high_pass()
+img.blur()
+img.sitie()
+
+### plot img.Bx, img.By, img.phase, img.data, img.rawData, etc
+</code></pre>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from . import dB, rgba, np, ndi, plt, os
-from .constants import *
+<pre><code class="python">&#34;&#34;&#34;Contains utilities for reconstructing phase and magnetization from Lorentz images.
+
+The most common use case is to generate a lorentz object from a ```.dm3``` file.
+Then one can analyze using high_pass(), sitie(), crop_pixel_counts(), etc.
+
+Example:
+
+```python
+import ncempy.io.dm as dm
+
+fdir = &#39;/path/to/data&#39;
+fname = &#39;lorentzImage.dm3&#39;
+file = dm.dmReader(os.path.join(fdir, fname))
+
+img = wsp_tools.lorentz(dm3file)
+img.crop_pixel_counts()
+img.high_pass()
+img.blur()
+img.sitie()
+
+### plot img.Bx, img.By, img.phase, img.data, img.rawData, etc
+```
+&#34;&#34;&#34;
+from . import dB, rgba, np, ndi, plt, os
+from . import constants as _
 np.seterr(divide=&#39;ignore&#39;)
 import json
 
 class lorentz:
         &#34;&#34;&#34;Class that contains sitie information about a lorentz image.
 
-dictionary-like dm3file with required keys:
-        - data
-        - filename
-        - pixelUnit
-        - pixelSize
+        Input:
+
+        * dm3file: a dictionary-like object with the following keys:
+                * data: numpy.2darray() containing the electron counts
+                * pixelSize: [scalar, scalar] containing the x and y pixel sizes
+                * pixelUnit: [string, string] containing the unit of the pixel sizes
         &#34;&#34;&#34;
         def __init__(self, dm3file):
                 self.rawData = dm3file[&#39;data&#39;]
@@ -55,32 +97,52 @@ dictionary-like dm3file with required keys:
                 self.Bx, self.By = None, None
 
         def reset(self):
+                &#34;&#34;&#34;Resets data to the rawData.
+                &#34;&#34;&#34;
                 self.data = self.rawData
 
         def sitie(self, defocus, wavelength=1.96e-12):
+                &#34;&#34;&#34;Carries out phase and B-field reconstruction.
+
+                Assigns phase, Bx, and By attributes.
+                &#34;&#34;&#34;
                 self.metadata.update({&#39;defocus&#39;: defocus})
                 dummy = sitie_RHS(self.data, defocus, wavelength)
                 self.phase = np.real(inverse_laplacian(dummy, self.pixelSize))
                 self.Bx, self.By = B_from_phase(self.phase, thickness=1)
 
         def crop_pixel_counts(self, sigma=10):
+                &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some std from avg.
+
+                Sets those pixels to avg +/- sigma*std.
+                &#34;&#34;&#34;
                 self.metadata.update({&#39;crop pixel sigma&#39;: sigma})
                 self.data = crop_pixel_counts(self.data, sigma=sigma)
 
         def high_pass(self, sigma=20):
+                &#34;&#34;&#34;Applies a high-pass filter to the image data.
+                &#34;&#34;&#34;
                 self.metadata.update({&#39;high pass sigma&#39;: sigma})
                 self.data = high_pass(self.data, sigma=sigma)
 
         def low_pass(self, sigma=50):
+                &#34;&#34;&#34;Applies a low-pass filter to the image data.
+                &#34;&#34;&#34;
                 self.metadata.update({&#39;low pass sigma&#39;: sigma})
                 self.data = low_pass(self.data, sigma=sigma)
 
         def blur(self, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
+                &#34;&#34;&#34;Applies a Gaussian blur to the image data.
+                &#34;&#34;&#34;
                 self.metadata.update({&#39;blur sigma&#39;: sigma})
                 self.data = blur(self.data, sigma, mode, cval)
 
-        def preview(self, window=((0,-1),(0,-1))):
-                ((xmin, xmax), (ymin, ymax)) = window
+        def preview(self, window=(0,-1,0,-1)):
+                &#34;&#34;&#34;Preview the image.
+
+                window = (xmin, xmax, ymin, ymax)
+                &#34;&#34;&#34;
+                (xmin, xmax, ymin, ymax) = window
                 if xmax == -1:
                         xmax = self.data.shape[0] - 1
                 if ymax == -1:
@@ -95,15 +157,20 @@ dictionary-like dm3file with required keys:
                 ax.imshow(data, origin=&#34;lower&#34;, extent=extent)
                 plt.show()
 
-        def saveMeta(self, outdir=&#39;&#39;):
-                with open(os.path.join(outdir, &#39;metadata.json&#39;), &#39;w&#39;) as fp:
+        def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
+                &#34;&#34;&#34;Save the metadata of the lorentz object to a file.&#34;&#34;&#34;
+                with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
                         json.dump(self.metadata, fp, indent=&#34;&#34;)
 
 ############################## Pre-processing ####################
 def blur(image, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
+        &#34;&#34;&#34;Applies a Gaussian filter to the image.
+        &#34;&#34;&#34;
         return(ndi.gaussian_filter(image, sigma, mode=mode, cval=cval))
 
 def crop_pixel_counts(image, sigma=10):
+        &#34;&#34;&#34;Crops the pixel counts to avg +/- sigma*std.
+        &#34;&#34;&#34;
         avg = np.mean(image)
         std = np.std(image)
         vmin = avg - sigma*std
@@ -113,6 +180,7 @@ def crop_pixel_counts(image, sigma=10):
         return(image)
 
 def high_pass(image, sigma=50):
+        &#34;&#34;&#34;Applies a high-pass filter to the image data.&#34;&#34;&#34;
         X = np.linspace(-image.shape[0]/2, image.shape[0]/2, image.shape[0])
         Y = np.linspace(-image.shape[1]/2, image.shape[1]/2, image.shape[1])
         x, y = np.meshgrid(X, Y)
@@ -122,6 +190,7 @@ def high_pass(image, sigma=50):
         return(np.real(out))
 
 def low_pass(image, sigma=50):
+        &#34;&#34;&#34;Applies a low-pass filter to the image data.&#34;&#34;&#34;
         X = np.linspace(-image.shape[0]/2, image.shape[0]/2, image.shape[0])
         Y = np.linspace(-image.shape[1]/2, image.shape[1]/2, image.shape[1])
         x, y = np.meshgrid(X, Y)
@@ -132,21 +201,22 @@ def low_pass(image, sigma=50):
 
 ################################## SITIE #######################################
 def B_from_phase(phase, thickness=1):
+        &#34;&#34;&#34;Calculates the transverse B-field that would impart a specific phase.&#34;&#34;&#34;
         dpdy, dpdx = np.gradient(phase)
-        Bx = hbar/e/thickness * dpdy
-        By = -hbar/e/thickness * dpdx
+        Bx = _.hbar/_.e/thickness * dpdy
+        By = -_.hbar/_.e/thickness * dpdx
         return(Bx, By)
 
 def SITIE(image, defocus, pixel_size, wavelength=1.97e-12):
+        &#34;&#34;&#34;Reconstruct the phase from a defocussed image.&#34;&#34;&#34;
         f = sitie_RHS(image, defocus, wavelength)
         phase = inverse_laplacian(f, pixel_size)
         return(np.real(phase))
 
 def sitie_RHS(I, defocus, wavelength=dB(3e5)):
-        return(2*pi/defocus * (1 - I/np.mean(I)))
+        return(2*_.pi/defocus * (1 - I/np.mean(I)))
 
 def inverse_laplacian(f, pixel_size):
-
         QX = np.fft.fftfreq(f.shape[0], pixel_size)
         QY = np.fft.fftfreq(f.shape[1], pixel_size)
         qx,qy = np.meshgrid(QX,QY)
@@ -169,15 +239,16 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">B_from_phase</span></span>(<span>phase, thickness=1)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Calculates the transverse B-field that would impart a specific phase.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def B_from_phase(phase, thickness=1):
+        &#34;&#34;&#34;Calculates the transverse B-field that would impart a specific phase.&#34;&#34;&#34;
         dpdy, dpdx = np.gradient(phase)
-        Bx = hbar/e/thickness * dpdy
-        By = -hbar/e/thickness * dpdx
+        Bx = _.hbar/_.e/thickness * dpdy
+        By = -_.hbar/_.e/thickness * dpdx
         return(Bx, By)</code></pre>
 </details>
 </dd>
@@ -185,12 +256,13 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">SITIE</span></span>(<span>image, defocus, pixel_size, wavelength=1.97e-12)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Reconstruct the phase from a defocussed image.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def SITIE(image, defocus, pixel_size, wavelength=1.97e-12):
+        &#34;&#34;&#34;Reconstruct the phase from a defocussed image.&#34;&#34;&#34;
         f = sitie_RHS(image, defocus, wavelength)
         phase = inverse_laplacian(f, pixel_size)
         return(np.real(phase))</code></pre>
@@ -200,12 +272,14 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">blur</span></span>(<span>image, sigma=5, mode='wrap', cval=0.0)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Applies a Gaussian filter to the image.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def blur(image, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
+        &#34;&#34;&#34;Applies a Gaussian filter to the image.
+        &#34;&#34;&#34;
         return(ndi.gaussian_filter(image, sigma, mode=mode, cval=cval))</code></pre>
 </details>
 </dd>
@@ -213,12 +287,14 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">crop_pixel_counts</span></span>(<span>image, sigma=10)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Crops the pixel counts to avg +/- sigma*std.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def crop_pixel_counts(image, sigma=10):
+        &#34;&#34;&#34;Crops the pixel counts to avg +/- sigma*std.
+        &#34;&#34;&#34;
         avg = np.mean(image)
         std = np.std(image)
         vmin = avg - sigma*std
@@ -232,12 +308,13 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">high_pass</span></span>(<span>image, sigma=50)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Applies a high-pass filter to the image data.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def high_pass(image, sigma=50):
+        &#34;&#34;&#34;Applies a high-pass filter to the image data.&#34;&#34;&#34;
         X = np.linspace(-image.shape[0]/2, image.shape[0]/2, image.shape[0])
         Y = np.linspace(-image.shape[1]/2, image.shape[1]/2, image.shape[1])
         x, y = np.meshgrid(X, Y)
@@ -257,7 +334,6 @@ def inverse_laplacian(f, pixel_size):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def inverse_laplacian(f, pixel_size):
-
         QX = np.fft.fftfreq(f.shape[0], pixel_size)
         QY = np.fft.fftfreq(f.shape[1], pixel_size)
         qx,qy = np.meshgrid(QX,QY)
@@ -273,12 +349,13 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">low_pass</span></span>(<span>image, sigma=50)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Applies a low-pass filter to the image data.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def low_pass(image, sigma=50):
+        &#34;&#34;&#34;Applies a low-pass filter to the image data.&#34;&#34;&#34;
         X = np.linspace(-image.shape[0]/2, image.shape[0]/2, image.shape[0])
         Y = np.linspace(-image.shape[1]/2, image.shape[1]/2, image.shape[1])
         x, y = np.meshgrid(X, Y)
@@ -298,7 +375,7 @@ def inverse_laplacian(f, pixel_size):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def sitie_RHS(I, defocus, wavelength=dB(3e5)):
-        return(2*pi/defocus * (1 - I/np.mean(I)))</code></pre>
+        return(2*_.pi/defocus * (1 - I/np.mean(I)))</code></pre>
 </details>
 </dd>
 </dl>
@@ -312,11 +389,13 @@ def inverse_laplacian(f, pixel_size):
 </code></dt>
 <dd>
 <div class="desc"><p>Class that contains sitie information about a lorentz image.</p>
-<p>dictionary-like dm3file with required keys:
-- data
-- filename
-- pixelUnit
-- pixelSize</p></div>
+<p>Input:</p>
+<ul>
+<li>dm3file: a dictionary-like object with the following keys:
+* data: numpy.2darray() containing the electron counts
+* pixelSize: [scalar, scalar] containing the x and y pixel sizes
+* pixelUnit: [string, string] containing the unit of the pixel sizes</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -324,11 +403,12 @@ def inverse_laplacian(f, pixel_size):
 <pre><code class="python">class lorentz:
         &#34;&#34;&#34;Class that contains sitie information about a lorentz image.
 
-dictionary-like dm3file with required keys:
-        - data
-        - filename
-        - pixelUnit
-        - pixelSize
+        Input:
+
+        * dm3file: a dictionary-like object with the following keys:
+                * data: numpy.2darray() containing the electron counts
+                * pixelSize: [scalar, scalar] containing the x and y pixel sizes
+                * pixelUnit: [string, string] containing the unit of the pixel sizes
         &#34;&#34;&#34;
         def __init__(self, dm3file):
                 self.rawData = dm3file[&#39;data&#39;]
@@ -345,32 +425,52 @@ dictionary-like dm3file with required keys:
                 self.Bx, self.By = None, None
 
         def reset(self):
+                &#34;&#34;&#34;Resets data to the rawData.
+                &#34;&#34;&#34;
                 self.data = self.rawData
 
         def sitie(self, defocus, wavelength=1.96e-12):
+                &#34;&#34;&#34;Carries out phase and B-field reconstruction.
+
+                Assigns phase, Bx, and By attributes.
+                &#34;&#34;&#34;
                 self.metadata.update({&#39;defocus&#39;: defocus})
                 dummy = sitie_RHS(self.data, defocus, wavelength)
                 self.phase = np.real(inverse_laplacian(dummy, self.pixelSize))
                 self.Bx, self.By = B_from_phase(self.phase, thickness=1)
 
         def crop_pixel_counts(self, sigma=10):
+                &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some std from avg.
+
+                Sets those pixels to avg +/- sigma*std.
+                &#34;&#34;&#34;
                 self.metadata.update({&#39;crop pixel sigma&#39;: sigma})
                 self.data = crop_pixel_counts(self.data, sigma=sigma)
 
         def high_pass(self, sigma=20):
+                &#34;&#34;&#34;Applies a high-pass filter to the image data.
+                &#34;&#34;&#34;
                 self.metadata.update({&#39;high pass sigma&#39;: sigma})
                 self.data = high_pass(self.data, sigma=sigma)
 
         def low_pass(self, sigma=50):
+                &#34;&#34;&#34;Applies a low-pass filter to the image data.
+                &#34;&#34;&#34;
                 self.metadata.update({&#39;low pass sigma&#39;: sigma})
                 self.data = low_pass(self.data, sigma=sigma)
 
         def blur(self, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
+                &#34;&#34;&#34;Applies a Gaussian blur to the image data.
+                &#34;&#34;&#34;
                 self.metadata.update({&#39;blur sigma&#39;: sigma})
                 self.data = blur(self.data, sigma, mode, cval)
 
-        def preview(self, window=((0,-1),(0,-1))):
-                ((xmin, xmax), (ymin, ymax)) = window
+        def preview(self, window=(0,-1,0,-1)):
+                &#34;&#34;&#34;Preview the image.
+
+                window = (xmin, xmax, ymin, ymax)
+                &#34;&#34;&#34;
+                (xmin, xmax, ymin, ymax) = window
                 if xmax == -1:
                         xmax = self.data.shape[0] - 1
                 if ymax == -1:
@@ -385,8 +485,9 @@ dictionary-like dm3file with required keys:
                 ax.imshow(data, origin=&#34;lower&#34;, extent=extent)
                 plt.show()
 
-        def saveMeta(self, outdir=&#39;&#39;):
-                with open(os.path.join(outdir, &#39;metadata.json&#39;), &#39;w&#39;) as fp:
+        def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
+                &#34;&#34;&#34;Save the metadata of the lorentz object to a file.&#34;&#34;&#34;
+                with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
                         json.dump(self.metadata, fp, indent=&#34;&#34;)</code></pre>
 </details>
 <h3>Methods</h3>
@@ -395,12 +496,14 @@ dictionary-like dm3file with required keys:
 <span>def <span class="ident">blur</span></span>(<span>self, sigma=5, mode='wrap', cval=0.0)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Applies a Gaussian blur to the image data.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def blur(self, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
+        &#34;&#34;&#34;Applies a Gaussian blur to the image data.
+        &#34;&#34;&#34;
         self.metadata.update({&#39;blur sigma&#39;: sigma})
         self.data = blur(self.data, sigma, mode, cval)</code></pre>
 </details>
@@ -409,12 +512,17 @@ dictionary-like dm3file with required keys:
 <span>def <span class="ident">crop_pixel_counts</span></span>(<span>self, sigma=10)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Crops any pixel counts that are higher or lower than some std from avg.</p>
+<p>Sets those pixels to avg +/- sigma*std.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def crop_pixel_counts(self, sigma=10):
+        &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some std from avg.
+
+        Sets those pixels to avg +/- sigma*std.
+        &#34;&#34;&#34;
         self.metadata.update({&#39;crop pixel sigma&#39;: sigma})
         self.data = crop_pixel_counts(self.data, sigma=sigma)</code></pre>
 </details>
@@ -423,12 +531,14 @@ dictionary-like dm3file with required keys:
 <span>def <span class="ident">high_pass</span></span>(<span>self, sigma=20)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Applies a high-pass filter to the image data.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def high_pass(self, sigma=20):
+        &#34;&#34;&#34;Applies a high-pass filter to the image data.
+        &#34;&#34;&#34;
         self.metadata.update({&#39;high pass sigma&#39;: sigma})
         self.data = high_pass(self.data, sigma=sigma)</code></pre>
 </details>
@@ -437,27 +547,34 @@ dictionary-like dm3file with required keys:
 <span>def <span class="ident">low_pass</span></span>(<span>self, sigma=50)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Applies a low-pass filter to the image data.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def low_pass(self, sigma=50):
+        &#34;&#34;&#34;Applies a low-pass filter to the image data.
+        &#34;&#34;&#34;
         self.metadata.update({&#39;low pass sigma&#39;: sigma})
         self.data = low_pass(self.data, sigma=sigma)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.lorentz.preview"><code class="name flex">
-<span>def <span class="ident">preview</span></span>(<span>self, window=((0, -1), (0, -1)))</span>
+<span>def <span class="ident">preview</span></span>(<span>self, window=(0, -1, 0, -1))</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Preview the image.</p>
+<p>window = (xmin, xmax, ymin, ymax)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def preview(self, window=((0,-1),(0,-1))):
-        ((xmin, xmax), (ymin, ymax)) = window
+<pre><code class="python">def preview(self, window=(0,-1,0,-1)):
+        &#34;&#34;&#34;Preview the image.
+
+        window = (xmin, xmax, ymin, ymax)
+        &#34;&#34;&#34;
+        (xmin, xmax, ymin, ymax) = window
         if xmax == -1:
                 xmax = self.data.shape[0] - 1
         if ymax == -1:
@@ -477,26 +594,29 @@ dictionary-like dm3file with required keys:
 <span>def <span class="ident">reset</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Resets data to the rawData.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def reset(self):
+        &#34;&#34;&#34;Resets data to the rawData.
+        &#34;&#34;&#34;
         self.data = self.rawData</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.lorentz.saveMeta"><code class="name flex">
-<span>def <span class="ident">saveMeta</span></span>(<span>self, outdir='')</span>
+<span>def <span class="ident">saveMeta</span></span>(<span>self, outdir='', outname='metadata.json')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Save the metadata of the lorentz object to a file.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def saveMeta(self, outdir=&#39;&#39;):
-        with open(os.path.join(outdir, &#39;metadata.json&#39;), &#39;w&#39;) as fp:
+<pre><code class="python">def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
+        &#34;&#34;&#34;Save the metadata of the lorentz object to a file.&#34;&#34;&#34;
+        with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
                 json.dump(self.metadata, fp, indent=&#34;&#34;)</code></pre>
 </details>
 </dd>
@@ -504,12 +624,17 @@ dictionary-like dm3file with required keys:
 <span>def <span class="ident">sitie</span></span>(<span>self, defocus, wavelength=1.96e-12)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Carries out phase and B-field reconstruction.</p>
+<p>Assigns phase, Bx, and By attributes.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def sitie(self, defocus, wavelength=1.96e-12):
+        &#34;&#34;&#34;Carries out phase and B-field reconstruction.
+
+        Assigns phase, Bx, and By attributes.
+        &#34;&#34;&#34;
         self.metadata.update({&#39;defocus&#39;: defocus})
         dummy = sitie_RHS(self.data, defocus, wavelength)
         self.phase = np.real(inverse_laplacian(dummy, self.pixelSize))
