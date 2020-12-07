@@ -454,9 +454,9 @@ Converts a 2d complex array to rgba data.
 
 **Parameters**
 
-  - **mode** : *ndarray* <br /> An array with the data to represent.
-    Dtype may be complex or real - if real, the color will be uniform,
-    and values will be represented by brightness.
+  - **mode** : *complex ndarray* <br /> An array with the data to
+    represent. Dtype may be complex or real - if real, the color will be
+    uniform, and values will be represented by brightness.
 
   - **cmap** : *string, optional* <br /> If `cmap = 'uniform'`, the
     CIELAB color space will be used. Otherwise, any pyplot
@@ -750,9 +750,10 @@ X = np.linspace(-10,10,100)
 Y = np.linspace(-10,10,100)
 x, y = np.meshgrid(X, Y)
 data = x + 1j*y
-window = (-4, 4, -4, 4)
+window = (-4, 4, -6, 6)
 
-fig, (ax1, ax2) = wt.subplots()
+fig, ax = wt.subplots(12)
+ax1, ax2 = ax[0,0], ax[0,1]
 ax1.setAxes(X, Y)
 ax1.imshow(np.abs(data))
 ax1.inset(window=window)
@@ -761,7 +762,7 @@ ax2.rgba(data)
 wt.plt.show()
 ```
 
-![asdf](img.png)
+![asdf](pyplotwrapperExample.png)
 
 ## Functions
 
@@ -771,22 +772,38 @@ wt.plt.show()
 > 
 >     def subplots(
 >         rc=11,
->         sharex=False,
->         sharey=False,
->         squeeze=False,
->         subplot_kw=None,
->         gridspec_kw=None,
->         **fig_kw
+>         **kwargs
 >     )
 
 Creates a fig, ax instance but replaces ax with singleAx.
 
-Behaves identically to matplotlib.pyplot.subplots(), but replaces each
-matplotlib.axes.Axes object with a wsp\_tools.pyplotwrapper.singleAx
+Behaves almost identically to matplotlib.pyplot.subplots(), but replaces
+each <code>matplotlib.axes.Axes</code> object with a
+<code>[singleAx](#wsp_tools.pyplotwrapper.singleAx "wsp_tools.pyplotwrapper.singleAx")</code>
 object.
 
-Each wsp\_tools.pyplotwrapper.singleAx object in turn behaves just like
-a normal Axes object, but with added methods.
+Each
+<code>[singleAx](#wsp_tools.pyplotwrapper.singleAx "wsp_tools.pyplotwrapper.singleAx")</code>
+object in turn behaves just like a normal <code>Axes</code> object, but
+with added methods.
+
+**Parameters**
+
+  - **rc** : *int* <br /> First digit - nrows. Second digit - ncols.
+    <br /> Default is `rc = 11`.
+
+  - **squeeze** : *bool* <br /> If true, extra dimensions are squeezed
+    out from the returned array of Axes. <br /> Default is `squeeze =
+    False`.
+
+  - **\*\*kwargs** <br /> All other kwargs are passed on to
+    <code>matplotlib.axes.Axes.subplots</code>.
+
+**Returns**
+
+  - **fig** : *Figure* <br />
+
+  - **ax** : *singleAx* or array of *singleAx* objects <br />
 
 ## Classes
 
@@ -801,11 +818,12 @@ a normal Axes object, but with added methods.
 >         ylabel=''
 >     )
 
-An extension of the matplotlib.axes.Axes class.
+An extension of the <code>matplotlib.axes.Axes</code> class.
 
 This class adds macros for 2d plotting that I commonly use. In
 particular, it’s easy to select only a window of your data to show, to
-add x-y axes, and to show the rgba version of a complex 2d array.
+add x-y axes, to add an inset, and to show the rgba version of a complex
+2d array.
 
 Typical usage:
 
@@ -827,6 +845,10 @@ plt.show()
 More commonly, this class is returned by
 `wsp_tools.pyplotwrapper.subplots`.
 
+**Parameters**
+
+  - **ax** : *matplotlib.axes.Axes* <br />
+
 #### Methods
 
 ##### Method `imshow`
@@ -840,13 +862,24 @@ More commonly, this class is returned by
 >         **kwargs
 >     )
 
-Imshows the data.
+Imshows the (windowed) data. Sets origin to lower, sets the extent.
 
-If a window has been applied to the plot before this is called, it will
-be used.
+**Parameters**
 
-data should be a numpy.2darray object. step: data\[::step,::step\] will
-be shown.
+  - **data** : *ndarray* <br /> The data to be shown. Use the
+    un-windowed data - the window will be applied automatically, if you
+    set one.
+
+  - **step** : *int* <br /> data will be returned as
+    `data[::step,::step]` - particularly useful for quiver plots. <br />
+    Default is `step = 1`.
+
+  - **\*\*kwargs** <br /> All other kwargs are passed on to
+    <code>matplotlib.axes.Axes.imshow</code>.
+
+**Returns**
+
+  - **None**
 
 ##### Method `inset`
 
@@ -854,17 +887,26 @@ be shown.
 > 
 >     def inset(
 >         self,
->         window=None,
->         color='white',
+>         window,
 >         **kwargs
 >     )
 
 Plots a square box with vertices defined by window.
 
-Window = (xmin, xmax, ymin, ymax).
+Default color is white.
 
-Default color is white. Takes all the same kwargs as
-matplotlib.pyplot.plot().
+**Parameters**
+
+  - **window** : *array-like* <br /> Format: `window = [xmin, xmax,
+    ymin, ymax]`. Note that these are the x and y values, rather than
+    their indices.
+
+  - **\*\*kwargs** <br /> All other kwargs are passed on to
+    <code>matplotlib.axes.Axes.plot</code>.
+
+**Returns**
+
+  - **None**
 
 ##### Method `prePlot`
 
@@ -884,19 +926,34 @@ function to get the windowed data:
 ``` python
 fig, axis = plt.subplots()
 ax = singleAx(axis)
-ax.setXY(x_axis, y_axis, window)
+ax.setWindow(window)
 x_windowed, y_windowed, data_windowed = ax.prePlot(data)
 ax.ax.SomeOtherMatplotlibPlottingRoutine(x_windowed, y_windowed, data_windowed)
 plt.show()
 ```
 
-Returns:
+**Parameters** :
 
-1.  xout - numpy.1darray: windowed x-axis
-2.  yout - numpy.1darray: windowed y-axis
-3.  dout - numpy.2darray: windowed data
+  - **data** : *complex ndarray* <br /> The data to plot. Must be
+    2-dimensional.
 
-Additionally, it sets the ax element’s extent.
+  - **step** : *int* <br /> data will be returned as
+    `data[::step,::step]` - particularly useful for quiver plots. <br />
+    Default is `step = 1`.
+
+**Returns**
+
+  - **xout** : *ndarray* <br /> A 1darray with x-coordinates - either
+    the array set by <code>setAxes()</code>, or an array of length
+    <code>data.shape\[1\]</code> from 0 to 100.
+
+  - **yout** : *ndarray* <br /> A 1darray with y-coordinates - either
+    the array set by <code>setAxes()</code>, or an array of length
+    <code>data.shape\[0\]</code> from 0 to 100.
+
+  - **dout** : *ndarray* <br /> A 2darray with the data to be plotted.
+    If you have set a window using either <code>setAxes()</code> or
+    <code>setWindow()</code>, the data will be windowed.
 
 ##### Method `quiver`
 
@@ -911,8 +968,22 @@ Additionally, it sets the ax element’s extent.
 
 Shows a quiver plot of complex data.
 
-data should be a complex numpy.2darray object. If real, the y component
-will just be zero everywhere. step: data\[::step,::step\] will be shown.
+**Parameters**
+
+  - **data** : *ndarray* <br /> The data to be shown. Use the
+    un-windowed data - the window will be applied automatically, if you
+    set one.
+
+  - **step** : *int* <br /> data will be returned as
+    `data[::step,::step]` - particularly useful for quiver plots. <br />
+    Default is `step = 1`.
+
+  - **\*\*kwargs** <br /> All other kwargs are passed on to
+    <code>matplotlib.axes.Axes.quiver</code>.
+
+**Returns**
+
+  - **None**
 
 ##### Method `rgba`
 
@@ -922,20 +993,42 @@ will just be zero everywhere. step: data\[::step,::step\] will be shown.
 >         self,
 >         data,
 >         step=1,
->         alpha='intensity',
+>         brightness='intensity',
+>         alpha='uniform',
 >         cmap='uniform',
 >         **kwargs
 >     )
 
 Shows an rgba interpretation of complex data.
 
-Color represents complex angle, and brightness represents either
-amplitude or intensity.
+**Parameters**
 
-data should be a complex numpy.2darray object. If real, the color will
-be uniform and only brightness will vary.
+  - **data** : *complex ndarray* <br /> An array with the data to
+    represent. Dtype may be complex or real - if real, the color will be
+    uniform, and values will be represented by brightness.
 
-alpha can represent either ‘intensity’ (default) or ‘amplitude’.
+  - **step** : *int* <br /> data will be returned as
+    `data[::step,::step]` - particularly useful for quiver plots. <br />
+    Default is `step = 1`.
+
+  - **cmap** : *string, optional* <br /> If `cmap = 'uniform'`, the
+    CIELAB color space will be used. Otherwise, any pyplot
+    ScalarMappable may be used. <br /> Default is `cmap = 'uniform'`.
+
+  - **brightness** : *string, optional* <br /> Allowed values:
+    `'intensity'`, `'amplitude'`, `'uniform'`. <br /> Default is
+    `brightness = 'intensity'`.
+
+  - **alpha** : *string, optional* <br /> Allowed values: `'intensity'`,
+    `'amplitude'`, `'uniform'`. Determines the alpha component of the
+    rgba value. <br /> Default is `alpha = 'uniform'`.
+
+  - **\*\*kwargs** <br /> All other kwargs are passed on to
+    <code>matplotlib.axes.Axes.imshow</code>.
+
+**Returns**
+
+  - **None**
 
 ##### Method `setAxes`
 
@@ -950,10 +1043,22 @@ alpha can represent either ‘intensity’ (default) or ‘amplitude’.
 
 Sets the x and y axes of the singleAx object, and can apply a window.
 
-x, y should be numpy.1darray objects.
+Note that this can be used before or after <code>setWindow()</code> -
+whichever was called last, will be used in plotting.
 
-Window should be wrt the values of x and y, not their indices. If window
-is omitted, the full data and x-y axes will be used.
+**Parameters**
+
+  - **x** : *ndarray* <br /> The x-coordinates. Should be 1-dimensional.
+
+  - **y** : *ndarray* <br /> The y-coordinates. Should be 1-dimensional.
+
+  - **window** : *array-like, optional* <br /> Format: `window = [xmin,
+    xmax, ymin, ymax]`. Note that these are the x and y values, rather
+    than their indices.
+
+**Returns**
+
+  - **None**
 
 ##### Method `setWindow`
 
@@ -966,11 +1071,18 @@ is omitted, the full data and x-y axes will be used.
 
 Applies a window to the singleAx object.
 
-Can be applied before or after setAxes - whichever was applied last will
-be used.
+Note that this can be used before or after <code>setAxes()</code> -
+whichever was called last, will be used in plotting.
 
-window = (xmin, xmax, ymin, ymax) wrt the values of the axes, not their
-indices.
+**Parameters**
+
+  - **window** : *array-like, optional* <br /> Format: `window = [xmin,
+    xmax, ymin, ymax]`. Note that these are the x and y values, rather
+    than their indices.
+
+**Returns**
+
+  - **None**
 
 ##### Method `set_title`
 
@@ -984,7 +1096,16 @@ indices.
 
 Sets the title of the plot.
 
-Takes all the same args as matplotlib.axes.Axes.set\_title
+**Parameters**
+
+  - **title** : *string* <br /> The plot title.
+
+  - **\*\*kwargs** <br /> All other kwargs are passed on to
+    <code>matplotlib.axes.Axes.set\_title</code>.
+
+**Returns**
+
+  - **None**
 
 ##### Method `set_xlabel`
 
@@ -998,7 +1119,16 @@ Takes all the same args as matplotlib.axes.Axes.set\_title
 
 Sets the xlabel of the plot.
 
-Takes all the same args as matplotlib.axes.Axes.set\_xlabel
+\*\*Parameters\*
+
+  - **xlabel** : *string* <br /> The xlabel.
+
+  - **\*\*kwargs** <br /> All other kwargs are passed on to
+    <code>matplotlib.axes.Axes.set\_xlabel</code>.
+
+**Returns**
+
+  - **None**
 
 ##### Method `set_xytitle`
 
@@ -1014,13 +1144,31 @@ Takes all the same args as matplotlib.axes.Axes.set\_xlabel
 
 Set the xlabel, ylabel, and title at the same time.
 
-Sets all three even if not all are given. Takes all the same kwargs as
-matplotlib.axes.Axes.set\_xlabel, matplotlib.axes.Axes.set\_ylabel,
-matplotlib.axes.Axes.set\_title. Whatever you input will be applied to
-all three.
+Sets all three even if not all are given. Whatever you input will be
+applied to all three.
 
-For individual control, use singleAx.set\_xlabel, singleAx.set\_ylabel,
-or singleAx.set\_title.
+For individual control, use
+<code>[singleAx.set\_xlabel()](#wsp_tools.pyplotwrapper.singleAx.set_xlabel "wsp_tools.pyplotwrapper.singleAx.set_xlabel")</code>,
+<code>[singleAx.set\_ylabel()](#wsp_tools.pyplotwrapper.singleAx.set_ylabel "wsp_tools.pyplotwrapper.singleAx.set_ylabel")</code>,
+or
+<code>[singleAx.set\_title()](#wsp_tools.pyplotwrapper.singleAx.set_title "wsp_tools.pyplotwrapper.singleAx.set_title")</code>.
+
+**Parameters**
+
+  - **ylabel** : *string* <br /> The ylabel.
+
+  - **xlabel** : *string* <br /> The xlabel.
+
+  - **title** : *string* <br /> The plot title.
+
+  - **\*\*kwargs** <br /> All other kwargs are passed on to
+    <code>matplotlib.axes.Axes.set\_xlabel</code>,
+    <code>matplotlib.axes.Axes.set\_ylabel</code>, and
+    <code>matplotlib.axes.Axes.set\_title</code>.
+
+**Returns**
+
+  - **None**
 
 ##### Method `set_ylabel`
 
@@ -1034,7 +1182,16 @@ or singleAx.set\_title.
 
 Sets the ylabel of the plot.
 
-Takes all the same kwargs as matplotlib.axes.Axes.set\_ylabel
+**Parameters**
+
+  - **ylabel** : *string* <br /> The ylabel.
+
+  - **\*\*kwargs** <br /> All other kwargs are passed on to
+    <code>matplotlib.axes.Axes.set\_ylabel</code>.
+
+**Returns**
+
+  - **None**
 
 # Module `wsp_tools.sitie`
 
@@ -1042,19 +1199,19 @@ Contains utilities for reconstructing phase and magnetization from
 Lorentz images.
 
 The most common use case is to generate a lorentz object from a `.dm3`
-file. Then one can analyze using high\_pass(), sitie(),
+file. Then you can analyze using high\_pass(), sitie(),
 crop\_pixel\_counts(), etc.
 
 Example:
 
 ``` python
 import ncempy.io.dm as dm
+import wsp_tools as wt
 
-fdir = '/path/to/data'
-fname = 'lorentzImage.dm3'
-file = dm.dmReader(os.path.join(fdir, fname))
+fname = '/path/to/data.dm3'
+dm3file = dm.dmReader(fname)
 
-img = wsp_tools.lorentz(dm3file)
+img = wt.lorentz(dm3file)
 img.crop_pixel_counts()
 img.high_pass()
 img.blur()
@@ -1074,7 +1231,21 @@ img.sitie()
 >         thickness=1
 >     )
 
-Calculates the transverse B-field that would impart a specific phase.
+Reconstructs the B-field from the phase profile.
+
+**Parameters**
+
+  - **phase** : *ndarray* <br /> a 2d array representing the electron’s
+    phase.
+
+  - **thickness** : *number* <br /> the thickness of the sample. <br />
+    Default is `thickness = 1`.
+
+**Returns**
+
+  - **Bx** : *ndarray* <br /> The x-component of the magnetic field.
+
+  - **By** : *ndarray* <br /> The y-component of the magnetic field.
 
 ### Function `SITIE`
 
@@ -1089,6 +1260,17 @@ Calculates the transverse B-field that would impart a specific phase.
 
 Reconstruct the phase from a defocussed image.
 
+**Parameters**
+
+  - **image** : *ndarray* <br /> the 2d image data. <br />
+
+  - **defocus** : *number* <br />
+
+  - **pixel\_size** : *number* <br />
+
+  - **wavelength** : *number, optional* <br /> Default is `wavelength
+    = 1.97e-12` (the relativistic wavelength of a 300kV electron).
+
 ### Function `blur`
 
 > 
@@ -1102,6 +1284,20 @@ Reconstruct the phase from a defocussed image.
 
 Applies a Gaussian filter to the image.
 
+**Parameters**
+
+  - **sigma** : *number, optional* <br /> Default is `sigma = 5`.
+
+  - **mode** : *string, optional* <br /> Gets passed to
+    <code>scipy.ndimage.blur</code>. <br /> Default is `mode = 'wrap'`.
+
+  - **cval** : *number, optional* <br /> Gets passed to
+    <code>scipy.ndimage.blur</code>. <br /> Default is `cval = 0.0`.
+
+**Returns**
+
+  - **None**
+
 ### Function `crop_pixel_counts`
 
 > 
@@ -1111,7 +1307,19 @@ Applies a Gaussian filter to the image.
 >         sigma=10
 >     )
 
-Crops the pixel counts to avg +/- sigma\*std.
+Crops any pixel counts that are higher or lower than some standard
+deviation from avg.
+
+All pixel counts are limited to (average) +/- sigma\*(standard
+deviation).
+
+**Parameters**
+
+  - **sigma** : *number, optional* <br /> Default is `sigma = 10`.
+
+**Returns**
+
+  - **None**
 
 ### Function `high_pass`
 
@@ -1123,6 +1331,14 @@ Crops the pixel counts to avg +/- sigma\*std.
 >     )
 
 Applies a high-pass filter to the image data.
+
+**Parameters**
+
+  - **sigma** : *number, optional* <br /> Default is `sigma = 20`.
+
+**Returns**
+
+  - **None**
 
 ### Function `inverse_laplacian`
 
@@ -1143,6 +1359,14 @@ Applies a high-pass filter to the image data.
 >     )
 
 Applies a low-pass filter to the image data.
+
+**Parameters**
+
+  - **sigma** : *number, optional* <br /> Default is `sigma = 50`.
+
+**Returns**
+
+  - **None**
 
 ### Function `sitie_RHS`
 
@@ -1166,13 +1390,23 @@ Applies a low-pass filter to the image data.
 
 Class that contains sitie information about a lorentz image.
 
-Input:
+**Parameters**
 
-dm3file: a dictionary-like object with the following keys:
-
-  - data: numpy.2darray() containing the electron counts
-  - pixelSize: \[scalar, scalar\] containing the x and y pixel sizes
-  - pixelUnit: \[string, string\] containing the unit of the pixel sizes
+  - **dm3file** : *dictionary-like* <br /> a dm3-like file with the
+    following keys: <br />
+    <ul>
+    <li>
+    **data** : *ndarray* <br /> An array carrying the electron counts.
+    </li>
+    <li>
+    **pixelSize** : *tuple* <br /> (*number*, *number*) - the x and y
+    pixel sizes.
+    </li>
+    <li>
+    **pixelUnit** : *tuple* <br /> (*string*, *string*) - the x and y
+    pixel units.
+    </li>
+    </ul>
 
 #### Methods
 
@@ -1189,6 +1423,20 @@ dm3file: a dictionary-like object with the following keys:
 
 Applies a Gaussian blur to the image data.
 
+**Parameters**
+
+  - **sigma** : *number, optional* <br /> Default is `sigma = 5`.
+
+  - **mode** : *string, optional* <br /> Gets passed to
+    <code>scipy.ndimage.blur</code>. <br /> Default is `mode = 'wrap'`.
+
+  - **cval** : *number, optional* <br /> Gets passed to
+    <code>scipy.ndimage.blur</code>. <br /> Default is `cval = 0.0`.
+
+**Returns**
+
+  - **None**
+
 ##### Method `crop_pixel_counts`
 
 > 
@@ -1198,9 +1446,19 @@ Applies a Gaussian blur to the image data.
 >         sigma=10
 >     )
 
-Crops any pixel counts that are higher or lower than some std from avg.
+Crops any pixel counts that are higher or lower than some standard
+deviation from avg.
 
-Sets those pixels to avg +/- sigma\*std.
+All pixel counts are limited to (average) +/- sigma\*(standard
+deviation).
+
+**Parameters**
+
+  - **sigma** : *number, optional* <br /> Default is `sigma = 10`.
+
+**Returns**
+
+  - **None**
 
 ##### Method `high_pass`
 
@@ -1213,6 +1471,14 @@ Sets those pixels to avg +/- sigma\*std.
 
 Applies a high-pass filter to the image data.
 
+**Parameters**
+
+  - **sigma** : *number, optional* <br /> Default is `sigma = 20`.
+
+**Returns**
+
+  - **None**
+
 ##### Method `low_pass`
 
 > 
@@ -1224,18 +1490,32 @@ Applies a high-pass filter to the image data.
 
 Applies a low-pass filter to the image data.
 
+**Parameters**
+
+  - **sigma** : *number, optional* <br /> Default is `sigma = 50`.
+
+**Returns**
+
+  - **None**
+
 ##### Method `preview`
 
 > 
 > 
 >     def preview(
 >         self,
->         window=(0, -1, 0, -1)
+>         window=None
 >     )
 
 Preview the image.
 
-window = (xmin, xmax, ymin, ymax)
+Note that unlike <code>pyplotwrapper</code>,
+
+**Parameters**
+
+  - **window** : *array-like, optional* <br /> Format is `window =
+    (xmin, xmax, ymin, ymax)`. <br /> Default is `window = (0, -1, 0,
+    -1)`
 
 ##### Method `reset`
 
@@ -1259,6 +1539,14 @@ Resets data to the rawData.
 
 Save the metadata of the lorentz object to a file.
 
+**Parameters**
+
+  - **outdir** : *string, optional* <br /> The directory where you’d
+    like to save the metadata. <br /> Default is `outdir = ''`.
+
+  - **outname** : *string, optional* <br /> The name of the metadata
+    file. <br /> Default is `outname = 'metadata.json'`.
+
 ##### Method `sitie`
 
 > 
@@ -1266,12 +1554,25 @@ Save the metadata of the lorentz object to a file.
 >     def sitie(
 >         self,
 >         defocus,
->         wavelength=1.96e-12
+>         wavelength=1.97e-12
 >     )
 
 Carries out phase and B-field reconstruction.
 
 Assigns phase, Bx, and By attributes.
+
+**Parameters**
+
+  - **defocus** : *number* <br /> The defocus at which the images were
+    taken.
+
+  - **wavelength** : *number, optional* <br /> The electron wavelength.
+    <br /> Default is `wavelength = 1.96e-12` (relativistic wavelength
+    of a 300kV electron).
+
+**Returns**
+
+  - **None**
 
 -----
 

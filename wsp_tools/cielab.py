@@ -66,7 +66,7 @@ def rgba(mode, cmap = 'uniform', brightness = 'intensity', alpha = 'uniform'):
 
 	**Parameters**
 
-	* **mode** : _ndarray_ <br />
+	* **mode** : _complex ndarray_ <br />
 	An array with the data to represent. Dtype may be complex or real - if real,
 	the color will be uniform, and values will be represented by brightness.
 

@@ -1,7 +1,6 @@
 __pycache__
 *.egg-info
 *.ser
-*.png
 *.dm3
 venv
 testingsitie.py

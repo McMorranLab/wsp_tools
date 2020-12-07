@@ -31,9 +31,10 @@ X = np.linspace(-10,10,100)
 Y = np.linspace(-10,10,100)
 x, y = np.meshgrid(X, Y)
 data = x + 1j*y
-window = (-4, 4, -4, 4)
+window = (-4, 4, -6, 6)
 
-fig, (ax1, ax2) = wt.subplots()
+fig, ax = wt.subplots(12)
+ax1, ax2 = ax[0,0], ax[0,1]
 ax1.setAxes(X, Y)
 ax1.imshow(np.abs(data))
 ax1.inset(window=window)
@@ -41,7 +42,7 @@ ax2.setAxes(X, Y, window=window)
 ax2.rgba(data)
 wt.plt.show()
 </code></pre>
-<p><img alt="asdf" src="img.png"></p>
+<p><img alt="asdf" src="pyplotwrapperExample.png"></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -58,9 +59,10 @@ X = np.linspace(-10,10,100)
 Y = np.linspace(-10,10,100)
 x, y = np.meshgrid(X, Y)
 data = x + 1j*y
-window = (-4, 4, -4, 4)
+window = (-4, 4, -6, 6)
 
-fig, (ax1, ax2) = wt.subplots()
+fig, ax = wt.subplots(12)
+ax1, ax2 = ax[0,0], ax[0,1]
 ax1.setAxes(X, Y)
 ax1.imshow(np.abs(data))
 ax1.inset(window=window)
@@ -69,16 +71,16 @@ ax2.rgba(data)
 wt.plt.show()
 ```
 
-![asdf](img.png)
+![asdf](pyplotwrapperExample.png)
 &#34;&#34;&#34;
 from . import plt, np, rgba
 
 class singleAx():
-        &#34;&#34;&#34;An extension of the matplotlib.axes.Axes class.
+        &#34;&#34;&#34;An extension of the `matplotlib.axes.Axes` class.
 
         This class adds macros for 2d plotting that I commonly use. In particular,
         it&#39;s easy to select only a window of your data to show, to add x-y axes,
-        and to show the rgba version of a complex 2d array.
+        to add an inset, and to show the rgba version of a complex 2d array.
 
         Typical usage:
 
@@ -98,6 +100,10 @@ class singleAx():
         ```
 
         More commonly, this class is returned by ```wsp_tools.pyplotwrapper.subplots```.
+
+        **Parameters**
+
+        * **ax** : _matplotlib.axes.Axes_ &lt;br /&gt;
         &#34;&#34;&#34;
         def __init__(self, ax, title=&#39;&#39;, xlabel=&#39;&#39;, ylabel=&#39;&#39;):
                 self.ax = ax
@@ -114,30 +120,57 @@ class singleAx():
                 ```python
                 fig, axis = plt.subplots()
                 ax = singleAx(axis)
-                ax.setXY(x_axis, y_axis, window)
+                ax.setWindow(window)
                 x_windowed, y_windowed, data_windowed = ax.prePlot(data)
                 ax.ax.SomeOtherMatplotlibPlottingRoutine(x_windowed, y_windowed, data_windowed)
                 plt.show()
                 ```
 
-                Returns:
+                **Parameters** :
 
-                1. xout - numpy.1darray: windowed x-axis
-                2. yout - numpy.1darray: windowed y-axis
-                3. dout - numpy.2darray: windowed data
+                * **data** : _complex ndarray_ &lt;br /&gt;
+                The data to plot. Must be 2-dimensional.
 
-                Additionally, it sets the ax element&#39;s extent.
+                * **step** : _int_ &lt;br /&gt;
+                data will be returned as `data[::step,::step]` - particularly useful for
+                quiver plots. &lt;br /&gt;
+                Default is `step = 1`.
+
+                **Returns**
+
+                * **xout** : _ndarray_ &lt;br /&gt;
+                A 1darray with x-coordinates - either the array set by `setAxes()`,
+                or an array of length `data.shape[1]` from 0 to 100.
+
+                * **yout** : _ndarray_ &lt;br /&gt;
+                A 1darray with y-coordinates - either the array set by `setAxes()`,
+                or an array of length `data.shape[0]` from 0 to 100.
+
+                * **dout** : _ndarray_ &lt;br /&gt;
+                A 2darray with the data to be plotted. If you have set a window using
+                either `setAxes()` or `setWindow()`, the data will be windowed.
                 &#34;&#34;&#34;
-                if not self.hasAxes:
+                if not self.hasAxes and not self.hasWindow:
                         self.x = np.linspace(0,100,data.shape[1])
                         self.y = np.linspace(0,100,data.shape[0])
-                if not self.hasWindow:
-                        self.xmin, self.xmax = 0, 100
-                        self.ymin, self.ymax = 0, 100
-                self.argxmin = np.argmin(np.abs(self.x - self.xmin))
-                self.argxmax = np.argmin(np.abs(self.x - self.xmax))
-                self.argymin = np.argmin(np.abs(self.y - self.ymin))
-                self.argymax = np.argmin(np.abs(self.y - self.ymax))
+                        self.argxmin, self.argxmax = 0, -1
+                        self.argymin, self.argymax = 0, -1
+                elif self.hasAxes and not self.hasWindow:
+                        self.argxmin, self.argxmax = 0, -1
+                        self.argymin, self.argymax = 0, -1
+                elif not self.hasAxes and self.hasWindow:
+                        self.x = np.linspace(0,100,data.shape[1])
+                        self.y = np.linspace(0,100,data.shape[0])
+                        self.argxmin = np.argmin(np.abs(self.x - self.xmin))
+                        self.argxmax = np.argmin(np.abs(self.x - self.xmax))
+                        self.argymin = np.argmin(np.abs(self.y - self.ymin))
+                        self.argymax = np.argmin(np.abs(self.y - self.ymax))
+                elif self.hasAxes and self.hasWindow:
+                        self.argxmin = np.argmin(np.abs(self.x - self.xmin))
+                        self.argxmax = np.argmin(np.abs(self.x - self.xmax))
+                        self.argymin = np.argmin(np.abs(self.y - self.ymin))
+                        self.argymax = np.argmin(np.abs(self.y - self.ymax))
+
                 xout = self.x[self.argxmin:self.argxmax:step]
                 yout = self.y[self.argymin:self.argymax:step]
                 dout = data[self.argymin:self.argymax:step, self.argxmin:self.argxmax:step]
@@ -147,12 +180,24 @@ class singleAx():
         def setAxes(self, x, y, window=None):
                 &#34;&#34;&#34;Sets the x and y axes of the singleAx object, and can apply a window.
 
-                x, y should be numpy.1darray objects.
+                Note that this can be used before or after `setWindow()` - whichever
+                was called last, will be used in plotting.
 
-                Window should be wrt the values of x and y, not their
-                indices.
-                If window is omitted, the full data and x-y axes will be used.
+                **Parameters**
 
+                * **x** : _ndarray_ &lt;br /&gt;
+                The x-coordinates. Should be 1-dimensional.
+
+                * **y** : _ndarray_ &lt;br /&gt;
+                The y-coordinates. Should be 1-dimensional.
+
+                * **window** : _array-like, optional_ &lt;br /&gt;
+                Format: `window = [xmin, xmax, ymin, ymax]`. Note that these are the x
+                and y values, rather than their indices.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.hasAxes = True
                 self.x, self.y = x, y
@@ -166,11 +211,18 @@ class singleAx():
         def setWindow(self, window=(0,100,0,100)):
                 &#34;&#34;&#34;Applies a window to the singleAx object.
 
-                Can be applied before or after setAxes - whichever was applied last
-                will be used.
+                Note that this can be used before or after `setAxes()` - whichever
+                was called last, will be used in plotting.
 
-                window = (xmin, xmax, ymin, ymax) wrt the values of the axes, not
-                their indices.
+                **Parameters**
+
+                * **window** : _array-like, optional_ &lt;br /&gt;
+                Format: `window = [xmin, xmax, ymin, ymax]`. Note that these are the x
+                and y values, rather than their indices.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.hasWindow = True
                 self.xmin = window[0]
@@ -181,111 +233,240 @@ class singleAx():
         def set_title(self, title=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the title of the plot.
 
-                Takes all the same args as matplotlib.axes.Axes.set_title
+                **Parameters**
+
+                * **title** : _string_ &lt;br /&gt;
+                The plot title.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.set_title`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.ax.set_title(title, **kwargs)
 
         def set_xlabel(self, xlabel=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the xlabel of the plot.
 
-                Takes all the same args as matplotlib.axes.Axes.set_xlabel
+                **Parameters*
+
+                * **xlabel** : _string_ &lt;br /&gt;
+                The xlabel.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.set_xlabel`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.ax.set_xlabel(xlabel, **kwargs)
 
         def set_ylabel(self, ylabel=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the ylabel of the plot.
 
-                Takes all the same kwargs as matplotlib.axes.Axes.set_ylabel
+                **Parameters**
+
+                * **ylabel** : _string_ &lt;br /&gt;
+                The ylabel.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.set_ylabel`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.ax.set_ylabel(ylabel, **kwargs)
 
         def set_xytitle(self, xlabel=&#39;&#39;, ylabel=&#39;&#39;, title=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Set the xlabel, ylabel, and title at the same time.
 
-                Sets all three even if not all are given.
-                Takes all the same kwargs as matplotlib.axes.Axes.set_xlabel,
-                matplotlib.axes.Axes.set_ylabel, matplotlib.axes.Axes.set_title.
-                Whatever you input will be applied to all three.
+                Sets all three even if not all are given. Whatever you input will be applied to all three.
 
-                For individual control, use singleAx.set_xlabel, singleAx.set_ylabel,
-                or singleAx.set_title.
+                For individual control, use `singleAx.set_xlabel`, `singleAx.set_ylabel`,
+                or `singleAx.set_title`.
+
+                **Parameters**
+
+                * **ylabel** : _string_ &lt;br /&gt;
+                The ylabel.
+
+                * **xlabel** : _string_ &lt;br /&gt;
+                The xlabel.
+
+                * **title** : _string_ &lt;br /&gt;
+                The plot title.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on
+                to `matplotlib.axes.Axes.set_xlabel`, `matplotlib.axes.Axes.set_ylabel`,
+                and `matplotlib.axes.Axes.set_title`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.ax.set_xlabel(xlabel, **kwargs)
                 self.ax.set_ylabel(ylabel, **kwargs)
                 self.ax.set_title(title, **kwargs)
 
         def imshow(self, data, step=1, **kwargs):
-                &#34;&#34;&#34;Imshows the data.
+                &#34;&#34;&#34;Imshows the (windowed) data. Sets origin to lower, sets the extent.
 
-                If a window has been applied to the plot before this is called, it
-                will be used.
+                **Parameters**
 
-                data should be a numpy.2darray object.
-                step: data[::step,::step] will be shown.
+                * **data** : _ndarray_ &lt;br /&gt;
+                The data to be shown. Use the un-windowed data - the window will be
+                applied automatically, if you set one.
+
+                * **step** : _int_ &lt;br /&gt;
+                data will be returned as `data[::step,::step]` - particularly useful for
+                quiver plots. &lt;br /&gt;
+                Default is `step = 1`.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.imshow`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 x, y, data = self.prePlot(data, step)
-                self.ax.imshow(data, extent=self.extent, origin=&#39;lower&#39;, **kwargs)
+                imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
+                imshowargs.update(kwargs)
+                self.ax.imshow(data, **imshowargs)
 
         def quiver(self, data, step=1, **kwargs):
                 &#34;&#34;&#34;Shows a quiver plot of complex data.
 
-                data should be a complex numpy.2darray object.
-                        If real, the y component will just be zero everywhere.
-                step: data[::step,::step] will be shown.
+                **Parameters**
+
+                * **data** : _ndarray_ &lt;br /&gt;
+                The data to be shown. Use the un-windowed data - the window will be
+                applied automatically, if you set one.
+
+                * **step** : _int_ &lt;br /&gt;
+                data will be returned as `data[::step,::step]` - particularly useful for
+                quiver plots. &lt;br /&gt;
+                Default is `step = 1`.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 xr, yr, data = self.prePlot(data, step)
                 self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
 
-        def rgba(self, data, step=1, alpha=&#39;intensity&#39;, cmap=&#39;uniform&#39;, **kwargs):
+        def rgba(self, data, step=1, brightness=&#39;intensity&#39;, alpha=&#39;uniform&#39;, cmap=&#39;uniform&#39;, **kwargs):
                 &#34;&#34;&#34;Shows an rgba interpretation of complex data.
 
-                Color represents complex angle, and brightness represents either
-                amplitude or intensity.
+                **Parameters**
 
-                data should be a complex numpy.2darray object.
-                        If real, the color will be uniform and only brightness will vary.
+                * **data** : _complex ndarray_ &lt;br /&gt;
+                An array with the data to represent. Dtype may be complex or real - if real,
+                the color will be uniform, and values will be represented by brightness.
 
-                alpha can represent either &#39;intensity&#39; (default) or &#39;amplitude&#39;.
+                * **step** : _int_ &lt;br /&gt;
+                data will be returned as `data[::step,::step]` - particularly useful for
+                quiver plots. &lt;br /&gt;
+                Default is `step = 1`.
+
+                * **cmap** : _string, optional_ &lt;br /&gt;
+                If `cmap = &#39;uniform&#39;`, the CIELAB color space will be used. Otherwise, any
+                pyplot ScalarMappable may be used. &lt;br /&gt;
+                Default is `cmap = &#39;uniform&#39;`.
+
+                * **brightness** : _string, optional_ &lt;br /&gt;
+                Allowed values: `&#39;intensity&#39;`, `&#39;amplitude&#39;`, `&#39;uniform&#39;`. &lt;br /&gt;
+                Default is `brightness = &#39;intensity&#39;`.
+
+                * **alpha** : _string, optional_ &lt;br /&gt;
+                Allowed values: `&#39;intensity&#39;`, `&#39;amplitude&#39;`, `&#39;uniform&#39;`. Determines the alpha
+                component of the rgba value. &lt;br /&gt;
+                Default is `alpha = &#39;uniform&#39;`.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.imshow`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
 
                 x, y, data = self.prePlot(data)
-                data = rgba(data,alpha=alpha,cmap=cmap)
-                self.ax.imshow(data, extent=self.extent, origin=&#39;lower&#39;)
+                data = rgba(data,brightness=brightness,alpha=alpha,cmap=cmap)
+                imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
+                imshowargs.update(kwargs)
+                self.ax.imshow(data, **imshowargs)
 
-        def inset(self, window=None, color=&#39;white&#39;, **kwargs):
+        def inset(self, window, **kwargs):
                 &#34;&#34;&#34;Plots a square box with vertices defined by window.
 
-                Window = (xmin, xmax, ymin, ymax).
+                Default color is white.
 
-                Default color is white. Takes all the same kwargs as
-                matplotlib.pyplot.plot().
+                **Parameters**
+
+                * **window** : _array-like_ &lt;br /&gt;
+                Format: `window = [xmin, xmax, ymin, ymax]`. Note that these are the x
+                and y values, rather than their indices.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.plot`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
+                plotargs = {&#39;color&#39;: &#39;white&#39;}
+                plotargs.update(kwargs)
                 self.ax.plot(np.linspace(window[0], window[1], 100),
-                                                np.zeros(100) + window[2], color=color, **kwargs)
+                                                np.zeros(100) + window[2], **plotargs)
                 self.ax.plot(np.linspace(window[0], window[1],100),
-                                                np.zeros(100)+window[3], color=color, **kwargs)
+                                                np.zeros(100)+window[3], **plotargs)
                 self.ax.plot(np.zeros(100) + window[0],
-                                                np.linspace(window[2], window[3], 100),
-                                                color=color, **kwargs)
+                                                np.linspace(window[2], window[3], 100), **plotargs)
                 self.ax.plot(np.zeros(100) + window[1],
                                                 np.linspace(window[2], window[3], 100),
-                                                color=color, **kwargs)
+                                                **plotargs)
 
-def subplots(rc=11, sharex=False, sharey=False, squeeze=False,
-                        subplot_kw=None, gridspec_kw=None, **fig_kw):
+def subplots(rc=11, **kwargs):
                 &#34;&#34;&#34;Creates a fig, ax instance but replaces ax with singleAx.
 
-                Behaves identically to matplotlib.pyplot.subplots(), but replaces each
-                matplotlib.axes.Axes object with a wsp_tools.pyplotwrapper.singleAx
+                Behaves almost identically to matplotlib.pyplot.subplots(), but replaces each
+                `matplotlib.axes.Axes` object with a `wsp_tools.pyplotwrapper.singleAx`
                 object.
 
-                Each wsp_tools.pyplotwrapper.singleAx object in turn behaves just like a
-                normal Axes object, but with added methods.
+                Each `wsp_tools.pyplotwrapper.singleAx` object in turn behaves just like a
+                normal `Axes` object, but with added methods.
+
+                **Parameters**
+
+                * **rc** : _int_ &lt;br /&gt;
+                First digit - nrows. Second digit - ncols. &lt;br /&gt;
+                Default is `rc = 11`.
+
+                * **squeeze** : _bool_ &lt;br /&gt;
+                If true, extra dimensions are squeezed out from the returned array of Axes. &lt;br /&gt;
+                Default is `squeeze = False`.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.subplots`.
+
+                **Returns**
+
+                * **fig** : _Figure_ &lt;br /&gt;
+
+                * **ax** : _singleAx_ or array of _singleAx_ objects &lt;br /&gt;
                 &#34;&#34;&#34;
-                fig, ax = plt.subplots(nrows=rc//10, ncols=rc%10,
-                                                        sharex=sharex, sharey=sharey, squeeze=squeeze,
-                                                        subplot_kw=subplot_kw, gridspec_kw=gridspec_kw,
-                                                        tight_layout=True, **fig_kw)
+                subplotsargs = {&#39;tight_layout&#39;: True, &#39;squeeze&#39;: False}
+                subplotsargs.update(kwargs)
+                fig, ax = plt.subplots(nrows=rc//10, ncols=rc%10, **subplotsargs)
                 for i in range(ax.shape[0]):
                         for j in range(ax.shape[1]):
                                 ax[i][j] = singleAx(ax[i][j])
@@ -300,34 +481,77 @@ def subplots(rc=11, sharex=False, sharey=False, squeeze=False,
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="wsp_tools.pyplotwrapper.subplots"><code class="name flex">
-<span>def <span class="ident">subplots</span></span>(<span>rc=11, sharex=False, sharey=False, squeeze=False, subplot_kw=None, gridspec_kw=None, **fig_kw)</span>
+<span>def <span class="ident">subplots</span></span>(<span>rc=11, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Creates a fig, ax instance but replaces ax with singleAx.</p>
-<p>Behaves identically to matplotlib.pyplot.subplots(), but replaces each
-matplotlib.axes.Axes object with a wsp_tools.pyplotwrapper.singleAx
+<p>Behaves almost identically to matplotlib.pyplot.subplots(), but replaces each
+<code>matplotlib.axes.Axes</code> object with a <code><a title="wsp_tools.pyplotwrapper.singleAx" href="#wsp_tools.pyplotwrapper.singleAx">singleAx</a></code>
 object.</p>
-<p>Each wsp_tools.pyplotwrapper.singleAx object in turn behaves just like a
-normal Axes object, but with added methods.</p></div>
+<p>Each <code><a title="wsp_tools.pyplotwrapper.singleAx" href="#wsp_tools.pyplotwrapper.singleAx">singleAx</a></code> object in turn behaves just like a
+normal <code>Axes</code> object, but with added methods.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>rc</strong> : <em>int</em> <br />
+First digit - nrows. Second digit - ncols. <br />
+Default is <code>rc = 11</code>.</p>
+</li>
+<li>
+<p><strong>squeeze</strong> : <em>bool</em> <br />
+If true, extra dimensions are squeezed out from the returned array of Axes. <br />
+Default is <code>squeeze = False</code>.</p>
+</li>
+<li>
+<p><strong>**kwargs</strong> <br />
+All other kwargs are passed on to <code>matplotlib.axes.Axes.subplots</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li>
+<p><strong>fig</strong> : <em>Figure</em> <br /></p>
+</li>
+<li>
+<p><strong>ax</strong> : <em>singleAx</em> or array of <em>singleAx</em> objects <br /></p>
+</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def subplots(rc=11, sharex=False, sharey=False, squeeze=False,
-                        subplot_kw=None, gridspec_kw=None, **fig_kw):
+<pre><code class="python">def subplots(rc=11, **kwargs):
                 &#34;&#34;&#34;Creates a fig, ax instance but replaces ax with singleAx.
 
-                Behaves identically to matplotlib.pyplot.subplots(), but replaces each
-                matplotlib.axes.Axes object with a wsp_tools.pyplotwrapper.singleAx
+                Behaves almost identically to matplotlib.pyplot.subplots(), but replaces each
+                `matplotlib.axes.Axes` object with a `wsp_tools.pyplotwrapper.singleAx`
                 object.
 
-                Each wsp_tools.pyplotwrapper.singleAx object in turn behaves just like a
-                normal Axes object, but with added methods.
+                Each `wsp_tools.pyplotwrapper.singleAx` object in turn behaves just like a
+                normal `Axes` object, but with added methods.
+
+                **Parameters**
+
+                * **rc** : _int_ &lt;br /&gt;
+                First digit - nrows. Second digit - ncols. &lt;br /&gt;
+                Default is `rc = 11`.
+
+                * **squeeze** : _bool_ &lt;br /&gt;
+                If true, extra dimensions are squeezed out from the returned array of Axes. &lt;br /&gt;
+                Default is `squeeze = False`.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.subplots`.
+
+                **Returns**
+
+                * **fig** : _Figure_ &lt;br /&gt;
+
+                * **ax** : _singleAx_ or array of _singleAx_ objects &lt;br /&gt;
                 &#34;&#34;&#34;
-                fig, ax = plt.subplots(nrows=rc//10, ncols=rc%10,
-                                                        sharex=sharex, sharey=sharey, squeeze=squeeze,
-                                                        subplot_kw=subplot_kw, gridspec_kw=gridspec_kw,
-                                                        tight_layout=True, **fig_kw)
+                subplotsargs = {&#39;tight_layout&#39;: True, &#39;squeeze&#39;: False}
+                subplotsargs.update(kwargs)
+                fig, ax = plt.subplots(nrows=rc//10, ncols=rc%10, **subplotsargs)
                 for i in range(ax.shape[0]):
                         for j in range(ax.shape[1]):
                                 ax[i][j] = singleAx(ax[i][j])
@@ -344,10 +568,10 @@ normal Axes object, but with added methods.</p></div>
 <span>(</span><span>ax, title='', xlabel='', ylabel='')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>An extension of the matplotlib.axes.Axes class.</p>
+<div class="desc"><p>An extension of the <code>matplotlib.axes.Axes</code> class.</p>
 <p>This class adds macros for 2d plotting that I commonly use. In particular,
 it's easy to select only a window of your data to show, to add x-y axes,
-and to show the rgba version of a complex 2d array.</p>
+to add an inset, and to show the rgba version of a complex 2d array.</p>
 <p>Typical usage:</p>
 <pre><code class="language-python">X = np.linspace(-10,10,xres)
 Y = np.linspace(-10,10,yres)
@@ -362,17 +586,21 @@ ax.set_xytitle('x','y','title')
 ax.rgba(data)
 plt.show()
 </code></pre>
-<p>More commonly, this class is returned by <code>wsp_tools.pyplotwrapper.subplots</code>.</p></div>
+<p>More commonly, this class is returned by <code>wsp_tools.pyplotwrapper.subplots</code>.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>ax</strong> : <em>matplotlib.axes.Axes</em> <br /></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class singleAx():
-        &#34;&#34;&#34;An extension of the matplotlib.axes.Axes class.
+        &#34;&#34;&#34;An extension of the `matplotlib.axes.Axes` class.
 
         This class adds macros for 2d plotting that I commonly use. In particular,
         it&#39;s easy to select only a window of your data to show, to add x-y axes,
-        and to show the rgba version of a complex 2d array.
+        to add an inset, and to show the rgba version of a complex 2d array.
 
         Typical usage:
 
@@ -392,6 +620,10 @@ plt.show()
         ```
 
         More commonly, this class is returned by ```wsp_tools.pyplotwrapper.subplots```.
+
+        **Parameters**
+
+        * **ax** : _matplotlib.axes.Axes_ &lt;br /&gt;
         &#34;&#34;&#34;
         def __init__(self, ax, title=&#39;&#39;, xlabel=&#39;&#39;, ylabel=&#39;&#39;):
                 self.ax = ax
@@ -408,30 +640,57 @@ plt.show()
                 ```python
                 fig, axis = plt.subplots()
                 ax = singleAx(axis)
-                ax.setXY(x_axis, y_axis, window)
+                ax.setWindow(window)
                 x_windowed, y_windowed, data_windowed = ax.prePlot(data)
                 ax.ax.SomeOtherMatplotlibPlottingRoutine(x_windowed, y_windowed, data_windowed)
                 plt.show()
                 ```
 
-                Returns:
+                **Parameters** :
 
-                1. xout - numpy.1darray: windowed x-axis
-                2. yout - numpy.1darray: windowed y-axis
-                3. dout - numpy.2darray: windowed data
+                * **data** : _complex ndarray_ &lt;br /&gt;
+                The data to plot. Must be 2-dimensional.
 
-                Additionally, it sets the ax element&#39;s extent.
+                * **step** : _int_ &lt;br /&gt;
+                data will be returned as `data[::step,::step]` - particularly useful for
+                quiver plots. &lt;br /&gt;
+                Default is `step = 1`.
+
+                **Returns**
+
+                * **xout** : _ndarray_ &lt;br /&gt;
+                A 1darray with x-coordinates - either the array set by `setAxes()`,
+                or an array of length `data.shape[1]` from 0 to 100.
+
+                * **yout** : _ndarray_ &lt;br /&gt;
+                A 1darray with y-coordinates - either the array set by `setAxes()`,
+                or an array of length `data.shape[0]` from 0 to 100.
+
+                * **dout** : _ndarray_ &lt;br /&gt;
+                A 2darray with the data to be plotted. If you have set a window using
+                either `setAxes()` or `setWindow()`, the data will be windowed.
                 &#34;&#34;&#34;
-                if not self.hasAxes:
+                if not self.hasAxes and not self.hasWindow:
                         self.x = np.linspace(0,100,data.shape[1])
                         self.y = np.linspace(0,100,data.shape[0])
-                if not self.hasWindow:
-                        self.xmin, self.xmax = 0, 100
-                        self.ymin, self.ymax = 0, 100
-                self.argxmin = np.argmin(np.abs(self.x - self.xmin))
-                self.argxmax = np.argmin(np.abs(self.x - self.xmax))
-                self.argymin = np.argmin(np.abs(self.y - self.ymin))
-                self.argymax = np.argmin(np.abs(self.y - self.ymax))
+                        self.argxmin, self.argxmax = 0, -1
+                        self.argymin, self.argymax = 0, -1
+                elif self.hasAxes and not self.hasWindow:
+                        self.argxmin, self.argxmax = 0, -1
+                        self.argymin, self.argymax = 0, -1
+                elif not self.hasAxes and self.hasWindow:
+                        self.x = np.linspace(0,100,data.shape[1])
+                        self.y = np.linspace(0,100,data.shape[0])
+                        self.argxmin = np.argmin(np.abs(self.x - self.xmin))
+                        self.argxmax = np.argmin(np.abs(self.x - self.xmax))
+                        self.argymin = np.argmin(np.abs(self.y - self.ymin))
+                        self.argymax = np.argmin(np.abs(self.y - self.ymax))
+                elif self.hasAxes and self.hasWindow:
+                        self.argxmin = np.argmin(np.abs(self.x - self.xmin))
+                        self.argxmax = np.argmin(np.abs(self.x - self.xmax))
+                        self.argymin = np.argmin(np.abs(self.y - self.ymin))
+                        self.argymax = np.argmin(np.abs(self.y - self.ymax))
+
                 xout = self.x[self.argxmin:self.argxmax:step]
                 yout = self.y[self.argymin:self.argymax:step]
                 dout = data[self.argymin:self.argymax:step, self.argxmin:self.argxmax:step]
@@ -441,12 +700,24 @@ plt.show()
         def setAxes(self, x, y, window=None):
                 &#34;&#34;&#34;Sets the x and y axes of the singleAx object, and can apply a window.
 
-                x, y should be numpy.1darray objects.
+                Note that this can be used before or after `setWindow()` - whichever
+                was called last, will be used in plotting.
 
-                Window should be wrt the values of x and y, not their
-                indices.
-                If window is omitted, the full data and x-y axes will be used.
+                **Parameters**
 
+                * **x** : _ndarray_ &lt;br /&gt;
+                The x-coordinates. Should be 1-dimensional.
+
+                * **y** : _ndarray_ &lt;br /&gt;
+                The y-coordinates. Should be 1-dimensional.
+
+                * **window** : _array-like, optional_ &lt;br /&gt;
+                Format: `window = [xmin, xmax, ymin, ymax]`. Note that these are the x
+                and y values, rather than their indices.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.hasAxes = True
                 self.x, self.y = x, y
@@ -460,11 +731,18 @@ plt.show()
         def setWindow(self, window=(0,100,0,100)):
                 &#34;&#34;&#34;Applies a window to the singleAx object.
 
-                Can be applied before or after setAxes - whichever was applied last
-                will be used.
+                Note that this can be used before or after `setAxes()` - whichever
+                was called last, will be used in plotting.
 
-                window = (xmin, xmax, ymin, ymax) wrt the values of the axes, not
-                their indices.
+                **Parameters**
+
+                * **window** : _array-like, optional_ &lt;br /&gt;
+                Format: `window = [xmin, xmax, ymin, ymax]`. Note that these are the x
+                and y values, rather than their indices.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.hasWindow = True
                 self.xmin = window[0]
@@ -475,95 +753,207 @@ plt.show()
         def set_title(self, title=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the title of the plot.
 
-                Takes all the same args as matplotlib.axes.Axes.set_title
+                **Parameters**
+
+                * **title** : _string_ &lt;br /&gt;
+                The plot title.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.set_title`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.ax.set_title(title, **kwargs)
 
         def set_xlabel(self, xlabel=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the xlabel of the plot.
 
-                Takes all the same args as matplotlib.axes.Axes.set_xlabel
+                **Parameters*
+
+                * **xlabel** : _string_ &lt;br /&gt;
+                The xlabel.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.set_xlabel`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.ax.set_xlabel(xlabel, **kwargs)
 
         def set_ylabel(self, ylabel=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the ylabel of the plot.
 
-                Takes all the same kwargs as matplotlib.axes.Axes.set_ylabel
+                **Parameters**
+
+                * **ylabel** : _string_ &lt;br /&gt;
+                The ylabel.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.set_ylabel`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.ax.set_ylabel(ylabel, **kwargs)
 
         def set_xytitle(self, xlabel=&#39;&#39;, ylabel=&#39;&#39;, title=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Set the xlabel, ylabel, and title at the same time.
 
-                Sets all three even if not all are given.
-                Takes all the same kwargs as matplotlib.axes.Axes.set_xlabel,
-                matplotlib.axes.Axes.set_ylabel, matplotlib.axes.Axes.set_title.
-                Whatever you input will be applied to all three.
+                Sets all three even if not all are given. Whatever you input will be applied to all three.
 
-                For individual control, use singleAx.set_xlabel, singleAx.set_ylabel,
-                or singleAx.set_title.
+                For individual control, use `singleAx.set_xlabel`, `singleAx.set_ylabel`,
+                or `singleAx.set_title`.
+
+                **Parameters**
+
+                * **ylabel** : _string_ &lt;br /&gt;
+                The ylabel.
+
+                * **xlabel** : _string_ &lt;br /&gt;
+                The xlabel.
+
+                * **title** : _string_ &lt;br /&gt;
+                The plot title.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on
+                to `matplotlib.axes.Axes.set_xlabel`, `matplotlib.axes.Axes.set_ylabel`,
+                and `matplotlib.axes.Axes.set_title`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.ax.set_xlabel(xlabel, **kwargs)
                 self.ax.set_ylabel(ylabel, **kwargs)
                 self.ax.set_title(title, **kwargs)
 
         def imshow(self, data, step=1, **kwargs):
-                &#34;&#34;&#34;Imshows the data.
+                &#34;&#34;&#34;Imshows the (windowed) data. Sets origin to lower, sets the extent.
 
-                If a window has been applied to the plot before this is called, it
-                will be used.
+                **Parameters**
 
-                data should be a numpy.2darray object.
-                step: data[::step,::step] will be shown.
+                * **data** : _ndarray_ &lt;br /&gt;
+                The data to be shown. Use the un-windowed data - the window will be
+                applied automatically, if you set one.
+
+                * **step** : _int_ &lt;br /&gt;
+                data will be returned as `data[::step,::step]` - particularly useful for
+                quiver plots. &lt;br /&gt;
+                Default is `step = 1`.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.imshow`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 x, y, data = self.prePlot(data, step)
-                self.ax.imshow(data, extent=self.extent, origin=&#39;lower&#39;, **kwargs)
+                imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
+                imshowargs.update(kwargs)
+                self.ax.imshow(data, **imshowargs)
 
         def quiver(self, data, step=1, **kwargs):
                 &#34;&#34;&#34;Shows a quiver plot of complex data.
 
-                data should be a complex numpy.2darray object.
-                        If real, the y component will just be zero everywhere.
-                step: data[::step,::step] will be shown.
+                **Parameters**
+
+                * **data** : _ndarray_ &lt;br /&gt;
+                The data to be shown. Use the un-windowed data - the window will be
+                applied automatically, if you set one.
+
+                * **step** : _int_ &lt;br /&gt;
+                data will be returned as `data[::step,::step]` - particularly useful for
+                quiver plots. &lt;br /&gt;
+                Default is `step = 1`.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 xr, yr, data = self.prePlot(data, step)
                 self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
 
-        def rgba(self, data, step=1, alpha=&#39;intensity&#39;, cmap=&#39;uniform&#39;, **kwargs):
+        def rgba(self, data, step=1, brightness=&#39;intensity&#39;, alpha=&#39;uniform&#39;, cmap=&#39;uniform&#39;, **kwargs):
                 &#34;&#34;&#34;Shows an rgba interpretation of complex data.
 
-                Color represents complex angle, and brightness represents either
-                amplitude or intensity.
+                **Parameters**
 
-                data should be a complex numpy.2darray object.
-                        If real, the color will be uniform and only brightness will vary.
+                * **data** : _complex ndarray_ &lt;br /&gt;
+                An array with the data to represent. Dtype may be complex or real - if real,
+                the color will be uniform, and values will be represented by brightness.
 
-                alpha can represent either &#39;intensity&#39; (default) or &#39;amplitude&#39;.
+                * **step** : _int_ &lt;br /&gt;
+                data will be returned as `data[::step,::step]` - particularly useful for
+                quiver plots. &lt;br /&gt;
+                Default is `step = 1`.
+
+                * **cmap** : _string, optional_ &lt;br /&gt;
+                If `cmap = &#39;uniform&#39;`, the CIELAB color space will be used. Otherwise, any
+                pyplot ScalarMappable may be used. &lt;br /&gt;
+                Default is `cmap = &#39;uniform&#39;`.
+
+                * **brightness** : _string, optional_ &lt;br /&gt;
+                Allowed values: `&#39;intensity&#39;`, `&#39;amplitude&#39;`, `&#39;uniform&#39;`. &lt;br /&gt;
+                Default is `brightness = &#39;intensity&#39;`.
+
+                * **alpha** : _string, optional_ &lt;br /&gt;
+                Allowed values: `&#39;intensity&#39;`, `&#39;amplitude&#39;`, `&#39;uniform&#39;`. Determines the alpha
+                component of the rgba value. &lt;br /&gt;
+                Default is `alpha = &#39;uniform&#39;`.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.imshow`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
 
                 x, y, data = self.prePlot(data)
-                data = rgba(data,alpha=alpha,cmap=cmap)
-                self.ax.imshow(data, extent=self.extent, origin=&#39;lower&#39;)
+                data = rgba(data,brightness=brightness,alpha=alpha,cmap=cmap)
+                imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
+                imshowargs.update(kwargs)
+                self.ax.imshow(data, **imshowargs)
 
-        def inset(self, window=None, color=&#39;white&#39;, **kwargs):
+        def inset(self, window, **kwargs):
                 &#34;&#34;&#34;Plots a square box with vertices defined by window.
 
-                Window = (xmin, xmax, ymin, ymax).
+                Default color is white.
 
-                Default color is white. Takes all the same kwargs as
-                matplotlib.pyplot.plot().
+                **Parameters**
+
+                * **window** : _array-like_ &lt;br /&gt;
+                Format: `window = [xmin, xmax, ymin, ymax]`. Note that these are the x
+                and y values, rather than their indices.
+
+                * **\*\*kwargs** &lt;br /&gt;
+                All other kwargs are passed on to `matplotlib.axes.Axes.plot`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
+                plotargs = {&#39;color&#39;: &#39;white&#39;}
+                plotargs.update(kwargs)
                 self.ax.plot(np.linspace(window[0], window[1], 100),
-                                                np.zeros(100) + window[2], color=color, **kwargs)
+                                                np.zeros(100) + window[2], **plotargs)
                 self.ax.plot(np.linspace(window[0], window[1],100),
-                                                np.zeros(100)+window[3], color=color, **kwargs)
+                                                np.zeros(100)+window[3], **plotargs)
                 self.ax.plot(np.zeros(100) + window[0],
-                                                np.linspace(window[2], window[3], 100),
-                                                color=color, **kwargs)
+                                                np.linspace(window[2], window[3], 100), **plotargs)
                 self.ax.plot(np.zeros(100) + window[1],
                                                 np.linspace(window[2], window[3], 100),
-                                                color=color, **kwargs)</code></pre>
+                                                **plotargs)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -571,58 +961,115 @@ plt.show()
 <span>def <span class="ident">imshow</span></span>(<span>self, data, step=1, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Imshows the data.</p>
-<p>If a window has been applied to the plot before this is called, it
-will be used.</p>
-<p>data should be a numpy.2darray object.
-step: data[::step,::step] will be shown.</p></div>
+<div class="desc"><p>Imshows the (windowed) data. Sets origin to lower, sets the extent.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>data</strong> : <em>ndarray</em> <br />
+The data to be shown. Use the un-windowed data - the window will be
+applied automatically, if you set one.</p>
+</li>
+<li>
+<p><strong>step</strong> : <em>int</em> <br />
+data will be returned as <code>data[::step,::step]</code> - particularly useful for
+quiver plots. <br />
+Default is <code>step = 1</code>.</p>
+</li>
+<li>
+<p><strong>**kwargs</strong> <br />
+All other kwargs are passed on to <code>matplotlib.axes.Axes.imshow</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def imshow(self, data, step=1, **kwargs):
-        &#34;&#34;&#34;Imshows the data.
+        &#34;&#34;&#34;Imshows the (windowed) data. Sets origin to lower, sets the extent.
 
-        If a window has been applied to the plot before this is called, it
-        will be used.
+        **Parameters**
 
-        data should be a numpy.2darray object.
-        step: data[::step,::step] will be shown.
+        * **data** : _ndarray_ &lt;br /&gt;
+        The data to be shown. Use the un-windowed data - the window will be
+        applied automatically, if you set one.
+
+        * **step** : _int_ &lt;br /&gt;
+        data will be returned as `data[::step,::step]` - particularly useful for
+        quiver plots. &lt;br /&gt;
+        Default is `step = 1`.
+
+        * **\*\*kwargs** &lt;br /&gt;
+        All other kwargs are passed on to `matplotlib.axes.Axes.imshow`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         x, y, data = self.prePlot(data, step)
-        self.ax.imshow(data, extent=self.extent, origin=&#39;lower&#39;, **kwargs)</code></pre>
+        imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
+        imshowargs.update(kwargs)
+        self.ax.imshow(data, **imshowargs)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.inset"><code class="name flex">
-<span>def <span class="ident">inset</span></span>(<span>self, window=None, color='white', **kwargs)</span>
+<span>def <span class="ident">inset</span></span>(<span>self, window, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plots a square box with vertices defined by window.</p>
-<p>Window = (xmin, xmax, ymin, ymax).</p>
-<p>Default color is white. Takes all the same kwargs as
-matplotlib.pyplot.plot().</p></div>
+<p>Default color is white.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>window</strong> : <em>array-like</em> <br />
+Format: <code>window = [xmin, xmax, ymin, ymax]</code>. Note that these are the x
+and y values, rather than their indices.</p>
+</li>
+<li>
+<p><strong>**kwargs</strong> <br />
+All other kwargs are passed on to <code>matplotlib.axes.Axes.plot</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def inset(self, window=None, color=&#39;white&#39;, **kwargs):
+<pre><code class="python">def inset(self, window, **kwargs):
         &#34;&#34;&#34;Plots a square box with vertices defined by window.
 
-        Window = (xmin, xmax, ymin, ymax).
+        Default color is white.
 
-        Default color is white. Takes all the same kwargs as
-        matplotlib.pyplot.plot().
+        **Parameters**
+
+        * **window** : _array-like_ &lt;br /&gt;
+        Format: `window = [xmin, xmax, ymin, ymax]`. Note that these are the x
+        and y values, rather than their indices.
+
+        * **\*\*kwargs** &lt;br /&gt;
+        All other kwargs are passed on to `matplotlib.axes.Axes.plot`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
+        plotargs = {&#39;color&#39;: &#39;white&#39;}
+        plotargs.update(kwargs)
         self.ax.plot(np.linspace(window[0], window[1], 100),
-                                        np.zeros(100) + window[2], color=color, **kwargs)
+                                        np.zeros(100) + window[2], **plotargs)
         self.ax.plot(np.linspace(window[0], window[1],100),
-                                        np.zeros(100)+window[3], color=color, **kwargs)
+                                        np.zeros(100)+window[3], **plotargs)
         self.ax.plot(np.zeros(100) + window[0],
-                                        np.linspace(window[2], window[3], 100),
-                                        color=color, **kwargs)
+                                        np.linspace(window[2], window[3], 100), **plotargs)
         self.ax.plot(np.zeros(100) + window[1],
                                         np.linspace(window[2], window[3], 100),
-                                        color=color, **kwargs)</code></pre>
+                                        **plotargs)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.prePlot"><code class="name flex">
@@ -634,18 +1081,42 @@ matplotlib.pyplot.plot().</p></div>
 function to get the windowed data:</p>
 <pre><code class="language-python">fig, axis = plt.subplots()
 ax = singleAx(axis)
-ax.setXY(x_axis, y_axis, window)
+ax.setWindow(window)
 x_windowed, y_windowed, data_windowed = ax.prePlot(data)
 ax.ax.SomeOtherMatplotlibPlottingRoutine(x_windowed, y_windowed, data_windowed)
 plt.show()
 </code></pre>
-<p>Returns:</p>
-<ol>
-<li>xout - numpy.1darray: windowed x-axis</li>
-<li>yout - numpy.1darray: windowed y-axis</li>
-<li>dout - numpy.2darray: windowed data</li>
-</ol>
-<p>Additionally, it sets the ax element's extent.</p></div>
+<p><strong>Parameters</strong> :</p>
+<ul>
+<li>
+<p><strong>data</strong> : <em>complex ndarray</em> <br />
+The data to plot. Must be 2-dimensional.</p>
+</li>
+<li>
+<p><strong>step</strong> : <em>int</em> <br />
+data will be returned as <code>data[::step,::step]</code> - particularly useful for
+quiver plots. <br />
+Default is <code>step = 1</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li>
+<p><strong>xout</strong> : <em>ndarray</em> <br />
+A 1darray with x-coordinates - either the array set by <code>setAxes()</code>,
+or an array of length <code>data.shape[1]</code> from 0 to 100.</p>
+</li>
+<li>
+<p><strong>yout</strong> : <em>ndarray</em> <br />
+A 1darray with y-coordinates - either the array set by <code>setAxes()</code>,
+or an array of length <code>data.shape[0]</code> from 0 to 100.</p>
+</li>
+<li>
+<p><strong>dout</strong> : <em>ndarray</em> <br />
+A 2darray with the data to be plotted. If you have set a window using
+either <code>setAxes()</code> or <code>setWindow()</code>, the data will be windowed.</p>
+</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -659,30 +1130,57 @@ plt.show()
         ```python
         fig, axis = plt.subplots()
         ax = singleAx(axis)
-        ax.setXY(x_axis, y_axis, window)
+        ax.setWindow(window)
         x_windowed, y_windowed, data_windowed = ax.prePlot(data)
         ax.ax.SomeOtherMatplotlibPlottingRoutine(x_windowed, y_windowed, data_windowed)
         plt.show()
         ```
 
-        Returns:
+        **Parameters** :
 
-        1. xout - numpy.1darray: windowed x-axis
-        2. yout - numpy.1darray: windowed y-axis
-        3. dout - numpy.2darray: windowed data
+        * **data** : _complex ndarray_ &lt;br /&gt;
+        The data to plot. Must be 2-dimensional.
 
-        Additionally, it sets the ax element&#39;s extent.
+        * **step** : _int_ &lt;br /&gt;
+        data will be returned as `data[::step,::step]` - particularly useful for
+        quiver plots. &lt;br /&gt;
+        Default is `step = 1`.
+
+        **Returns**
+
+        * **xout** : _ndarray_ &lt;br /&gt;
+        A 1darray with x-coordinates - either the array set by `setAxes()`,
+        or an array of length `data.shape[1]` from 0 to 100.
+
+        * **yout** : _ndarray_ &lt;br /&gt;
+        A 1darray with y-coordinates - either the array set by `setAxes()`,
+        or an array of length `data.shape[0]` from 0 to 100.
+
+        * **dout** : _ndarray_ &lt;br /&gt;
+        A 2darray with the data to be plotted. If you have set a window using
+        either `setAxes()` or `setWindow()`, the data will be windowed.
         &#34;&#34;&#34;
-        if not self.hasAxes:
+        if not self.hasAxes and not self.hasWindow:
                 self.x = np.linspace(0,100,data.shape[1])
                 self.y = np.linspace(0,100,data.shape[0])
-        if not self.hasWindow:
-                self.xmin, self.xmax = 0, 100
-                self.ymin, self.ymax = 0, 100
-        self.argxmin = np.argmin(np.abs(self.x - self.xmin))
-        self.argxmax = np.argmin(np.abs(self.x - self.xmax))
-        self.argymin = np.argmin(np.abs(self.y - self.ymin))
-        self.argymax = np.argmin(np.abs(self.y - self.ymax))
+                self.argxmin, self.argxmax = 0, -1
+                self.argymin, self.argymax = 0, -1
+        elif self.hasAxes and not self.hasWindow:
+                self.argxmin, self.argxmax = 0, -1
+                self.argymin, self.argymax = 0, -1
+        elif not self.hasAxes and self.hasWindow:
+                self.x = np.linspace(0,100,data.shape[1])
+                self.y = np.linspace(0,100,data.shape[0])
+                self.argxmin = np.argmin(np.abs(self.x - self.xmin))
+                self.argxmax = np.argmin(np.abs(self.x - self.xmax))
+                self.argymin = np.argmin(np.abs(self.y - self.ymin))
+                self.argymax = np.argmin(np.abs(self.y - self.ymax))
+        elif self.hasAxes and self.hasWindow:
+                self.argxmin = np.argmin(np.abs(self.x - self.xmin))
+                self.argxmax = np.argmin(np.abs(self.x - self.xmax))
+                self.argymin = np.argmin(np.abs(self.y - self.ymin))
+                self.argymax = np.argmin(np.abs(self.y - self.ymax))
+
         xout = self.x[self.argxmin:self.argxmax:step]
         yout = self.y[self.argymin:self.argymax:step]
         dout = data[self.argymin:self.argymax:step, self.argxmin:self.argxmax:step]
@@ -695,9 +1193,28 @@ plt.show()
 </code></dt>
 <dd>
 <div class="desc"><p>Shows a quiver plot of complex data.</p>
-<p>data should be a complex numpy.2darray object.
-If real, the y component will just be zero everywhere.
-step: data[::step,::step] will be shown.</p></div>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>data</strong> : <em>ndarray</em> <br />
+The data to be shown. Use the un-windowed data - the window will be
+applied automatically, if you set one.</p>
+</li>
+<li>
+<p><strong>step</strong> : <em>int</em> <br />
+data will be returned as <code>data[::step,::step]</code> - particularly useful for
+quiver plots. <br />
+Default is <code>step = 1</code>.</p>
+</li>
+<li>
+<p><strong>**kwargs</strong> <br />
+All other kwargs are passed on to <code>matplotlib.axes.Axes.quiver</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -705,43 +1222,117 @@ step: data[::step,::step] will be shown.</p></div>
 <pre><code class="python">def quiver(self, data, step=1, **kwargs):
         &#34;&#34;&#34;Shows a quiver plot of complex data.
 
-        data should be a complex numpy.2darray object.
-                If real, the y component will just be zero everywhere.
-        step: data[::step,::step] will be shown.
+        **Parameters**
+
+        * **data** : _ndarray_ &lt;br /&gt;
+        The data to be shown. Use the un-windowed data - the window will be
+        applied automatically, if you set one.
+
+        * **step** : _int_ &lt;br /&gt;
+        data will be returned as `data[::step,::step]` - particularly useful for
+        quiver plots. &lt;br /&gt;
+        Default is `step = 1`.
+
+        * **\*\*kwargs** &lt;br /&gt;
+        All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         xr, yr, data = self.prePlot(data, step)
         self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.rgba"><code class="name flex">
-<span>def <span class="ident">rgba</span></span>(<span>self, data, step=1, alpha='intensity', cmap='uniform', **kwargs)</span>
+<span>def <span class="ident">rgba</span></span>(<span>self, data, step=1, brightness='intensity', alpha='uniform', cmap='uniform', **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Shows an rgba interpretation of complex data.</p>
-<p>Color represents complex angle, and brightness represents either
-amplitude or intensity.</p>
-<p>data should be a complex numpy.2darray object.
-If real, the color will be uniform and only brightness will vary.</p>
-<p>alpha can represent either 'intensity' (default) or 'amplitude'.</p></div>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>data</strong> : <em>complex ndarray</em> <br />
+An array with the data to represent. Dtype may be complex or real - if real,
+the color will be uniform, and values will be represented by brightness.</p>
+</li>
+<li>
+<p><strong>step</strong> : <em>int</em> <br />
+data will be returned as <code>data[::step,::step]</code> - particularly useful for
+quiver plots. <br />
+Default is <code>step = 1</code>.</p>
+</li>
+<li>
+<p><strong>cmap</strong> : <em>string, optional</em> <br />
+If <code>cmap = 'uniform'</code>, the CIELAB color space will be used. Otherwise, any
+pyplot ScalarMappable may be used. <br />
+Default is <code>cmap = 'uniform'</code>.</p>
+</li>
+<li>
+<p><strong>brightness</strong> : <em>string, optional</em> <br />
+Allowed values: <code>'intensity'</code>, <code>'amplitude'</code>, <code>'uniform'</code>. <br />
+Default is <code>brightness = 'intensity'</code>.</p>
+</li>
+<li>
+<p><strong>alpha</strong> : <em>string, optional</em> <br />
+Allowed values: <code>'intensity'</code>, <code>'amplitude'</code>, <code>'uniform'</code>. Determines the alpha
+component of the rgba value. <br />
+Default is <code>alpha = 'uniform'</code>.</p>
+</li>
+<li>
+<p><strong>**kwargs</strong> <br />
+All other kwargs are passed on to <code>matplotlib.axes.Axes.imshow</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def rgba(self, data, step=1, alpha=&#39;intensity&#39;, cmap=&#39;uniform&#39;, **kwargs):
+<pre><code class="python">def rgba(self, data, step=1, brightness=&#39;intensity&#39;, alpha=&#39;uniform&#39;, cmap=&#39;uniform&#39;, **kwargs):
         &#34;&#34;&#34;Shows an rgba interpretation of complex data.
 
-        Color represents complex angle, and brightness represents either
-        amplitude or intensity.
+        **Parameters**
 
-        data should be a complex numpy.2darray object.
-                If real, the color will be uniform and only brightness will vary.
+        * **data** : _complex ndarray_ &lt;br /&gt;
+        An array with the data to represent. Dtype may be complex or real - if real,
+        the color will be uniform, and values will be represented by brightness.
 
-        alpha can represent either &#39;intensity&#39; (default) or &#39;amplitude&#39;.
+        * **step** : _int_ &lt;br /&gt;
+        data will be returned as `data[::step,::step]` - particularly useful for
+        quiver plots. &lt;br /&gt;
+        Default is `step = 1`.
+
+        * **cmap** : _string, optional_ &lt;br /&gt;
+        If `cmap = &#39;uniform&#39;`, the CIELAB color space will be used. Otherwise, any
+        pyplot ScalarMappable may be used. &lt;br /&gt;
+        Default is `cmap = &#39;uniform&#39;`.
+
+        * **brightness** : _string, optional_ &lt;br /&gt;
+        Allowed values: `&#39;intensity&#39;`, `&#39;amplitude&#39;`, `&#39;uniform&#39;`. &lt;br /&gt;
+        Default is `brightness = &#39;intensity&#39;`.
+
+        * **alpha** : _string, optional_ &lt;br /&gt;
+        Allowed values: `&#39;intensity&#39;`, `&#39;amplitude&#39;`, `&#39;uniform&#39;`. Determines the alpha
+        component of the rgba value. &lt;br /&gt;
+        Default is `alpha = &#39;uniform&#39;`.
+
+        * **\*\*kwargs** &lt;br /&gt;
+        All other kwargs are passed on to `matplotlib.axes.Axes.imshow`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
 
         x, y, data = self.prePlot(data)
-        data = rgba(data,alpha=alpha,cmap=cmap)
-        self.ax.imshow(data, extent=self.extent, origin=&#39;lower&#39;)</code></pre>
+        data = rgba(data,brightness=brightness,alpha=alpha,cmap=cmap)
+        imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
+        imshowargs.update(kwargs)
+        self.ax.imshow(data, **imshowargs)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.setAxes"><code class="name flex">
@@ -749,10 +1340,28 @@ If real, the color will be uniform and only brightness will vary.</p>
 </code></dt>
 <dd>
 <div class="desc"><p>Sets the x and y axes of the singleAx object, and can apply a window.</p>
-<p>x, y should be numpy.1darray objects.</p>
-<p>Window should be wrt the values of x and y, not their
-indices.
-If window is omitted, the full data and x-y axes will be used.</p></div>
+<p>Note that this can be used before or after <code>setWindow()</code> - whichever
+was called last, will be used in plotting.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>x</strong> : <em>ndarray</em> <br />
+The x-coordinates. Should be 1-dimensional.</p>
+</li>
+<li>
+<p><strong>y</strong> : <em>ndarray</em> <br />
+The y-coordinates. Should be 1-dimensional.</p>
+</li>
+<li>
+<p><strong>window</strong> : <em>array-like, optional</em> <br />
+Format: <code>window = [xmin, xmax, ymin, ymax]</code>. Note that these are the x
+and y values, rather than their indices.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -760,12 +1369,24 @@ If window is omitted, the full data and x-y axes will be used.</p></div>
 <pre><code class="python">def setAxes(self, x, y, window=None):
         &#34;&#34;&#34;Sets the x and y axes of the singleAx object, and can apply a window.
 
-        x, y should be numpy.1darray objects.
+        Note that this can be used before or after `setWindow()` - whichever
+        was called last, will be used in plotting.
 
-        Window should be wrt the values of x and y, not their
-        indices.
-        If window is omitted, the full data and x-y axes will be used.
+        **Parameters**
 
+        * **x** : _ndarray_ &lt;br /&gt;
+        The x-coordinates. Should be 1-dimensional.
+
+        * **y** : _ndarray_ &lt;br /&gt;
+        The y-coordinates. Should be 1-dimensional.
+
+        * **window** : _array-like, optional_ &lt;br /&gt;
+        Format: `window = [xmin, xmax, ymin, ymax]`. Note that these are the x
+        and y values, rather than their indices.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.hasAxes = True
         self.x, self.y = x, y
@@ -782,10 +1403,18 @@ If window is omitted, the full data and x-y axes will be used.</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Applies a window to the singleAx object.</p>
-<p>Can be applied before or after setAxes - whichever was applied last
-will be used.</p>
-<p>window = (xmin, xmax, ymin, ymax) wrt the values of the axes, not
-their indices.</p></div>
+<p>Note that this can be used before or after <code>setAxes()</code> - whichever
+was called last, will be used in plotting.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>window</strong> : <em>array-like, optional</em> <br />
+Format: <code>window = [xmin, xmax, ymin, ymax]</code>. Note that these are the x
+and y values, rather than their indices.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -793,11 +1422,18 @@ their indices.</p></div>
 <pre><code class="python">def setWindow(self, window=(0,100,0,100)):
         &#34;&#34;&#34;Applies a window to the singleAx object.
 
-        Can be applied before or after setAxes - whichever was applied last
-        will be used.
+        Note that this can be used before or after `setAxes()` - whichever
+        was called last, will be used in plotting.
 
-        window = (xmin, xmax, ymin, ymax) wrt the values of the axes, not
-        their indices.
+        **Parameters**
+
+        * **window** : _array-like, optional_ &lt;br /&gt;
+        Format: `window = [xmin, xmax, ymin, ymax]`. Note that these are the x
+        and y values, rather than their indices.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.hasWindow = True
         self.xmin = window[0]
@@ -811,7 +1447,21 @@ their indices.</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Sets the title of the plot.</p>
-<p>Takes all the same args as matplotlib.axes.Axes.set_title</p></div>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>title</strong> : <em>string</em> <br />
+The plot title.</p>
+</li>
+<li>
+<p><strong>**kwargs</strong> <br />
+All other kwargs are passed on to <code>matplotlib.axes.Axes.set_title</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -819,7 +1469,17 @@ their indices.</p></div>
 <pre><code class="python">def set_title(self, title=&#39;&#39;, **kwargs):
         &#34;&#34;&#34;Sets the title of the plot.
 
-        Takes all the same args as matplotlib.axes.Axes.set_title
+        **Parameters**
+
+        * **title** : _string_ &lt;br /&gt;
+        The plot title.
+
+        * **\*\*kwargs** &lt;br /&gt;
+        All other kwargs are passed on to `matplotlib.axes.Axes.set_title`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.ax.set_title(title, **kwargs)</code></pre>
 </details>
@@ -829,7 +1489,21 @@ their indices.</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Sets the xlabel of the plot.</p>
-<p>Takes all the same args as matplotlib.axes.Axes.set_xlabel</p></div>
+<p>*<em>Parameters</em></p>
+<ul>
+<li>
+<p><strong>xlabel</strong> : <em>string</em> <br />
+The xlabel.</p>
+</li>
+<li>
+<p><strong>**kwargs</strong> <br />
+All other kwargs are passed on to <code>matplotlib.axes.Axes.set_xlabel</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -837,7 +1511,17 @@ their indices.</p></div>
 <pre><code class="python">def set_xlabel(self, xlabel=&#39;&#39;, **kwargs):
         &#34;&#34;&#34;Sets the xlabel of the plot.
 
-        Takes all the same args as matplotlib.axes.Axes.set_xlabel
+        **Parameters*
+
+        * **xlabel** : _string_ &lt;br /&gt;
+        The xlabel.
+
+        * **\*\*kwargs** &lt;br /&gt;
+        All other kwargs are passed on to `matplotlib.axes.Axes.set_xlabel`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.ax.set_xlabel(xlabel, **kwargs)</code></pre>
 </details>
@@ -847,12 +1531,34 @@ their indices.</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Set the xlabel, ylabel, and title at the same time.</p>
-<p>Sets all three even if not all are given.
-Takes all the same kwargs as matplotlib.axes.Axes.set_xlabel,
-matplotlib.axes.Axes.set_ylabel, matplotlib.axes.Axes.set_title.
-Whatever you input will be applied to all three.</p>
-<p>For individual control, use singleAx.set_xlabel, singleAx.set_ylabel,
-or singleAx.set_title.</p></div>
+<p>Sets all three even if not all are given. Whatever you input will be applied to all three.</p>
+<p>For individual control, use <code><a title="wsp_tools.pyplotwrapper.singleAx.set_xlabel" href="#wsp_tools.pyplotwrapper.singleAx.set_xlabel">singleAx.set_xlabel()</a></code>, <code><a title="wsp_tools.pyplotwrapper.singleAx.set_ylabel" href="#wsp_tools.pyplotwrapper.singleAx.set_ylabel">singleAx.set_ylabel()</a></code>,
+or <code><a title="wsp_tools.pyplotwrapper.singleAx.set_title" href="#wsp_tools.pyplotwrapper.singleAx.set_title">singleAx.set_title()</a></code>.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>ylabel</strong> : <em>string</em> <br />
+The ylabel.</p>
+</li>
+<li>
+<p><strong>xlabel</strong> : <em>string</em> <br />
+The xlabel.</p>
+</li>
+<li>
+<p><strong>title</strong> : <em>string</em> <br />
+The plot title.</p>
+</li>
+<li>
+<p><strong>**kwargs</strong> <br />
+All other kwargs are passed on
+to <code>matplotlib.axes.Axes.set_xlabel</code>, <code>matplotlib.axes.Axes.set_ylabel</code>,
+and <code>matplotlib.axes.Axes.set_title</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -860,13 +1566,30 @@ or singleAx.set_title.</p></div>
 <pre><code class="python">def set_xytitle(self, xlabel=&#39;&#39;, ylabel=&#39;&#39;, title=&#39;&#39;, **kwargs):
         &#34;&#34;&#34;Set the xlabel, ylabel, and title at the same time.
 
-        Sets all three even if not all are given.
-        Takes all the same kwargs as matplotlib.axes.Axes.set_xlabel,
-        matplotlib.axes.Axes.set_ylabel, matplotlib.axes.Axes.set_title.
-        Whatever you input will be applied to all three.
+        Sets all three even if not all are given. Whatever you input will be applied to all three.
 
-        For individual control, use singleAx.set_xlabel, singleAx.set_ylabel,
-        or singleAx.set_title.
+        For individual control, use `singleAx.set_xlabel`, `singleAx.set_ylabel`,
+        or `singleAx.set_title`.
+
+        **Parameters**
+
+        * **ylabel** : _string_ &lt;br /&gt;
+        The ylabel.
+
+        * **xlabel** : _string_ &lt;br /&gt;
+        The xlabel.
+
+        * **title** : _string_ &lt;br /&gt;
+        The plot title.
+
+        * **\*\*kwargs** &lt;br /&gt;
+        All other kwargs are passed on
+        to `matplotlib.axes.Axes.set_xlabel`, `matplotlib.axes.Axes.set_ylabel`,
+        and `matplotlib.axes.Axes.set_title`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.ax.set_xlabel(xlabel, **kwargs)
         self.ax.set_ylabel(ylabel, **kwargs)
@@ -878,7 +1601,21 @@ or singleAx.set_title.</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Sets the ylabel of the plot.</p>
-<p>Takes all the same kwargs as matplotlib.axes.Axes.set_ylabel</p></div>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>ylabel</strong> : <em>string</em> <br />
+The ylabel.</p>
+</li>
+<li>
+<p><strong>**kwargs</strong> <br />
+All other kwargs are passed on to <code>matplotlib.axes.Axes.set_ylabel</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -886,7 +1623,17 @@ or singleAx.set_title.</p></div>
 <pre><code class="python">def set_ylabel(self, ylabel=&#39;&#39;, **kwargs):
         &#34;&#34;&#34;Sets the ylabel of the plot.
 
-        Takes all the same kwargs as matplotlib.axes.Axes.set_ylabel
+        **Parameters**
+
+        * **ylabel** : _string_ &lt;br /&gt;
+        The ylabel.
+
+        * **\*\*kwargs** &lt;br /&gt;
+        All other kwargs are passed on to `matplotlib.axes.Axes.set_ylabel`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.ax.set_ylabel(ylabel, **kwargs)</code></pre>
 </details>

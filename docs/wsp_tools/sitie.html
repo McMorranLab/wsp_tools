@@ -24,15 +24,15 @@
 <section id="section-intro">
 <p>Contains utilities for reconstructing phase and magnetization from Lorentz images.</p>
 <p>The most common use case is to generate a lorentz object from a <code>.dm3</code> file.
-Then one can analyze using high_pass(), sitie(), crop_pixel_counts(), etc.</p>
+Then you can analyze using high_pass(), sitie(), crop_pixel_counts(), etc.</p>
 <p>Example:</p>
 <pre><code class="language-python">import ncempy.io.dm as dm
+import wsp_tools as wt
 
-fdir = '/path/to/data'
-fname = 'lorentzImage.dm3'
-file = dm.dmReader(os.path.join(fdir, fname))
+fname = '/path/to/data.dm3'
+dm3file = dm.dmReader(fname)
 
-img = wsp_tools.lorentz(dm3file)
+img = wt.lorentz(dm3file)
 img.crop_pixel_counts()
 img.high_pass()
 img.blur()
@@ -47,18 +47,18 @@ img.sitie()
 <pre><code class="python">&#34;&#34;&#34;Contains utilities for reconstructing phase and magnetization from Lorentz images.
 
 The most common use case is to generate a lorentz object from a ```.dm3``` file.
-Then one can analyze using high_pass(), sitie(), crop_pixel_counts(), etc.
+Then you can analyze using high_pass(), sitie(), crop_pixel_counts(), etc.
 
 Example:
 
 ```python
 import ncempy.io.dm as dm
+import wsp_tools as wt
 
-fdir = &#39;/path/to/data&#39;
-fname = &#39;lorentzImage.dm3&#39;
-file = dm.dmReader(os.path.join(fdir, fname))
+fname = &#39;/path/to/data.dm3&#39;
+dm3file = dm.dmReader(fname)
 
-img = wsp_tools.lorentz(dm3file)
+img = wt.lorentz(dm3file)
 img.crop_pixel_counts()
 img.high_pass()
 img.blur()
@@ -68,6 +68,7 @@ img.sitie()
 ```
 &#34;&#34;&#34;
 from . import dB, rgba, np, ndi, plt, os
+from .pyplotwrapper import subplots
 from . import constants as _
 np.seterr(divide=&#39;ignore&#39;)
 import json
@@ -75,13 +76,18 @@ import json
 class lorentz:
         &#34;&#34;&#34;Class that contains sitie information about a lorentz image.
 
-        Input:
+        **Parameters**
 
-        dm3file: a dictionary-like object with the following keys:
-
-        * data: numpy.2darray() containing the electron counts
-        * pixelSize: [scalar, scalar] containing the x and y pixel sizes
-        * pixelUnit: [string, string] containing the unit of the pixel sizes
+        * **dm3file** : _dictionary-like_ &lt;br /&gt;
+        a dm3-like file with the following keys: &lt;br /&gt;
+                &lt;ul&gt;
+                &lt;li&gt; **data** : _ndarray_ &lt;br /&gt;
+                An array carrying the electron counts. &lt;/li&gt;
+                &lt;li&gt; **pixelSize** : _tuple_ &lt;br /&gt;
+                (_number_, _number_) - the x and y pixel sizes. &lt;/li&gt;
+                &lt;li&gt; **pixelUnit** : _tuple_ &lt;br /&gt;
+                (_string_, _string_) - the x and y pixel units. &lt;/li&gt;
+                &lt;/ul&gt;
         &#34;&#34;&#34;
         def __init__(self, dm3file):
                 self.rawData = dm3file[&#39;data&#39;]
@@ -102,10 +108,23 @@ class lorentz:
                 &#34;&#34;&#34;
                 self.data = self.rawData
 
-        def sitie(self, defocus, wavelength=1.96e-12):
+        def sitie(self, defocus, wavelength=1.97e-12):
                 &#34;&#34;&#34;Carries out phase and B-field reconstruction.
 
                 Assigns phase, Bx, and By attributes.
+
+                **Parameters**
+
+                * **defocus** : _number_ &lt;br /&gt;
+                The defocus at which the images were taken.
+
+                * **wavelength** : _number, optional_ &lt;br /&gt;
+                The electron wavelength. &lt;br /&gt;
+                Default is `wavelength = 1.96e-12` (relativistic wavelength of a 300kV electron).
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;defocus&#39;: defocus})
                 dummy = sitie_RHS(self.data, defocus, wavelength)
@@ -113,64 +132,148 @@ class lorentz:
                 self.Bx, self.By = B_from_phase(self.phase, thickness=1)
 
         def crop_pixel_counts(self, sigma=10):
-                &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some std from avg.
+                &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some standard deviation from avg.
 
-                Sets those pixels to avg +/- sigma*std.
+                All pixel counts are limited to (average) +/- sigma*(standard deviation).
+
+                **Parameters**
+
+                * **sigma** : _number, optional_ &lt;br /&gt;
+                Default is `sigma = 10`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;crop pixel sigma&#39;: sigma})
                 self.data = crop_pixel_counts(self.data, sigma=sigma)
 
         def high_pass(self, sigma=20):
                 &#34;&#34;&#34;Applies a high-pass filter to the image data.
+
+                **Parameters**
+
+                * **sigma** : _number, optional_ &lt;br /&gt;
+                Default is `sigma = 20`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;high pass sigma&#39;: sigma})
                 self.data = high_pass(self.data, sigma=sigma)
 
         def low_pass(self, sigma=50):
                 &#34;&#34;&#34;Applies a low-pass filter to the image data.
+
+                **Parameters**
+
+                * **sigma** : _number, optional_ &lt;br /&gt;
+                Default is `sigma = 50`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;low pass sigma&#39;: sigma})
                 self.data = low_pass(self.data, sigma=sigma)
 
         def blur(self, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
                 &#34;&#34;&#34;Applies a Gaussian blur to the image data.
+
+                **Parameters**
+
+                * **sigma** : _number, optional_ &lt;br /&gt;
+                Default is `sigma = 5`.
+
+                * **mode** : _string, optional_ &lt;br /&gt;
+                Gets passed to `scipy.ndimage.blur`. &lt;br /&gt;
+                Default is `mode = &#39;wrap&#39;`.
+
+                * **cval** : _number, optional_ &lt;br /&gt;
+                Gets passed to `scipy.ndimage.blur`. &lt;br /&gt;
+                Default is `cval = 0.0`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;blur sigma&#39;: sigma})
                 self.data = blur(self.data, sigma, mode, cval)
 
-        def preview(self, window=(0,-1,0,-1)):
+        def preview(self, window=None):
                 &#34;&#34;&#34;Preview the image.
 
-                window = (xmin, xmax, ymin, ymax)
+                Note that unlike `pyplotwrapper`,
+
+                **Parameters**
+
+                * **window** : _array-like, optional_ &lt;br /&gt;
+                Format is `window = (xmin, xmax, ymin, ymax)`. &lt;br /&gt;
+                Default is `window = (0, -1, 0, -1)`
                 &#34;&#34;&#34;
-                (xmin, xmax, ymin, ymax) = window
-                if xmax == -1:
-                        xmax = self.data.shape[0] - 1
-                if ymax == -1:
-                        ymax = self.data.shape[1] - 1
-                fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)), tight_layout=True)
-                data = self.data[ymin:ymax, xmin:xmax]
-                data = crop_pixel_counts(data, sigma=10)
-                extent = [self.x[xmin],self.x[xmax],self.y[ymin],self.y[ymax]]
-                ax.set_title(&#34;Intensity&#34;, fontsize=30)
-                ax.set_xlabel(&#34;x (px)&#34;)
-                ax.set_ylabel(&#34;y (px)&#34;)
-                ax.imshow(data, origin=&#34;lower&#34;, extent=extent)
+                fig, ax = subplots(11)
+                if not window is None:
+                        ax[0,0].setWindow(window)
+                data = crop_pixel_counts(self.data, sigma=10)
+                ax[0,0].setAxes(self.x, self.y)
+                ax[0,0].set_xlabel(&#34;x ({:})&#34;.format(self.pixelUnit))
+                ax[0,0].set_ylabel(&#34;y ({:})&#34;.format(self.pixelUnit))
+                ax[0,0].imshow(data)
                 plt.show()
 
         def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
-                &#34;&#34;&#34;Save the metadata of the lorentz object to a file.&#34;&#34;&#34;
+                &#34;&#34;&#34;Save the metadata of the lorentz object to a file.
+
+                **Parameters**
+
+                * **outdir** : _string, optional_ &lt;br /&gt;
+                The directory where you&#39;d like to save the metadata. &lt;br /&gt;
+                Default is `outdir = &#39;&#39;`.
+
+                * **outname** : _string, optional_ &lt;br /&gt;
+                The name of the metadata file. &lt;br /&gt;
+                Default is `outname = &#39;metadata.json&#39;`.
+                &#34;&#34;&#34;
                 with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
                         json.dump(self.metadata, fp, indent=&#34;&#34;)
 
 ############################## Pre-processing ####################
 def blur(image, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
         &#34;&#34;&#34;Applies a Gaussian filter to the image.
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 5`.
+
+        * **mode** : _string, optional_ &lt;br /&gt;
+        Gets passed to `scipy.ndimage.blur`. &lt;br /&gt;
+        Default is `mode = &#39;wrap&#39;`.
+
+        * **cval** : _number, optional_ &lt;br /&gt;
+        Gets passed to `scipy.ndimage.blur`. &lt;br /&gt;
+        Default is `cval = 0.0`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         return(ndi.gaussian_filter(image, sigma, mode=mode, cval=cval))
 
 def crop_pixel_counts(image, sigma=10):
-        &#34;&#34;&#34;Crops the pixel counts to avg +/- sigma*std.
+        &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some standard deviation from avg.
+
+        All pixel counts are limited to (average) +/- sigma*(standard deviation).
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 10`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         avg = np.mean(image)
         std = np.std(image)
@@ -181,7 +284,17 @@ def crop_pixel_counts(image, sigma=10):
         return(image)
 
 def high_pass(image, sigma=50):
-        &#34;&#34;&#34;Applies a high-pass filter to the image data.&#34;&#34;&#34;
+        &#34;&#34;&#34;Applies a high-pass filter to the image data.
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 20`.
+
+        **Returns**
+
+        * **None**
+        &#34;&#34;&#34;
         X = np.linspace(-image.shape[0]/2, image.shape[0]/2, image.shape[0])
         Y = np.linspace(-image.shape[1]/2, image.shape[1]/2, image.shape[1])
         x, y = np.meshgrid(X, Y)
@@ -191,7 +304,17 @@ def high_pass(image, sigma=50):
         return(np.real(out))
 
 def low_pass(image, sigma=50):
-        &#34;&#34;&#34;Applies a low-pass filter to the image data.&#34;&#34;&#34;
+        &#34;&#34;&#34;Applies a low-pass filter to the image data.
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 50`.
+
+        **Returns**
+
+        * **None**
+        &#34;&#34;&#34;
         X = np.linspace(-image.shape[0]/2, image.shape[0]/2, image.shape[0])
         Y = np.linspace(-image.shape[1]/2, image.shape[1]/2, image.shape[1])
         x, y = np.meshgrid(X, Y)
@@ -202,14 +325,46 @@ def low_pass(image, sigma=50):
 
 ################################## SITIE #######################################
 def B_from_phase(phase, thickness=1):
-        &#34;&#34;&#34;Calculates the transverse B-field that would impart a specific phase.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reconstructs the B-field from the phase profile.
+
+        **Parameters**
+
+        * **phase** : _ndarray_ &lt;br /&gt;
+        a 2d array representing the electron&#39;s phase.
+
+        * **thickness** : _number_ &lt;br /&gt;
+        the thickness of the sample. &lt;br /&gt;
+        Default is `thickness = 1`.
+
+        **Returns**
+
+        * **Bx** : _ndarray_ &lt;br /&gt;
+        The x-component of the magnetic field.
+
+        * **By** : _ndarray_ &lt;br /&gt;
+        The y-component of the magnetic field.
+        &#34;&#34;&#34;
         dpdy, dpdx = np.gradient(phase)
         Bx = _.hbar/_.e/thickness * dpdy
         By = -_.hbar/_.e/thickness * dpdx
         return(Bx, By)
 
 def SITIE(image, defocus, pixel_size, wavelength=1.97e-12):
-        &#34;&#34;&#34;Reconstruct the phase from a defocussed image.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reconstruct the phase from a defocussed image.
+
+        **Parameters**
+
+        * **image** : _ndarray_ &lt;br /&gt;
+        the 2d image data. &lt;br /&gt;
+
+        * **defocus** : _number_ &lt;br /&gt;
+
+        * **pixel_size** : _number_ &lt;br /&gt;
+
+        * **wavelength** : _number, optional_ &lt;br /&gt;
+        Default is `wavelength = 1.97e-12` (the relativistic wavelength of a 300kV electron).
+
+        &#34;&#34;&#34;
         f = sitie_RHS(image, defocus, wavelength)
         phase = inverse_laplacian(f, pixel_size)
         return(np.real(phase))
@@ -240,13 +395,54 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">B_from_phase</span></span>(<span>phase, thickness=1)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Calculates the transverse B-field that would impart a specific phase.</p></div>
+<div class="desc"><p>Reconstructs the B-field from the phase profile.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>phase</strong> : <em>ndarray</em> <br />
+a 2d array representing the electron's phase.</p>
+</li>
+<li>
+<p><strong>thickness</strong> : <em>number</em> <br />
+the thickness of the sample. <br />
+Default is <code>thickness = 1</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li>
+<p><strong>Bx</strong> : <em>ndarray</em> <br />
+The x-component of the magnetic field.</p>
+</li>
+<li>
+<p><strong>By</strong> : <em>ndarray</em> <br />
+The y-component of the magnetic field.</p>
+</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def B_from_phase(phase, thickness=1):
-        &#34;&#34;&#34;Calculates the transverse B-field that would impart a specific phase.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reconstructs the B-field from the phase profile.
+
+        **Parameters**
+
+        * **phase** : _ndarray_ &lt;br /&gt;
+        a 2d array representing the electron&#39;s phase.
+
+        * **thickness** : _number_ &lt;br /&gt;
+        the thickness of the sample. &lt;br /&gt;
+        Default is `thickness = 1`.
+
+        **Returns**
+
+        * **Bx** : _ndarray_ &lt;br /&gt;
+        The x-component of the magnetic field.
+
+        * **By** : _ndarray_ &lt;br /&gt;
+        The y-component of the magnetic field.
+        &#34;&#34;&#34;
         dpdy, dpdx = np.gradient(phase)
         Bx = _.hbar/_.e/thickness * dpdy
         By = -_.hbar/_.e/thickness * dpdx
@@ -257,13 +453,44 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">SITIE</span></span>(<span>image, defocus, pixel_size, wavelength=1.97e-12)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Reconstruct the phase from a defocussed image.</p></div>
+<div class="desc"><p>Reconstruct the phase from a defocussed image.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>image</strong> : <em>ndarray</em> <br />
+the 2d image data. <br /></p>
+</li>
+<li>
+<p><strong>defocus</strong> : <em>number</em> <br /></p>
+</li>
+<li>
+<p><strong>pixel_size</strong> : <em>number</em> <br /></p>
+</li>
+<li>
+<p><strong>wavelength</strong> : <em>number, optional</em> <br />
+Default is <code>wavelength = 1.97e-12</code> (the relativistic wavelength of a 300kV electron).</p>
+</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def SITIE(image, defocus, pixel_size, wavelength=1.97e-12):
-        &#34;&#34;&#34;Reconstruct the phase from a defocussed image.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reconstruct the phase from a defocussed image.
+
+        **Parameters**
+
+        * **image** : _ndarray_ &lt;br /&gt;
+        the 2d image data. &lt;br /&gt;
+
+        * **defocus** : _number_ &lt;br /&gt;
+
+        * **pixel_size** : _number_ &lt;br /&gt;
+
+        * **wavelength** : _number, optional_ &lt;br /&gt;
+        Default is `wavelength = 1.97e-12` (the relativistic wavelength of a 300kV electron).
+
+        &#34;&#34;&#34;
         f = sitie_RHS(image, defocus, wavelength)
         phase = inverse_laplacian(f, pixel_size)
         return(np.real(phase))</code></pre>
@@ -273,13 +500,51 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">blur</span></span>(<span>image, sigma=5, mode='wrap', cval=0.0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Applies a Gaussian filter to the image.</p></div>
+<div class="desc"><p>Applies a Gaussian filter to the image.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>sigma</strong> : <em>number, optional</em> <br />
+Default is <code>sigma = 5</code>.</p>
+</li>
+<li>
+<p><strong>mode</strong> : <em>string, optional</em> <br />
+Gets passed to <code>scipy.ndimage.blur</code>. <br />
+Default is <code>mode = 'wrap'</code>.</p>
+</li>
+<li>
+<p><strong>cval</strong> : <em>number, optional</em> <br />
+Gets passed to <code>scipy.ndimage.blur</code>. <br />
+Default is <code>cval = 0.0</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def blur(image, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
         &#34;&#34;&#34;Applies a Gaussian filter to the image.
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 5`.
+
+        * **mode** : _string, optional_ &lt;br /&gt;
+        Gets passed to `scipy.ndimage.blur`. &lt;br /&gt;
+        Default is `mode = &#39;wrap&#39;`.
+
+        * **cval** : _number, optional_ &lt;br /&gt;
+        Gets passed to `scipy.ndimage.blur`. &lt;br /&gt;
+        Default is `cval = 0.0`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         return(ndi.gaussian_filter(image, sigma, mode=mode, cval=cval))</code></pre>
 </details>
@@ -288,13 +553,34 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">crop_pixel_counts</span></span>(<span>image, sigma=10)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Crops the pixel counts to avg +/- sigma*std.</p></div>
+<div class="desc"><p>Crops any pixel counts that are higher or lower than some standard deviation from avg.</p>
+<p>All pixel counts are limited to (average) +/- sigma*(standard deviation).</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>sigma</strong> : <em>number, optional</em> <br />
+Default is <code>sigma = 10</code>.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def crop_pixel_counts(image, sigma=10):
-        &#34;&#34;&#34;Crops the pixel counts to avg +/- sigma*std.
+        &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some standard deviation from avg.
+
+        All pixel counts are limited to (average) +/- sigma*(standard deviation).
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 10`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         avg = np.mean(image)
         std = np.std(image)
@@ -309,13 +595,32 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">high_pass</span></span>(<span>image, sigma=50)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Applies a high-pass filter to the image data.</p></div>
+<div class="desc"><p>Applies a high-pass filter to the image data.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>sigma</strong> : <em>number, optional</em> <br />
+Default is <code>sigma = 20</code>.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def high_pass(image, sigma=50):
-        &#34;&#34;&#34;Applies a high-pass filter to the image data.&#34;&#34;&#34;
+        &#34;&#34;&#34;Applies a high-pass filter to the image data.
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 20`.
+
+        **Returns**
+
+        * **None**
+        &#34;&#34;&#34;
         X = np.linspace(-image.shape[0]/2, image.shape[0]/2, image.shape[0])
         Y = np.linspace(-image.shape[1]/2, image.shape[1]/2, image.shape[1])
         x, y = np.meshgrid(X, Y)
@@ -350,13 +655,32 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">low_pass</span></span>(<span>image, sigma=50)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Applies a low-pass filter to the image data.</p></div>
+<div class="desc"><p>Applies a low-pass filter to the image data.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>sigma</strong> : <em>number, optional</em> <br />
+Default is <code>sigma = 50</code>.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def low_pass(image, sigma=50):
-        &#34;&#34;&#34;Applies a low-pass filter to the image data.&#34;&#34;&#34;
+        &#34;&#34;&#34;Applies a low-pass filter to the image data.
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 50`.
+
+        **Returns**
+
+        * **None**
+        &#34;&#34;&#34;
         X = np.linspace(-image.shape[0]/2, image.shape[0]/2, image.shape[0])
         Y = np.linspace(-image.shape[1]/2, image.shape[1]/2, image.shape[1])
         x, y = np.meshgrid(X, Y)
@@ -390,12 +714,18 @@ def inverse_laplacian(f, pixel_size):
 </code></dt>
 <dd>
 <div class="desc"><p>Class that contains sitie information about a lorentz image.</p>
-<p>Input:</p>
-<p>dm3file: a dictionary-like object with the following keys:</p>
+<p><strong>Parameters</strong></p>
 <ul>
-<li>data: numpy.2darray() containing the electron counts</li>
-<li>pixelSize: [scalar, scalar] containing the x and y pixel sizes</li>
-<li>pixelUnit: [string, string] containing the unit of the pixel sizes</li>
+<li><strong>dm3file</strong> : <em>dictionary-like</em> <br />
+a dm3-like file with the following keys: <br />
+<ul>
+<li> <strong>data</strong> : <em>ndarray</em> <br />
+An array carrying the electron counts. </li>
+<li> <strong>pixelSize</strong> : <em>tuple</em> <br />
+(<em>number</em>, <em>number</em>) - the x and y pixel sizes. </li>
+<li> <strong>pixelUnit</strong> : <em>tuple</em> <br />
+(<em>string</em>, <em>string</em>) - the x and y pixel units. </li>
+</ul></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -404,13 +734,18 @@ def inverse_laplacian(f, pixel_size):
 <pre><code class="python">class lorentz:
         &#34;&#34;&#34;Class that contains sitie information about a lorentz image.
 
-        Input:
+        **Parameters**
 
-        dm3file: a dictionary-like object with the following keys:
-
-        * data: numpy.2darray() containing the electron counts
-        * pixelSize: [scalar, scalar] containing the x and y pixel sizes
-        * pixelUnit: [string, string] containing the unit of the pixel sizes
+        * **dm3file** : _dictionary-like_ &lt;br /&gt;
+        a dm3-like file with the following keys: &lt;br /&gt;
+                &lt;ul&gt;
+                &lt;li&gt; **data** : _ndarray_ &lt;br /&gt;
+                An array carrying the electron counts. &lt;/li&gt;
+                &lt;li&gt; **pixelSize** : _tuple_ &lt;br /&gt;
+                (_number_, _number_) - the x and y pixel sizes. &lt;/li&gt;
+                &lt;li&gt; **pixelUnit** : _tuple_ &lt;br /&gt;
+                (_string_, _string_) - the x and y pixel units. &lt;/li&gt;
+                &lt;/ul&gt;
         &#34;&#34;&#34;
         def __init__(self, dm3file):
                 self.rawData = dm3file[&#39;data&#39;]
@@ -431,10 +766,23 @@ def inverse_laplacian(f, pixel_size):
                 &#34;&#34;&#34;
                 self.data = self.rawData
 
-        def sitie(self, defocus, wavelength=1.96e-12):
+        def sitie(self, defocus, wavelength=1.97e-12):
                 &#34;&#34;&#34;Carries out phase and B-field reconstruction.
 
                 Assigns phase, Bx, and By attributes.
+
+                **Parameters**
+
+                * **defocus** : _number_ &lt;br /&gt;
+                The defocus at which the images were taken.
+
+                * **wavelength** : _number, optional_ &lt;br /&gt;
+                The electron wavelength. &lt;br /&gt;
+                Default is `wavelength = 1.96e-12` (relativistic wavelength of a 300kV electron).
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;defocus&#39;: defocus})
                 dummy = sitie_RHS(self.data, defocus, wavelength)
@@ -442,53 +790,109 @@ def inverse_laplacian(f, pixel_size):
                 self.Bx, self.By = B_from_phase(self.phase, thickness=1)
 
         def crop_pixel_counts(self, sigma=10):
-                &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some std from avg.
+                &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some standard deviation from avg.
 
-                Sets those pixels to avg +/- sigma*std.
+                All pixel counts are limited to (average) +/- sigma*(standard deviation).
+
+                **Parameters**
+
+                * **sigma** : _number, optional_ &lt;br /&gt;
+                Default is `sigma = 10`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;crop pixel sigma&#39;: sigma})
                 self.data = crop_pixel_counts(self.data, sigma=sigma)
 
         def high_pass(self, sigma=20):
                 &#34;&#34;&#34;Applies a high-pass filter to the image data.
+
+                **Parameters**
+
+                * **sigma** : _number, optional_ &lt;br /&gt;
+                Default is `sigma = 20`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;high pass sigma&#39;: sigma})
                 self.data = high_pass(self.data, sigma=sigma)
 
         def low_pass(self, sigma=50):
                 &#34;&#34;&#34;Applies a low-pass filter to the image data.
+
+                **Parameters**
+
+                * **sigma** : _number, optional_ &lt;br /&gt;
+                Default is `sigma = 50`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;low pass sigma&#39;: sigma})
                 self.data = low_pass(self.data, sigma=sigma)
 
         def blur(self, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
                 &#34;&#34;&#34;Applies a Gaussian blur to the image data.
+
+                **Parameters**
+
+                * **sigma** : _number, optional_ &lt;br /&gt;
+                Default is `sigma = 5`.
+
+                * **mode** : _string, optional_ &lt;br /&gt;
+                Gets passed to `scipy.ndimage.blur`. &lt;br /&gt;
+                Default is `mode = &#39;wrap&#39;`.
+
+                * **cval** : _number, optional_ &lt;br /&gt;
+                Gets passed to `scipy.ndimage.blur`. &lt;br /&gt;
+                Default is `cval = 0.0`.
+
+                **Returns**
+
+                * **None**
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;blur sigma&#39;: sigma})
                 self.data = blur(self.data, sigma, mode, cval)
 
-        def preview(self, window=(0,-1,0,-1)):
+        def preview(self, window=None):
                 &#34;&#34;&#34;Preview the image.
 
-                window = (xmin, xmax, ymin, ymax)
+                Note that unlike `pyplotwrapper`,
+
+                **Parameters**
+
+                * **window** : _array-like, optional_ &lt;br /&gt;
+                Format is `window = (xmin, xmax, ymin, ymax)`. &lt;br /&gt;
+                Default is `window = (0, -1, 0, -1)`
                 &#34;&#34;&#34;
-                (xmin, xmax, ymin, ymax) = window
-                if xmax == -1:
-                        xmax = self.data.shape[0] - 1
-                if ymax == -1:
-                        ymax = self.data.shape[1] - 1
-                fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)), tight_layout=True)
-                data = self.data[ymin:ymax, xmin:xmax]
-                data = crop_pixel_counts(data, sigma=10)
-                extent = [self.x[xmin],self.x[xmax],self.y[ymin],self.y[ymax]]
-                ax.set_title(&#34;Intensity&#34;, fontsize=30)
-                ax.set_xlabel(&#34;x (px)&#34;)
-                ax.set_ylabel(&#34;y (px)&#34;)
-                ax.imshow(data, origin=&#34;lower&#34;, extent=extent)
+                fig, ax = subplots(11)
+                if not window is None:
+                        ax[0,0].setWindow(window)
+                data = crop_pixel_counts(self.data, sigma=10)
+                ax[0,0].setAxes(self.x, self.y)
+                ax[0,0].set_xlabel(&#34;x ({:})&#34;.format(self.pixelUnit))
+                ax[0,0].set_ylabel(&#34;y ({:})&#34;.format(self.pixelUnit))
+                ax[0,0].imshow(data)
                 plt.show()
 
         def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
-                &#34;&#34;&#34;Save the metadata of the lorentz object to a file.&#34;&#34;&#34;
+                &#34;&#34;&#34;Save the metadata of the lorentz object to a file.
+
+                **Parameters**
+
+                * **outdir** : _string, optional_ &lt;br /&gt;
+                The directory where you&#39;d like to save the metadata. &lt;br /&gt;
+                Default is `outdir = &#39;&#39;`.
+
+                * **outname** : _string, optional_ &lt;br /&gt;
+                The name of the metadata file. &lt;br /&gt;
+                Default is `outname = &#39;metadata.json&#39;`.
+                &#34;&#34;&#34;
                 with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
                         json.dump(self.metadata, fp, indent=&#34;&#34;)</code></pre>
 </details>
@@ -498,13 +902,51 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">blur</span></span>(<span>self, sigma=5, mode='wrap', cval=0.0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Applies a Gaussian blur to the image data.</p></div>
+<div class="desc"><p>Applies a Gaussian blur to the image data.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>sigma</strong> : <em>number, optional</em> <br />
+Default is <code>sigma = 5</code>.</p>
+</li>
+<li>
+<p><strong>mode</strong> : <em>string, optional</em> <br />
+Gets passed to <code>scipy.ndimage.blur</code>. <br />
+Default is <code>mode = 'wrap'</code>.</p>
+</li>
+<li>
+<p><strong>cval</strong> : <em>number, optional</em> <br />
+Gets passed to <code>scipy.ndimage.blur</code>. <br />
+Default is <code>cval = 0.0</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def blur(self, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
         &#34;&#34;&#34;Applies a Gaussian blur to the image data.
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 5`.
+
+        * **mode** : _string, optional_ &lt;br /&gt;
+        Gets passed to `scipy.ndimage.blur`. &lt;br /&gt;
+        Default is `mode = &#39;wrap&#39;`.
+
+        * **cval** : _number, optional_ &lt;br /&gt;
+        Gets passed to `scipy.ndimage.blur`. &lt;br /&gt;
+        Default is `cval = 0.0`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.metadata.update({&#39;blur sigma&#39;: sigma})
         self.data = blur(self.data, sigma, mode, cval)</code></pre>
@@ -514,16 +956,34 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">crop_pixel_counts</span></span>(<span>self, sigma=10)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Crops any pixel counts that are higher or lower than some std from avg.</p>
-<p>Sets those pixels to avg +/- sigma*std.</p></div>
+<div class="desc"><p>Crops any pixel counts that are higher or lower than some standard deviation from avg.</p>
+<p>All pixel counts are limited to (average) +/- sigma*(standard deviation).</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>sigma</strong> : <em>number, optional</em> <br />
+Default is <code>sigma = 10</code>.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def crop_pixel_counts(self, sigma=10):
-        &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some std from avg.
+        &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some standard deviation from avg.
 
-        Sets those pixels to avg +/- sigma*std.
+        All pixel counts are limited to (average) +/- sigma*(standard deviation).
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 10`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.metadata.update({&#39;crop pixel sigma&#39;: sigma})
         self.data = crop_pixel_counts(self.data, sigma=sigma)</code></pre>
@@ -533,13 +993,31 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">high_pass</span></span>(<span>self, sigma=20)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Applies a high-pass filter to the image data.</p></div>
+<div class="desc"><p>Applies a high-pass filter to the image data.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>sigma</strong> : <em>number, optional</em> <br />
+Default is <code>sigma = 20</code>.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def high_pass(self, sigma=20):
         &#34;&#34;&#34;Applies a high-pass filter to the image data.
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 20`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.metadata.update({&#39;high pass sigma&#39;: sigma})
         self.data = high_pass(self.data, sigma=sigma)</code></pre>
@@ -549,46 +1027,71 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">low_pass</span></span>(<span>self, sigma=50)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Applies a low-pass filter to the image data.</p></div>
+<div class="desc"><p>Applies a low-pass filter to the image data.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>sigma</strong> : <em>number, optional</em> <br />
+Default is <code>sigma = 50</code>.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def low_pass(self, sigma=50):
         &#34;&#34;&#34;Applies a low-pass filter to the image data.
+
+        **Parameters**
+
+        * **sigma** : _number, optional_ &lt;br /&gt;
+        Default is `sigma = 50`.
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.metadata.update({&#39;low pass sigma&#39;: sigma})
         self.data = low_pass(self.data, sigma=sigma)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.lorentz.preview"><code class="name flex">
-<span>def <span class="ident">preview</span></span>(<span>self, window=(0, -1, 0, -1))</span>
+<span>def <span class="ident">preview</span></span>(<span>self, window=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Preview the image.</p>
-<p>window = (xmin, xmax, ymin, ymax)</p></div>
+<p>Note that unlike <code>pyplotwrapper</code>,</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>window</strong> : <em>array-like, optional</em> <br />
+Format is <code>window = (xmin, xmax, ymin, ymax)</code>. <br />
+Default is <code>window = (0, -1, 0, -1)</code></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def preview(self, window=(0,-1,0,-1)):
+<pre><code class="python">def preview(self, window=None):
         &#34;&#34;&#34;Preview the image.
 
-        window = (xmin, xmax, ymin, ymax)
+        Note that unlike `pyplotwrapper`,
+
+        **Parameters**
+
+        * **window** : _array-like, optional_ &lt;br /&gt;
+        Format is `window = (xmin, xmax, ymin, ymax)`. &lt;br /&gt;
+        Default is `window = (0, -1, 0, -1)`
         &#34;&#34;&#34;
-        (xmin, xmax, ymin, ymax) = window
-        if xmax == -1:
-                xmax = self.data.shape[0] - 1
-        if ymax == -1:
-                ymax = self.data.shape[1] - 1
-        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6,6*(ymax-ymin)/(xmax-xmin)), tight_layout=True)
-        data = self.data[ymin:ymax, xmin:xmax]
-        data = crop_pixel_counts(data, sigma=10)
-        extent = [self.x[xmin],self.x[xmax],self.y[ymin],self.y[ymax]]
-        ax.set_title(&#34;Intensity&#34;, fontsize=30)
-        ax.set_xlabel(&#34;x (px)&#34;)
-        ax.set_ylabel(&#34;y (px)&#34;)
-        ax.imshow(data, origin=&#34;lower&#34;, extent=extent)
+        fig, ax = subplots(11)
+        if not window is None:
+                ax[0,0].setWindow(window)
+        data = crop_pixel_counts(self.data, sigma=10)
+        ax[0,0].setAxes(self.x, self.y)
+        ax[0,0].set_xlabel(&#34;x ({:})&#34;.format(self.pixelUnit))
+        ax[0,0].set_ylabel(&#34;y ({:})&#34;.format(self.pixelUnit))
+        ax[0,0].imshow(data)
         plt.show()</code></pre>
 </details>
 </dd>
@@ -611,31 +1114,84 @@ def inverse_laplacian(f, pixel_size):
 <span>def <span class="ident">saveMeta</span></span>(<span>self, outdir='', outname='metadata.json')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Save the metadata of the lorentz object to a file.</p></div>
+<div class="desc"><p>Save the metadata of the lorentz object to a file.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>outdir</strong> : <em>string, optional</em> <br />
+The directory where you'd like to save the metadata. <br />
+Default is <code>outdir = ''</code>.</p>
+</li>
+<li>
+<p><strong>outname</strong> : <em>string, optional</em> <br />
+The name of the metadata file. <br />
+Default is <code>outname = 'metadata.json'</code>.</p>
+</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
-        &#34;&#34;&#34;Save the metadata of the lorentz object to a file.&#34;&#34;&#34;
+        &#34;&#34;&#34;Save the metadata of the lorentz object to a file.
+
+        **Parameters**
+
+        * **outdir** : _string, optional_ &lt;br /&gt;
+        The directory where you&#39;d like to save the metadata. &lt;br /&gt;
+        Default is `outdir = &#39;&#39;`.
+
+        * **outname** : _string, optional_ &lt;br /&gt;
+        The name of the metadata file. &lt;br /&gt;
+        Default is `outname = &#39;metadata.json&#39;`.
+        &#34;&#34;&#34;
         with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
                 json.dump(self.metadata, fp, indent=&#34;&#34;)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.lorentz.sitie"><code class="name flex">
-<span>def <span class="ident">sitie</span></span>(<span>self, defocus, wavelength=1.96e-12)</span>
+<span>def <span class="ident">sitie</span></span>(<span>self, defocus, wavelength=1.97e-12)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Carries out phase and B-field reconstruction.</p>
-<p>Assigns phase, Bx, and By attributes.</p></div>
+<p>Assigns phase, Bx, and By attributes.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>defocus</strong> : <em>number</em> <br />
+The defocus at which the images were taken.</p>
+</li>
+<li>
+<p><strong>wavelength</strong> : <em>number, optional</em> <br />
+The electron wavelength. <br />
+Default is <code>wavelength = 1.96e-12</code> (relativistic wavelength of a 300kV electron).</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def sitie(self, defocus, wavelength=1.96e-12):
+<pre><code class="python">def sitie(self, defocus, wavelength=1.97e-12):
         &#34;&#34;&#34;Carries out phase and B-field reconstruction.
 
         Assigns phase, Bx, and By attributes.
+
+        **Parameters**
+
+        * **defocus** : _number_ &lt;br /&gt;
+        The defocus at which the images were taken.
+
+        * **wavelength** : _number, optional_ &lt;br /&gt;
+        The electron wavelength. &lt;br /&gt;
+        Default is `wavelength = 1.96e-12` (relativistic wavelength of a 300kV electron).
+
+        **Returns**
+
+        * **None**
         &#34;&#34;&#34;
         self.metadata.update({&#39;defocus&#39;: defocus})
         dummy = sitie_RHS(self.data, defocus, wavelength)
