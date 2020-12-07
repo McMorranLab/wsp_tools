@@ -1,4 +1,27 @@
 """A wrapper for matplotlib.pyplot containing common plotting routines.
+
+Example
+
+```python
+import numpy as np
+import wsp_tools as wt
+
+X = np.linspace(-10,10,100)
+Y = np.linspace(-10,10,100)
+x, y = np.meshgrid(X, Y)
+data = x + 1j*y
+window = (-4, 4, -4, 4)
+
+fig, (ax1, ax2) = wt.subplots()
+ax1.setAxes(X, Y)
+ax1.imshow(np.abs(data))
+ax1.inset(window=window)
+ax2.setAxes(X, Y, window=window)
+ax2.rgba(data)
+wt.plt.show()
+```
+
+![asdf](img.png)
 """
 from . import plt, np, rgba
 
@@ -12,20 +35,21 @@ class singleAx():
 	Typical usage:
 
 	```python
-	x = np.linspace(-10,10,xres)
-	y = np.linspace(-10,10,yres)
-	data = np.cos(x+y)
+	X = np.linspace(-10,10,xres)
+	Y = np.linspace(-10,10,yres)
+	x, y = np.meshgrid(X, Y)
+	data = x+1j*y
 	window = [-3,7,1,4]
 
 	fig, ax = plt.subplots()
 	myax = wsp_tools.singleAx(ax)
 	ax.setAxes(x, y, window)
 	ax.set_xytitle('x','y','title')
+	ax.rgba(data)
 	plt.show()
 	```
 
 	More commonly, this class is returned by ```wsp_tools.pyplotwrapper.subplots```.
-
 	"""
 	def __init__(self, ax, title='', xlabel='', ylabel=''):
 		self.ax = ax
@@ -56,16 +80,27 @@ class singleAx():
 
 		Additionally, it sets the ax element's extent.
 		"""
-		if not self.hasAxes:
+		if not self.hasAxes and not self.hasWindow:
 			self.x = np.linspace(0,100,data.shape[1])
 			self.y = np.linspace(0,100,data.shape[0])
-		if not self.hasWindow:
-			self.xmin, self.xmax = 0, 100
-			self.ymin, self.ymax = 0, 100
-		self.argxmin = np.argmin(np.abs(self.x - self.xmin))
-		self.argxmax = np.argmin(np.abs(self.x - self.xmax))
-		self.argymin = np.argmin(np.abs(self.y - self.ymin))
-		self.argymax = np.argmin(np.abs(self.y - self.ymax))
+			self.argxmin, self.argxmax = 0, -1
+			self.argymin, self.argymax = 0, -1
+		elif self.hasAxes and not self.hasWindow:
+			self.argxmin, self.argxmax = 0, -1
+			self.argymin, self.argymax = 0, -1
+		elif not self.hasAxes and self.hasWindow:
+			self.x = np.linspace(0,100,data.shape[1])
+			self.y = np.linspace(0,100,data.shape[0])
+			self.argxmin = np.argmin(np.abs(self.x - self.xmin))
+			self.argxmax = np.argmin(np.abs(self.x - self.xmax))
+			self.argymin = np.argmin(np.abs(self.y - self.ymin))
+			self.argymax = np.argmin(np.abs(self.y - self.ymax))
+		elif self.hasAxes and self.hasWindow:
+			self.argxmin = np.argmin(np.abs(self.x - self.xmin))
+			self.argxmax = np.argmin(np.abs(self.x - self.xmax))
+			self.argymin = np.argmin(np.abs(self.y - self.ymin))
+			self.argymax = np.argmin(np.abs(self.y - self.ymax))
+
 		xout = self.x[self.argxmin:self.argxmax:step]
 		yout = self.y[self.argymin:self.argymax:step]
 		dout = data[self.argymin:self.argymax:step, self.argxmin:self.argxmax:step]
@@ -164,7 +199,7 @@ class singleAx():
 		xr, yr, data = self.prePlot(data, step)
 		self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
 
-	def rgba(self, data, step=1, alpha='intensity', cmap='uniform', **kwargs):
+	def rgba(self, data, step=1, brightness='intensity', alpha='uniform', cmap='uniform', **kwargs):
 		"""Shows an rgba interpretation of complex data.
 
 		Color represents complex angle, and brightness represents either
@@ -177,7 +212,7 @@ class singleAx():
 		"""
 
 		x, y, data = self.prePlot(data)
-		data = rgba(data,alpha=alpha,cmap=cmap)
+		data = rgba(data,brightness=brightness,alpha=alpha,cmap=cmap)
 		self.ax.imshow(data, extent=self.extent, origin='lower')
 
 	def inset(self, window=None, color='white', **kwargs):

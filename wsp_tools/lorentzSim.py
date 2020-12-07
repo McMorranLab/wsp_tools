@@ -2,30 +2,41 @@ from . import constants as _
 from . import np
 
 def abphase2d(mx, my, mz, Lx=1e-6, Ly=1e-6, p=np.array([0,0,1]), t=60e-9):
-	"""Calculates the Aharonov-Bohm phase acquired by an electron through a 2d
+	"""Calculates the Aharonov-Bohm phase acquired by an electron passing through a 2d
 	magnetization.
 
-	Inputs:
+	**Parameters**
 
-	The real space magnetization of the sample.
+	* **mx** : _ndarray_ <br />
+	The x-component of magnetization. Should be a 2-dimensional array.
 
-	mx: numpy.2darray() - x component of magnetization
+	* **my** : _ndarray_ <br />
+	The y-component of magnetization. Should be a 2-dimensional array.
 
-	my: numpy.2darray() - y component of magnetization
+	* **mz** : _ndarray_ <br />
+	The z-component of magnetization. Should be a 2-dimensional array.
 
-	mz: numpy.2darray() - z component of magnetization
+	* **Lx** : _number, optional_ <br />
+	The x-length of the area calculated. (i.e., Lx = xmax - xmin). <br />
+	Default is `Lx = 1e-6`.
 
-	Lx: scalar, the width of the sample.
+	* **Ly** : _number, optional_ <br />
+	The y-length of the area calculated. (i.e., Ly = ymax - ymin). <br />
+	Default is `Ly = 1e-6`.
 
-	Ly: scalar, the length of the sample.
+	* **p** : _ndarray, optional_ <br />
+	A unit vector in the direction of electron propagation. Should be a 1darray with length 3. <br />
+	Default is `p = np.array([0,0,1])` (the electron is propagating in the z-direction).
 
-	p: numpy.1darray with length 3 - unit vector in the direction of electron motion.
+	* **t** : _number, optional_ <br />
+	The thickness of the 2d magnetization. <br />
+	Default is `t = 60e-9`.
 
-	t: the thickness of the sample.
+	**Returns**
 
-	Returns:
-
-	phi = numpy.2darray() the phase acquired.
+	* **phi** : _ndarray_
+	The phase acquired by an electron passing through the specified magnetization.
+	Output is a 2d array of the same shape as mx, my, and mz.
 	"""
 	Mx = np.fft.fftshift(np.fft.fft2(np.fft.fftshift(mx)))
 	My = np.fft.fftshift(np.fft.fft2(np.fft.fftshift(my)))
@@ -51,24 +62,44 @@ def abphase2d(mx, my, mz, Lx=1e-6, Ly=1e-6, p=np.array([0,0,1]), t=60e-9):
 	return(np.real(phi))
 
 def propagate(x, y, cphase, defocus=0, wavelength=1.97e-12, focal_length=1):
-	"""Calculates the Lorentz image given a specific phase.
+	"""Calculates the Lorentz image given a specific phase and defocus.
 
-	Inputs:
+	This takes into account the microscope and phase transfer functions.
 
-	x, y: numpy.2darray objects with the x and y coordinates
+	**Parameters**
 
-	cphase: the complex phase acquired (complex to allow for attenuation)
+	* **x** : _ndarray_ <br />
+	The x coordinates of the input complex phase. Dimension should be 2.
 
-	defocus: scalar
+	* **y** : _ndarray_ <br />
+	The y coordinates of the input complex phase. Dimension should be 2.
 
-	Returns:
+	* **cphase**: _complex ndarray_ <br />
+	The complex phase to propagate. Dimension should be two. May be complex
+	to allow for attenuation through the sample.
 
-	psi_out: numpy.2darray containing the complex wavefunction in the image plane.
+	* **defocus** : _number, optional_ <br />
+	The defocus at which the phase was acquired. <br />
+	Default is `defocus = 0`.
+
+	* **wavelength** : _number, optional_ <br />
+	The wavelength of the electron. Scales the phase transfer function and the reciprocal coordinates. <br />
+	Default is `wavelength = 1.97e-12` (the relativistic wavelength of a 300kV electron).
+
+	* **focal_length** : _number, optional_ <br />
+	The focal length of the lens, which scales the reciprocal coordinates. <br />
+	Default is `focal_length = 1`.
+
+	**Returns**
+
+	* **psi_out** : _complex ndarray_ <br />
+	The transverse complex amplitude in the image plane. Output has the same
+	shape as x, y, and cphase.
 	"""
 	dx = x[1,1]-x[0,0]
 	dy = y[1,1]-y[0,0]
-	U = np.fft.fftshift(np.fft.fftfreq(x.shape[0],dx))
-	V = np.fft.fftshift(np.fft.fftfreq(x.shape[1],dy))
+	U = 2*_.pi / wavelength / focal_length * np.fft.fftshift(np.fft.fftfreq(x.shape[0],dx))
+	V = 2*_.pi / wavelength / focal_length * np.fft.fftshift(np.fft.fftfreq(x.shape[1],dy))
 	qx, qy = np.meshgrid(U, V)
 	psi_0 = np.exp(1j*cphase)
 	psi_q = np.fft.fftshift(np.fft.fft2(np.fft.fftshift(psi_0)))
@@ -96,9 +127,50 @@ def aperture(qx, qy):
 def jchessmodel(x, y, z=0, **kwargs):
 	"""Calculates the magnetization of a hopfion based on Jordan Chess' model.
 
-	Returns:
+	**Parameters**
 
-	mx, my, mz - numpy.ndarray objects in the same shape as x and y.
+	* **x** : _number, ndarray_ <br />
+	The x-coordinates over which to calculate magnetization.
+
+	* **y** : _number, ndarray_ <br />
+	The y-coordinates over which to calculate magnetization.
+
+	* **z** : _number, ndarray, optional_ <br />
+	The z-coordinates over which to calculate magnetization. Note, if z is an
+	ndarray, then x, y, and z should have the same shape rather than relying
+	on array broadcasting. <br />
+	Default is `z = 0`.
+
+	* **aa**, **ba**, **ca** : _number, optional_ <br />
+	In this model, the thickness of the domain wall is set by a
+	Gaussian function, defined as `aa * exp(-ba * z**2) + ca`. <br />
+	Defaults are `aa = 5`, `ba = 5`, `ca = 0`.
+
+	* **ak**, **bk**, **ck** : _number, optional_ <br />
+	In this model, the thickness of the core is set by a Gaussian function,
+	defined as `ak * exp(-bk * z**2) + ck`. <br />
+	Defaults are `ak = 5e7`, `bk = -50`, `ck = 0`.
+
+	* **bg**, **cg** : _number, optional_ <br />
+	In this model, the helicity varies as a function of z, given
+	as `pi / 2 * tanh( bg * z ) + cg`. <br />
+	Defaults are `bg = 5e7`, `cg = pi/2`.
+
+	* **n** : _number, optional_ <br />
+	The skyrmion number. <br />
+	Default is `n = 1`.
+
+
+	**Returns**
+
+	* **mx** : _ndarray_ <br />
+	The x-component of magnetization. Shape will be the same as x and y.
+
+	* **my** : _ndarray_ <br />
+	The y-component of magnetization. Shape will be the same as x and y.
+
+	* **mz** : _ndarray_ <br />
+	The z-component of magnetization. Shape will be the same as x and y.
 	"""
 	p = {   'aa':5, 'ba':5, 'ca':0,
 			'ak':5e7, 'bk':-5e1, 'ck':0,

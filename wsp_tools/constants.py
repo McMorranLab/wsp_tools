@@ -7,9 +7,8 @@ To set units:
 ```python
 import wsp_tools as wt
 wt.setUnits(meter = 1e-3) # set km as base unit for length
-from wsp_tools.constants import *
 
-print(c) # outputs 299792.458
+print(wt.constants.c) # outputs 299792.458
 ```
 
 Note that all other modules should update automatically as well.
@@ -20,18 +19,49 @@ import scipy.constants as sc
 __all__ = ['s','m','kg','A','K','mol','cd','F','J','C','W','eV','c',
 			'mu_0','eps_0','h','hbar','h_eV','hbar_eV','G','e','R','alpha',
 			'N_A','k_B','k_B_eV','sigma','Wien','Rydberg','m_e','m_p',
-			'm_n','pi']
+			'm_n','pi','setUnits']
 
 def setUnits(second=1, meter=1, kilogram=1, Amp=1, Kelvin=1, mole=1, candela=1):
 	"""Sets the units across the wsp_tools module.
 
 	i.e. setUnits(meter = 1000) sets the millimeter as the base unit for length.
+
+	**Parameters**
+
+	* **second** : _number, optional_ <br />
+	The SI base unit for time. <br />
+	Default is `second = 1`.
+
+	* **meter** : _number, optional_ <br />
+	The SI base unit for length. <br />
+	Default is `meter = 1`.
+
+	* **kilogram** : _number, optional_ <br />
+	The SI base unit for mass. <br />
+	Default is `kilogram = 1`.
+
+	* **Amp** : _number, optional_ <br />
+	The SI base unit for current. <br />
+	Default is `Amp = 1`.
+
+	* **Kelvin** : _number, optional_ <br />
+	The SI base unit for temperature. <br />
+	Default is `Kelvin = 1`.
+
+	* **mole** : _number, optional_ <br />
+	The SI base unit for amount of substance. <br />
+	Default is `mole = 1`.
+
+	* **candela** : _number, optional_ <br />
+	The SI base unit for luminous intensity. <br />
+	Default is `candela = 1`.
 	"""
 	global s,m,kg,A,K,mol,cd
 	s,m,kg,A,K,mol,cd = second, meter, kilogram, Amp, Kelvin, mole, candela
 	setConsts(s, m, kg, A, K, mol, cd)
 
 def setConsts(s, m, kg, A, K, mol, cd):
+	"""Utility function for `setUnits()`."""
 	global F,J,C,W,eV,c,mu_0,eps_0,h,hbar,h_eV,hbar_eV,G,e,R,alpha,N_A,k_B
 	global k_B_eV,sigma,Wien,Rydberg,m_e,m_p,m_n,pi
 	F = s**4 * A**2 / m**2 / kg

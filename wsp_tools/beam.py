@@ -89,7 +89,7 @@ def v_g(T_eV):
 
 	**Returns**
 
-	* **v_g(T_eV) : _number <br />
+	* **v_g(T_eV)** : _number <br />
 	the group velocity in m s<sup>-1</sup>.
 	"""
 	return(_.c * k(T_eV) / np.sqrt(_.m_e**2 * _.c**2 / _.hbar**2 + k(T_eV)**2))
@@ -184,15 +184,15 @@ def besselPacket(t = 0, l = 0,
 
 	* **kres** : _int, optional_ <br />
 	the resolution of the k-space; also, the resolution of the output beam. Note that the function will be faster if the resolution is a power of 2. <br />
-	Default is 'kres = 128'.
+	Default is `kres = 128`.
 
 	* **kmin** : _number, optional_ <br />
 	the minimum value in k-space. This is applied to the x, y, and z components of the wavenumber. <br />
-	Default is 'kmin = -3 * k(3e5)'.
+	Default is `kmin = -3 * k(3e5)`.
 
 	* **kmax** : _number, optional_ <br />
 	the maximum value in k-space. This is applied to the x, y, and z components of the wavenumber. <br />
-	Default is 'kmax = 3 * k(3e5)'.
+	Default is `kmax = 3 * k(3e5)`.
 
 	* **kz0** : _number, optional_ <br />
 	the z-coordinate of the spectrum. That is, the z component of the beam's wavevector. <br />

@@ -27,16 +27,6 @@ Module to generate spatial modes and beam parameters.
 
 ## Functions
 
-### Function `E`
-
-> 
-> 
->     def E(
->         T_eV
->     )
-
-kinetic energy \[eV\] -\> total energy \[J\]
-
 ### Function `LG`
 
 > 
@@ -53,22 +43,38 @@ kinetic energy \[eV\] -\> total energy \[J\]
 
 Generates a Laguerre-Gauss spatial mode.
 
-Returns:
+Note: broadcasting is not supported - if x and y are both 1d arrays, the
+result will be a 1darray and will NOT make sense. Likewise if x, y are
+2d arrays, but z is a 1d array, the result will be an error.
 
-numpy.2darray() = the 2d complex amplitude of a Laguerre-Gauss mode at
-z.
+**Parameters**
 
-### Function `R`
+  - **x** : *number, ndarray* <br /> The x-coordinates over which to
+    calculate the beam.
 
-> 
-> 
->     def R(
->         z,
->         w0,
->         k
->     )
+  - **y** : *number, ndarray* <br /> The y-coordinates over which to
+    calculate the beam.
 
-Radius of curvature as a function of z, w0, k
+  - **z** : *number, ndarray, optional* <br /> The z-coordinates over
+    which to calculate the beam. <br /> Default is `z = 0`.
+
+  - **l** : *number, optional* <br /> The winding number, or chirality,
+    of the beam. <br /> Default is `l = 0`.
+
+  - **p** : *number, optional* <br /> The radial index of the beam.
+    <br /> Default is `p = 0`.
+
+  - **w\_0** : *number, optional* <br /> The beam waist. <br /> Default
+    is `w_0 = 2e-6`.
+
+  - **lam** : *number, optional* <br /> The beam’s wavelength. <br />
+    Default is `lam = 1.97e-12` (the relativistic wavelength of a 300keV
+    electron).
+
+**Returns**
+
+  - **mode** : *ndarray* <br /> The complex amplitudes of a Laguerre
+    Gaussian beam at the specified x, y, and z positions.
 
 ### Function `bessel`
 
@@ -85,10 +91,46 @@ Radius of curvature as a function of z, w0, k
 >         N=30
 >     )
 
-Creates a bessel beam by adding plane waves.
+Creates a Bessel beam by adding plane waves.
 
-The spectrum is a circle in k-space (k\_z, dkperp + kperp \* cos(theta),
-kperp \* sin(theta)).
+The spectrum is a circle in k-space <br />`(kz0, dkperp + kperp *
+cos(theta), kperp * sin(theta))`.
+
+**Parameters**
+
+  - **x** : *number, ndarray* <br /> the x-coordinates over which to
+    calculate the beam.
+
+  - **y** : *number, ndarray* <br /> the y-coordinates over which to
+    calculate the beam.
+
+  - **z** : *number, ndarray, optional* <br /> the z-coordinates over
+    which to calculate the beam. <br /> Default is `z = 0`.
+
+  - **l** : *number, optional* <br /> the winding number, or chirality,
+    of the beam. <br /> Default is `l = 0`.
+
+  - **kz0** : *number, optional* <br /> the z-coordinate of the
+    spectrum. That is, the z component of the beam’s wavevector. <br />
+    Default is `kz0 = k(3e5)`.
+
+  - **kperp** : *number, optional* <br /> the perpendicular component of
+    the spectrum. That is, the perpendicular component of the beam’s
+    wavevector. This is the radius of the beam’s spectrum. <br />
+    Default is `kperp = 5e-4 * k(3e5)`.
+
+  - **dkperp** : *number, optional* <br /> the perpendicular offset of
+    the spectrum. This is applied in the <code>k\_x</code> direction.
+    <br /> Default is `dkperp = 0`.
+
+  - **N** : *int, optional* <br /> The number of plane waves to use.
+    <br /> Default is `N = 30`.
+
+**Returns**
+
+  - **mode** : *ndarray* <br /> The complex amplitudes of the Bessel
+    beam at the specified x, y, and z positions. Shape is broadcast
+    between x, y, and z inputs.
 
 ### Function `besselPacket`
 
@@ -108,8 +150,52 @@ kperp \* sin(theta)).
 
 Creates a bessel beam by Fourier transforming a Gaussian spectrum.
 
-The spectrum is a gaussian centered on a circle in k-space (k\_z, dkperp
-+ kperp \* cos(theta), kperp \* sin(theta)).
+The spectrum is a gaussian centered on a circle in k-space <br /> `(k_z,
+dkperp + kperp * cos(theta), kperp * sin(theta))`.
+
+**Parameters**
+
+  - **t** : *number, optional* <br /> time in seconds. <br /> Default is
+    `t = 0`.
+
+  - **l** : *number, optional* <br /> the winding number, or chirality,
+    of the beam. <br /> Default is `l = 0`.
+
+  - **kres** : *int, optional* <br /> the resolution of the k-space;
+    also, the resolution of the output beam. Note that the function will
+    be faster if the resolution is a power of 2. <br /> Default is `kres
+    = 128`.
+
+  - **kmin** : *number, optional* <br /> the minimum value in k-space.
+    This is applied to the x, y, and z components of the wavenumber.
+    <br /> Default is `kmin = -3 * k(3e5)`.
+
+  - **kmax** : *number, optional* <br /> the maximum value in k-space.
+    This is applied to the x, y, and z components of the wavenumber.
+    <br /> Default is `kmax = 3 * k(3e5)`.
+
+  - **kz0** : *number, optional* <br /> the z-coordinate of the
+    spectrum. That is, the z component of the beam’s wavevector. <br />
+    Default is `kz0 = k(3e5)`.
+
+  - **kperp** : *number, optional* <br /> the perpendicular component of
+    the spectrum. That is, the perpendicular component of the beam’s
+    wavevector. This is the radius of the beam’s spectrum. <br />
+    Default is `kperp = 5e-4 * k(3e5)`.
+
+  - **dkperp** : *number, optional* <br /> the perpendicular offset of
+    the spectrum. This is applied in the <code>k\_x</code> direction.
+    <br /> Default is `dkperp = 0`.
+
+  - **sig** : *number, optional* <br /> the standard deviation of the
+    Gaussian envelope around the circle in k-space. <br /> Default is
+    `sig = 0.05 * k(3e5)`.
+
+**Returns**
+
+  - **mode** : *ndarray* <br /> three-dimensional array containing the
+    complex amplitudes of the Bessel packet. Shape is
+    <code>kres</code>x<code>kres</code>x<code>kres</code>.
 
 ### Function `dB`
 
@@ -119,7 +205,33 @@ The spectrum is a gaussian centered on a circle in k-space (k\_z, dkperp
 >         T_eV
 >     )
 
-kinetic energy \[eV\] -\> deBroglie wavelength \[m\]
+Calculates the de Broglie wavelength from the electron’s kinetic energy.
+
+**Parameters**
+
+  - **T\_eV** : *number* <br /> the kinetic energy in eV.
+
+**Returns**
+
+  - **dB(T\_eV)** : *number* <br /> the de Broglie wavelength in m.
+
+### Function `energy`
+
+> 
+> 
+>     def energy(
+>         T_eV
+>     )
+
+Calculates the total electron energy from its kinetic energy.
+
+**Parameters**
+
+  - **T\_eV** : *number* <br /> the kinetic energy in eV.
+
+**Returns**
+
+  - **energy(T\_eV)** : *number* <br /> the total energy in eV.
 
 ### Function `k`
 
@@ -129,7 +241,15 @@ kinetic energy \[eV\] -\> deBroglie wavelength \[m\]
 >         T_eV
 >     )
 
-kinetic energy \[eV\] -\> wavenumber \[m^-1\]
+Calculates the wavenumber from the electron’s kinetic energy.
+
+**Parameters**
+
+  - **T\_eV** : *number* <br /> the kinetic energy in eV.
+
+**Returns**
+
+  - **k(T\_eV)** : *number* <br /> the wavenumber in m<sup>-1</sup>.
 
 ### Function `omega`
 
@@ -139,7 +259,16 @@ kinetic energy \[eV\] -\> wavenumber \[m^-1\]
 >         T_eV
 >     )
 
-kinetic energy \[eV\] -\> angular frequency \[rad s^-1\]
+Calculates the angular frequency from the electron’s kinetic energy.
+
+**Parameters**
+
+  - **T\_eV** : *number* <br /> the kinetic energy in eV.
+
+**Returns**
+
+  - **omega(T\_eV)** : *number* <br /> the angular frequency in rad
+    s<sup>-1</sup>.
 
 ### Function `p`
 
@@ -149,7 +278,39 @@ kinetic energy \[eV\] -\> angular frequency \[rad s^-1\]
 >         T_eV
 >     )
 
-kinetic energy \[eV\] -\> momentum \[N s\]
+Calculates the momentum from the electron’s kinetic energy.
+
+**Parameters**
+
+  - **T\_eV** : *number* <br /> the kinetic energy in eV.
+
+**Returns**
+
+  - **p(T\_eV)** : *number* <br /> the momentum in N s.
+
+### Function `roc`
+
+> 
+> 
+>     def roc(
+>         z,
+>         w0,
+>         k
+>     )
+
+Radius of curvature as a function of z, beam waist, and wavenumber.
+
+**Parameters**
+
+  - **z** : *number* <br /> z-position.
+
+  - **w0** : *number* <br /> beam waist.
+
+  - **k** : *number* <br /> wavenumber.
+
+**Returns**
+
+  - **roc(z, w0, k)** : *number* <br /> Radius of curvature.
 
 ### Function `v_g`
 
@@ -159,7 +320,16 @@ kinetic energy \[eV\] -\> momentum \[N s\]
 >         T_eV
 >     )
 
-kinetic energy \[eV\] -\> group velocity \[m s^-1\]
+Calculates the group velocity from the electron’s kinetic energy.
+
+**Parameters**
+
+  - **T\_eV** : *number* <br /> the kinetic energy in eV.
+
+**Returns**
+
+  - **v\_g(T\_eV)** : \_number <br /> the group velocity in m
+    s<sup>-1</sup>.
 
 ### Function `v_p`
 
@@ -169,7 +339,16 @@ kinetic energy \[eV\] -\> group velocity \[m s^-1\]
 >         T_eV
 >     )
 
-kinetic energy \[eV\] -\> phase velocity \[m s^-1\]
+Calculates the phase velocity from the electron’s kinetic energy.
+
+**Parameters**
+
+  - **T\_eV** : *number* <br /> the kinetic energy in eV.
+
+**Returns**
+
+  - **v\_p(T\_eV)** : *number* <br /> the phase velocity in m
+    s<sup>-1</sup>.
 
 ### Function `w`
 
@@ -181,7 +360,19 @@ kinetic energy \[eV\] -\> phase velocity \[m s^-1\]
 >         k
 >     )
 
-Beam waist as a function of z, beam waist at z=0, and k
+Spot size as a function of z, beam waist, and wavenumber.
+
+**Parameters**
+
+  - **z** : *number* <br /> z-position.
+
+  - **w0** : *number* <br /> beam waist.
+
+  - **k** : *number* <br /> wavenumber.
+
+**Returns**
+
+  - **w(z, w0, k)** : *number* <br /> the spot size at z.
 
 ### Function `zR`
 
@@ -192,11 +383,21 @@ Beam waist as a function of z, beam waist at z=0, and k
 >         w0
 >     )
 
-Rayleigh range as a function of k, beam waist
+Rayleigh range as a function of wavenumber and beam waist.
+
+**Parameters**
+
+  - **k** : *number* <br /> Wavenumber.
+
+  - **w0** : *number* <br /> Beam waist.
+
+**Returns**
+
+  - **zR(k, w0)** : *number* <br /> the Rayleigh range.
 
 # Module `wsp_tools.cielab`
 
-Module to generate rgba data from numpy.2darrays.
+Module to generate rgba data from scalar values.
 
 ## Functions
 
@@ -206,21 +407,37 @@ Module to generate rgba data from numpy.2darrays.
 > 
 >     def cielab_image(
 >         data,
->         alpha='intensity'
+>         brightness='intensity',
+>         alpha='uniform'
 >     )
 
-Converts a 2d complex array to rgba data based on the cielab color
-space.
+Converts complex values to rgba data based on the CIELAB color space.
 
-Input:
+The output color will represent the complex angle, and brightness may
+represent either intensity or amplitude.
 
-numpy.2darray(). dtype can be real or complex - if real, the output
-color will be constant. If complex, the color will reflect the complex
-angle.
+The CIELAB color space is intended to be perceptually uniform - none of
+the colors look brighter or darker than the others.
 
-Returns:
+**Parameters**
 
-numpy.ndarray() with shape \[data.shape\[0\], data.shape\[1\], 4\]
+  - **data** : *ndarray* <br /> An array with the data to represent.
+    Dtype may be complex or real - if real, the color will be uniform,
+    and values will be represented by brightness.
+
+  - **brightness** : *string, optional* <br /> Allowed values:
+    `'intensity'`, `'amplitude'`, `'uniform'`. <br /> Default is
+    `brightness = 'intensity'`.
+
+  - **alpha** : *string, optional* <br /> Allowed values: `'intensity'`,
+    `'amplitude'`, `'uniform'`. Determines the alpha component of the
+    rgba value. <br /> Default is `alpha = 'uniform'`.
+
+**Returns**
+
+  - **rgba\_image\_components** : *ndarray* <br /> The rgba components
+    calculated from scalar values. If the input array has shape NxN, the
+    output array will have shape NxNx4.
 
 ### Function `rgba`
 
@@ -229,23 +446,35 @@ numpy.ndarray() with shape \[data.shape\[0\], data.shape\[1\], 4\]
 >     def rgba(
 >         mode,
 >         cmap='uniform',
->         alpha='intensity'
+>         brightness='intensity',
+>         alpha='uniform'
 >     )
 
 Converts a 2d complex array to rgba data.
 
-Input:
+**Parameters**
 
-dtype can be real or complex - if real, the output color will be
-constant. If complex, the color will reflect the complex angle.
+  - **mode** : *ndarray* <br /> An array with the data to represent.
+    Dtype may be complex or real - if real, the color will be uniform,
+    and values will be represented by brightness.
 
-If cmap = ‘uniform’, the cielab color space will be used.
+  - **cmap** : *string, optional* <br /> If `cmap = 'uniform'`, the
+    CIELAB color space will be used. Otherwise, any pyplot
+    ScalarMappable may be used. <br /> Default is `cmap = 'uniform'`.
 
-Alpha can be either intensity or amplitude.
+  - **brightness** : *string, optional* <br /> Allowed values:
+    `'intensity'`, `'amplitude'`, `'uniform'`. <br /> Default is
+    `brightness = 'intensity'`.
 
-Output:
+  - **alpha** : *string, optional* <br /> Allowed values: `'intensity'`,
+    `'amplitude'`, `'uniform'`. Determines the alpha component of the
+    rgba value. <br /> Default is `alpha = 'uniform'`.
 
-numpy.ndarray() with shape \[data.shape\[0\], data.shape\[1\], 4\].
+**Returns**
+
+  - **rgba\_image\_components** : *ndarray* <br /> The rgba components
+    calculated from scalar values. If the input array has shape NxN, the
+    output array will have shape NxNx4.
 
 ### Function `whatIsC`
 
@@ -267,12 +496,55 @@ To set units:
 ``` python
 import wsp_tools as wt
 wt.setUnits(meter = 1e-3) # set km as base unit for length
-from wsp_tools.constants import *
 
-print(c) # outputs 299792.458
+print(wt.constants.c) # outputs 299792.458
 ```
 
 Note that all other modules should update automatically as well.
+
+## Functions
+
+### Function `setUnits`
+
+> 
+> 
+>     def setUnits(
+>         second=1,
+>         meter=1,
+>         kilogram=1,
+>         Amp=1,
+>         Kelvin=1,
+>         mole=1,
+>         candela=1
+>     )
+
+Sets the units across the wsp\_tools module.
+
+i.e. setUnits(meter = 1000) sets the millimeter as the base unit for
+length.
+
+**Parameters**
+
+  - **second** : *number, optional* <br /> The SI base unit for time.
+    <br /> Default is `second = 1`.
+
+  - **meter** : *number, optional* <br /> The SI base unit for length.
+    <br /> Default is `meter = 1`.
+
+  - **kilogram** : *number, optional* <br /> The SI base unit for mass.
+    <br /> Default is `kilogram = 1`.
+
+  - **Amp** : *number, optional* <br /> The SI base unit for current.
+    <br /> Default is `Amp = 1`.
+
+  - **Kelvin** : *number, optional* <br /> The SI base unit for
+    temperature. <br /> Default is `Kelvin = 1`.
+
+  - **mole** : *number, optional* <br /> The SI base unit for amount of
+    substance. <br /> Default is `mole = 1`.
+
+  - **candela** : *number, optional* <br /> The SI base unit for
+    luminous intensity. <br /> Default is `candela = 1`.
 
 # Module `wsp_tools.lorentzSim`
 
@@ -305,31 +577,39 @@ Utility function for propagate(). Microscope transfer function.
 >         t=6e-08
 >     )
 
-Calculates the Aharonov-Bohm phase acquired by an electron through a 2d
-magnetization.
+Calculates the Aharonov-Bohm phase acquired by an electron passing
+through a 2d magnetization.
 
-Inputs:
+**Parameters**
 
-The real space magnetization of the sample.
+  - **mx** : *ndarray* <br /> The x-component of magnetization. Should
+    be a 2-dimensional array.
 
-mx: numpy.2darray() - x component of magnetization
+  - **my** : *ndarray* <br /> The y-component of magnetization. Should
+    be a 2-dimensional array.
 
-my: numpy.2darray() - y component of magnetization
+  - **mz** : *ndarray* <br /> The z-component of magnetization. Should
+    be a 2-dimensional array.
 
-mz: numpy.2darray() - z component of magnetization
+  - **Lx** : *number, optional* <br /> The x-length of the area
+    calculated. (i.e., Lx = xmax - xmin). <br /> Default is `Lx = 1e-6`.
 
-Lx: scalar, the width of the sample.
+  - **Ly** : *number, optional* <br /> The y-length of the area
+    calculated. (i.e., Ly = ymax - ymin). <br /> Default is `Ly = 1e-6`.
 
-Ly: scalar, the length of the sample.
+  - **p** : *ndarray, optional* <br /> A unit vector in the direction of
+    electron propagation. Should be a 1darray with length 3. <br />
+    Default is `p = np.array([0,0,1])` (the electron is propagating in
+    the z-direction).
 
-p: numpy.1darray with length 3 - unit vector in the direction of
-electron motion.
+  - **t** : *number, optional* <br /> The thickness of the 2d
+    magnetization. <br /> Default is `t = 60e-9`.
 
-t: the thickness of the sample.
+**Returns**
 
-Returns:
-
-phi = numpy.2darray() the phase acquired.
+  - **phi** : *ndarray* The phase acquired by an electron passing
+    through the specified magnetization. Output is a 2d array of the
+    same shape as mx, my, and mz.
 
 ### Function `aperture`
 
@@ -368,9 +648,46 @@ Utility function for propagate(). Phase transfer function.
 
 Calculates the magnetization of a hopfion based on Jordan Chess’ model.
 
-Returns:
+**Parameters**
 
-mx, my, mz - numpy.ndarray objects in the same shape as x and y.
+  - **x** : *number, ndarray* <br /> The x-coordinates over which to
+    calculate magnetization.
+
+  - **y** : *number, ndarray* <br /> The y-coordinates over which to
+    calculate magnetization.
+
+  - **z** : *number, ndarray, optional* <br /> The z-coordinates over
+    which to calculate magnetization. Note, if z is an ndarray, then x,
+    y, and z should have the same shape rather than relying on array
+    broadcasting. <br /> Default is `z = 0`.
+
+  - **aa**, **ba**, **ca** : *number, optional* <br /> In this model,
+    the thickness of the domain wall is set by a Gaussian function,
+    defined as `aa * exp(-ba * z**2) + ca`. <br /> Defaults are `aa
+    = 5`, `ba = 5`, `ca = 0`.
+
+  - **ak**, **bk**, **ck** : *number, optional* <br /> In this model,
+    the thickness of the core is set by a Gaussian function, defined as
+    `ak * exp(-bk * z**2) + ck`. <br /> Defaults are `ak = 5e7`, `bk =
+    -50`, `ck = 0`.
+
+  - **bg**, **cg** : *number, optional* <br /> In this model, the
+    helicity varies as a function of z, given as `pi / 2 * tanh( bg * z
+    ) + cg`. <br /> Defaults are `bg = 5e7`, `cg = pi/2`.
+
+  - **n** : *number, optional* <br /> The skyrmion number. <br />
+    Default is `n = 1`.
+
+**Returns**
+
+  - **mx** : *ndarray* <br /> The x-component of magnetization. Shape
+    will be the same as x and y.
+
+  - **my** : *ndarray* <br /> The y-component of magnetization. Shape
+    will be the same as x and y.
+
+  - **mz** : *ndarray* <br /> The z-component of magnetization. Shape
+    will be the same as x and y.
 
 ### Function `propagate`
 
@@ -385,24 +702,66 @@ mx, my, mz - numpy.ndarray objects in the same shape as x and y.
 >         focal_length=1
 >     )
 
-Calculates the Lorentz image given a specific phase.
+Calculates the Lorentz image given a specific phase and defocus.
 
-Inputs:
+This takes into account the microscope and phase transfer functions.
 
-x, y: numpy.2darray objects with the x and y coordinates
+**Parameters**
 
-cphase: the complex phase acquired (complex to allow for attenuation)
+  - **x** : *ndarray* <br /> The x coordinates of the input complex
+    phase. Dimension should be 2.
 
-defocus: scalar
+  - **y** : *ndarray* <br /> The y coordinates of the input complex
+    phase. Dimension should be 2.
 
-Returns:
+  - **cphase**: *complex ndarray* <br /> The complex phase to propagate.
+    Dimension should be two. May be complex to allow for attenuation
+    through the sample.
 
-psi\_out: numpy.2darray containing the complex wavefunction in the image
-plane.
+  - **defocus** : *number, optional* <br /> The defocus at which the
+    phase was acquired. <br /> Default is `defocus = 0`.
+
+  - **wavelength** : *number, optional* <br /> The wavelength of the
+    electron. Scales the phase transfer function and the reciprocal
+    coordinates. <br /> Default is `wavelength = 1.97e-12` (the
+    relativistic wavelength of a 300kV electron).
+
+  - **focal\_length** : *number, optional* <br /> The focal length of
+    the lens, which scales the reciprocal coordinates. <br /> Default is
+    `focal_length = 1`.
+
+**Returns**
+
+  - **psi\_out** : *complex ndarray* <br /> The transverse complex
+    amplitude in the image plane. Output has the same shape as x, y, and
+    cphase.
 
 # Module `wsp_tools.pyplotwrapper`
 
 A wrapper for matplotlib.pyplot containing common plotting routines.
+
+Example
+
+``` python
+import numpy as np
+import wsp_tools as wt
+
+X = np.linspace(-10,10,100)
+Y = np.linspace(-10,10,100)
+x, y = np.meshgrid(X, Y)
+data = x + 1j*y
+window = (-4, 4, -4, 4)
+
+fig, (ax1, ax2) = wt.subplots()
+ax1.setAxes(X, Y)
+ax1.imshow(np.abs(data))
+ax1.inset(window=window)
+ax2.setAxes(X, Y, window=window)
+ax2.rgba(data)
+wt.plt.show()
+```
+
+![asdf](img.png)
 
 ## Functions
 
@@ -451,15 +810,17 @@ add x-y axes, and to show the rgba version of a complex 2d array.
 Typical usage:
 
 ``` python
-x = np.linspace(-10,10,xres)
-y = np.linspace(-10,10,yres)
-data = np.cos(x+y)
+X = np.linspace(-10,10,xres)
+Y = np.linspace(-10,10,yres)
+x, y = np.meshgrid(X, Y)
+data = x+1j*y
 window = [-3,7,1,4]
 
 fig, ax = plt.subplots()
 myax = wsp_tools.singleAx(ax)
 ax.setAxes(x, y, window)
 ax.set_xytitle('x','y','title')
+ax.rgba(data)
 plt.show()
 ```
 
