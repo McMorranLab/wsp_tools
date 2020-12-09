@@ -21,6 +21,8 @@ img.sitie()
 ### plot img.Bx, img.By, img.phase, img.data, img.rawData, etc
 ```
 """
+
+# %%
 from . import dB, rgba, np, plt, os
 from .image_processing import *
 from .pyplotwrapper import subplots
@@ -57,7 +59,28 @@ class lorentz:
 		self.phase = None
 		self.Bx, self.By = None, None
 
-	def sitie(self, defocus, wavelength=1.97e-12):
+	def fix_units(self, unit=None):
+		if unit is None:
+			if self.pixelUnit == 'nm':
+				unit = 1e-9
+			elif self.pixelUnit == 'mm':
+				unit = 1e-3
+			elif self.pixelUnit == 'µm':
+				unit = 1e-6
+			elif self.pixelUnit == 'm':
+				unit = 1
+		print("Setting unit from {:0.0e} meters to 1 meter".format(unit))
+		self.pixelSize *= unit
+		self.pixelUnit = 'm'
+		self.x *= unit
+		self.y *= unit
+		self.metadata.update({
+			'pixelSize': float(self.pixelSize),
+			'pixelUnit': self.pixelUnit
+		})
+		return(None)
+
+	def sitie(self, defocus = 1, wavelength=1.97e-12):
 		"""Carries out phase and B-field reconstruction.
 
 		Assigns phase, Bx, and By attributes.
@@ -83,7 +106,7 @@ class lorentz:
 	def preview(self, window=None):
 		"""Preview the image.
 
-		Note that unlike `pyplotwrapper`,
+		Note that unlike `pyplotwrapper`, window is in units of pixels.
 
 		**Parameters**
 
@@ -143,7 +166,7 @@ def B_from_phase(phase, thickness=1):
 	By = -_.hbar/_.e/thickness * dpdx
 	return(Bx, By)
 
-def SITIE(image, defocus, pixel_size, wavelength=1.97e-12):
+def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
 	"""Reconstruct the phase from a defocussed image.
 
 	**Parameters**
@@ -159,20 +182,18 @@ def SITIE(image, defocus, pixel_size, wavelength=1.97e-12):
 	Default is `wavelength = 1.97e-12` (the relativistic wavelength of a 300kV electron).
 
 	"""
-	f = sitie_RHS(image, defocus, wavelength)
-	phase = inverse_laplacian(f, pixel_size)
+	rhs = sitie_RHS(image, defocus, wavelength)
+	phase = inverse_laplacian(rhs, pixel_size)
 	return(phase)
 
 def sitie_RHS(I, defocus, wavelength=dB(3e5)):
-	return(2*_.pi/defocus * (1 - I/np.mean(I)))
+	return(2 * _.pi / defocus / wavelength * (1 - I/np.mean(I)))
 
 def inverse_laplacian(f, pixel_size):
 	QX = np.fft.fftfreq(f.shape[1], pixel_size)
 	QY = np.fft.fftfreq(f.shape[0], pixel_size)
 	qx,qy = np.meshgrid(QX,QY)
-
 	f = np.fft.fft2(f)
-	f = f/(qy**2 + qx**2 + np.max(qx)/qx.shape[0]/100000)
-	f[(qx==0)&(qy==0)] = 0
+	f = np.nan_to_num(-f/(qy**2 + qx**2), posinf=0, neginf=0)
 	f = np.fft.ifft2(f)
 	return(np.real(f))

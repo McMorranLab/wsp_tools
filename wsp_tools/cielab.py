@@ -1,7 +1,6 @@
 """Module to generate rgba data from scalar values.
 """
 from . import np, plt
-import numpy as np
 from . import constants as _
 
 def cielab_image(data, brightness = 'intensity', alpha = 'uniform'):

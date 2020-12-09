@@ -42,13 +42,13 @@ def abphase2d(mx, my, mz, Lx=1e-6, Ly=1e-6, p=np.array([0,0,1]), t=60e-9):
 	My = np.fft.fft2(my)
 	Mz = np.fft.fft2(mz)
 	M = np.array([Mx, My, Mz])
-	xres, yres = int(M.shape[1]/2), int(M.shape[2]/2)
-	SI = np.fft.fftfreq(M.shape[1],Lx/M.shape[1])
-	SJ = np.fft.fftfreq(M.shape[0],Ly/M.shape[0])
-	si, sj = np.meshgrid(SI, SI)
+	SI = np.fft.fftfreq(M[0].shape[1],Lx/M[0].shape[1])
+	SJ = np.fft.fftfreq(M[0].shape[0],Ly/M[0].shape[0])
+	si, sj = np.meshgrid(SI, SJ)
 	s = np.array([si,sj,0*si])
 	s_mag = np.sqrt(np.einsum('ijk,ijk->jk',s,s))
-	s_mag[s_mag == 0] = 1e-100
+	s_mag[s_mag == 0] = np.max(s_mag)/s_mag.shape[0]/1000000
+
 	sig = np.nan_to_num(s/s_mag, nan=0,posinf=0,neginf=0)
 	Gts = 1/(np.einsum('i,ijk->jk',p,sig)**2 + p[2]**2) \
 			* np.sinc(t*np.einsum('i,ijk->jk',p,sig)/p[2])
@@ -60,7 +60,7 @@ def abphase2d(mx, my, mz, Lx=1e-6, Ly=1e-6, p=np.array([0,0,1]), t=60e-9):
 	weights = 1j * np.nan_to_num(t/s_mag, nan=0,neginf=0,posinf=0) * Gts * d
 
 	phi = 2*_.e/_.hbar/_.c * np.fft.ifft2(weights)
-	return(np.real(phi))
+	return(phi.real)
 
 def propagate(x, y, cphase, defocus=0, wavelength=1.97e-12, focal_length=1):
 	"""Calculates the Lorentz image given a specific phase and defocus.
@@ -99,8 +99,8 @@ def propagate(x, y, cphase, defocus=0, wavelength=1.97e-12, focal_length=1):
 	"""
 	dx = x[1,1]-x[0,0]
 	dy = y[1,1]-y[0,0]
-	U = 2*_.pi / wavelength / focal_length * np.fft.fftfreq(x.shape[1],dx)
-	V = 2*_.pi / wavelength / focal_length * np.fft.fftfreq(x.shape[0],dy)
+	U = np.fft.fftfreq(cphase.shape[1],dx)
+	V = np.fft.fftfreq(cphase.shape[0],dy)
 	qx, qy = np.meshgrid(U, V)
 	psi_0 = np.exp(1j*cphase)
 	psi_q = np.fft.fft2(psi_0)
