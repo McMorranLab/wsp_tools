@@ -38,16 +38,17 @@ def abphase2d(mx, my, mz, Lx=1e-6, Ly=1e-6, p=np.array([0,0,1]), t=60e-9):
 	The phase acquired by an electron passing through the specified magnetization.
 	Output is a 2d array of the same shape as mx, my, and mz.
 	"""
-	Mx = np.fft.fftshift(np.fft.fft2(np.fft.fftshift(mx)))
-	My = np.fft.fftshift(np.fft.fft2(np.fft.fftshift(my)))
-	Mz = np.fft.fftshift(np.fft.fft2(np.fft.fftshift(mz)))
+	Mx = np.fft.fft2(mx)
+	My = np.fft.fft2(my)
+	Mz = np.fft.fft2(mz)
 	M = np.array([Mx, My, Mz])
 	xres, yres = int(M.shape[1]/2), int(M.shape[2]/2)
-	SI = np.arange(-xres,xres)
-	SJ = np.arange(-yres,yres)
+	SI = np.fft.fftfreq(M.shape[1],Lx/M.shape[1])
+	SJ = np.fft.fftfreq(M.shape[0],Ly/M.shape[0])
 	si, sj = np.meshgrid(SI, SI)
-	s = np.array([si/Lx,sj/Ly,0*si])
+	s = np.array([si,sj,0*si])
 	s_mag = np.sqrt(np.einsum('ijk,ijk->jk',s,s))
+	s_mag[s_mag == 0] = 1e-100
 	sig = np.nan_to_num(s/s_mag, nan=0,posinf=0,neginf=0)
 	Gts = 1/(np.einsum('i,ijk->jk',p,sig)**2 + p[2]**2) \
 			* np.sinc(t*np.einsum('i,ijk->jk',p,sig)/p[2])
@@ -58,7 +59,7 @@ def abphase2d(mx, my, mz, Lx=1e-6, Ly=1e-6, p=np.array([0,0,1]), t=60e-9):
 	d = np.einsum('ijk,ijk->ij', sigxz, pxpxM)
 	weights = 1j * np.nan_to_num(t/s_mag, nan=0,neginf=0,posinf=0) * Gts * d
 
-	phi = 2*_.e/_.hbar/_.c * np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(weights)))
+	phi = 2*_.e/_.hbar/_.c * np.fft.ifft2(weights)
 	return(np.real(phi))
 
 def propagate(x, y, cphase, defocus=0, wavelength=1.97e-12, focal_length=1):
@@ -98,12 +99,12 @@ def propagate(x, y, cphase, defocus=0, wavelength=1.97e-12, focal_length=1):
 	"""
 	dx = x[1,1]-x[0,0]
 	dy = y[1,1]-y[0,0]
-	U = 2*_.pi / wavelength / focal_length * np.fft.fftshift(np.fft.fftfreq(x.shape[0],dx))
-	V = 2*_.pi / wavelength / focal_length * np.fft.fftshift(np.fft.fftfreq(x.shape[1],dy))
+	U = 2*_.pi / wavelength / focal_length * np.fft.fftfreq(x.shape[1],dx)
+	V = 2*_.pi / wavelength / focal_length * np.fft.fftfreq(x.shape[0],dy)
 	qx, qy = np.meshgrid(U, V)
 	psi_0 = np.exp(1j*cphase)
-	psi_q = np.fft.fftshift(np.fft.fft2(np.fft.fftshift(psi_0)))
-	psi_out = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(psi_q * T(qx, qy, defocus, wavelength))))
+	psi_q = np.fft.fft2(psi_0)
+	psi_out = np.fft.ifft2(psi_q * T(qx, qy, defocus, wavelength))
 	return(psi_out)
 
 def T(qx, qy, defocus, wavelength):

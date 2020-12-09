@@ -14,12 +14,12 @@ instead of meters)
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import eval_genlaguerre, factorial
-import scipy.ndimage as ndi
 import os
 
-from .constants import setUnits
-from .cielab import *
 from .beam import *
-from .sitie import *
+from .cielab import *
+from .constants import setUnits
+from .image_processing import *
 from .lorentzSim import *
 from .pyplotwrapper import *
+from .sitie import *
