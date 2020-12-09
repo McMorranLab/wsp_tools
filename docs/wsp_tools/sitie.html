@@ -105,8 +105,13 @@ class lorentz:
 
         def reset(self):
                 &#34;&#34;&#34;Resets data to the rawData.
+
+                **Returns**
+
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.data = self.rawData
+                return(self)
 
         def sitie(self, defocus, wavelength=1.97e-12):
                 &#34;&#34;&#34;Carries out phase and B-field reconstruction.
@@ -124,12 +129,13 @@ class lorentz:
 
                 **Returns**
 
-                * **None**
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;defocus&#39;: defocus})
                 dummy = sitie_RHS(self.data, defocus, wavelength)
                 self.phase = np.real(inverse_laplacian(dummy, self.pixelSize))
                 self.Bx, self.By = B_from_phase(self.phase, thickness=1)
+                return(self)
 
         def crop_pixel_counts(self, sigma=10):
                 &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some standard deviation from avg.
@@ -143,10 +149,11 @@ class lorentz:
 
                 **Returns**
 
-                * **None**
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;crop pixel sigma&#39;: sigma})
                 self.data = crop_pixel_counts(self.data, sigma=sigma)
+                return(self)
 
         def high_pass(self, sigma=20):
                 &#34;&#34;&#34;Applies a high-pass filter to the image data.
@@ -158,10 +165,11 @@ class lorentz:
 
                 **Returns**
 
-                * **None**
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;high pass sigma&#39;: sigma})
                 self.data = high_pass(self.data, sigma=sigma)
+                return(self)
 
         def low_pass(self, sigma=50):
                 &#34;&#34;&#34;Applies a low-pass filter to the image data.
@@ -173,10 +181,11 @@ class lorentz:
 
                 **Returns**
 
-                * **None**
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;low pass sigma&#39;: sigma})
                 self.data = low_pass(self.data, sigma=sigma)
+                return(self)
 
         def blur(self, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
                 &#34;&#34;&#34;Applies a Gaussian blur to the image data.
@@ -196,10 +205,11 @@ class lorentz:
 
                 **Returns**
 
-                * **None**
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;blur sigma&#39;: sigma})
                 self.data = blur(self.data, sigma, mode, cval)
+                return(self)
 
         def preview(self, window=None):
                 &#34;&#34;&#34;Preview the image.
@@ -763,8 +773,13 @@ An array carrying the electron counts. </li>
 
         def reset(self):
                 &#34;&#34;&#34;Resets data to the rawData.
+
+                **Returns**
+
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.data = self.rawData
+                return(self)
 
         def sitie(self, defocus, wavelength=1.97e-12):
                 &#34;&#34;&#34;Carries out phase and B-field reconstruction.
@@ -782,12 +797,13 @@ An array carrying the electron counts. </li>
 
                 **Returns**
 
-                * **None**
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;defocus&#39;: defocus})
                 dummy = sitie_RHS(self.data, defocus, wavelength)
                 self.phase = np.real(inverse_laplacian(dummy, self.pixelSize))
                 self.Bx, self.By = B_from_phase(self.phase, thickness=1)
+                return(self)
 
         def crop_pixel_counts(self, sigma=10):
                 &#34;&#34;&#34;Crops any pixel counts that are higher or lower than some standard deviation from avg.
@@ -801,10 +817,11 @@ An array carrying the electron counts. </li>
 
                 **Returns**
 
-                * **None**
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;crop pixel sigma&#39;: sigma})
                 self.data = crop_pixel_counts(self.data, sigma=sigma)
+                return(self)
 
         def high_pass(self, sigma=20):
                 &#34;&#34;&#34;Applies a high-pass filter to the image data.
@@ -816,10 +833,11 @@ An array carrying the electron counts. </li>
 
                 **Returns**
 
-                * **None**
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;high pass sigma&#39;: sigma})
                 self.data = high_pass(self.data, sigma=sigma)
+                return(self)
 
         def low_pass(self, sigma=50):
                 &#34;&#34;&#34;Applies a low-pass filter to the image data.
@@ -831,10 +849,11 @@ An array carrying the electron counts. </li>
 
                 **Returns**
 
-                * **None**
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;low pass sigma&#39;: sigma})
                 self.data = low_pass(self.data, sigma=sigma)
+                return(self)
 
         def blur(self, sigma=5, mode=&#39;wrap&#39;, cval=0.0):
                 &#34;&#34;&#34;Applies a Gaussian blur to the image data.
@@ -854,10 +873,11 @@ An array carrying the electron counts. </li>
 
                 **Returns**
 
-                * **None**
+                * **self** : _lorentz_
                 &#34;&#34;&#34;
                 self.metadata.update({&#39;blur sigma&#39;: sigma})
                 self.data = blur(self.data, sigma, mode, cval)
+                return(self)
 
         def preview(self, window=None):
                 &#34;&#34;&#34;Preview the image.
@@ -922,7 +942,7 @@ Default is <code>cval = 0.0</code>.</p>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>lorentz</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -946,10 +966,11 @@ Default is <code>cval = 0.0</code>.</p>
 
         **Returns**
 
-        * **None**
+        * **self** : _lorentz_
         &#34;&#34;&#34;
         self.metadata.update({&#39;blur sigma&#39;: sigma})
-        self.data = blur(self.data, sigma, mode, cval)</code></pre>
+        self.data = blur(self.data, sigma, mode, cval)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.lorentz.crop_pixel_counts"><code class="name flex">
@@ -965,7 +986,7 @@ Default is <code>sigma = 10</code>.</li>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>lorentz</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -983,10 +1004,11 @@ Default is <code>sigma = 10</code>.</li>
 
         **Returns**
 
-        * **None**
+        * **self** : _lorentz_
         &#34;&#34;&#34;
         self.metadata.update({&#39;crop pixel sigma&#39;: sigma})
-        self.data = crop_pixel_counts(self.data, sigma=sigma)</code></pre>
+        self.data = crop_pixel_counts(self.data, sigma=sigma)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.lorentz.high_pass"><code class="name flex">
@@ -1001,7 +1023,7 @@ Default is <code>sigma = 20</code>.</li>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>lorentz</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1017,10 +1039,11 @@ Default is <code>sigma = 20</code>.</li>
 
         **Returns**
 
-        * **None**
+        * **self** : _lorentz_
         &#34;&#34;&#34;
         self.metadata.update({&#39;high pass sigma&#39;: sigma})
-        self.data = high_pass(self.data, sigma=sigma)</code></pre>
+        self.data = high_pass(self.data, sigma=sigma)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.lorentz.low_pass"><code class="name flex">
@@ -1035,7 +1058,7 @@ Default is <code>sigma = 50</code>.</li>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>lorentz</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1051,10 +1074,11 @@ Default is <code>sigma = 50</code>.</li>
 
         **Returns**
 
-        * **None**
+        * **self** : _lorentz_
         &#34;&#34;&#34;
         self.metadata.update({&#39;low pass sigma&#39;: sigma})
-        self.data = low_pass(self.data, sigma=sigma)</code></pre>
+        self.data = low_pass(self.data, sigma=sigma)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.lorentz.preview"><code class="name flex">
@@ -1099,15 +1123,24 @@ Default is <code>window = (0, -1, 0, -1)</code></li>
 <span>def <span class="ident">reset</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Resets data to the rawData.</p></div>
+<div class="desc"><p>Resets data to the rawData.</p>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>self</strong> : <em>lorentz</em></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def reset(self):
         &#34;&#34;&#34;Resets data to the rawData.
+
+        **Returns**
+
+        * **self** : _lorentz_
         &#34;&#34;&#34;
-        self.data = self.rawData</code></pre>
+        self.data = self.rawData
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.lorentz.saveMeta"><code class="name flex">
@@ -1169,7 +1202,7 @@ Default is <code>wavelength = 1.96e-12</code> (relativistic wavelength of a 300k
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>lorentz</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1191,12 +1224,13 @@ Default is <code>wavelength = 1.96e-12</code> (relativistic wavelength of a 300k
 
         **Returns**
 
-        * **None**
+        * **self** : _lorentz_
         &#34;&#34;&#34;
         self.metadata.update({&#39;defocus&#39;: defocus})
         dummy = sitie_RHS(self.data, defocus, wavelength)
         self.phase = np.real(inverse_laplacian(dummy, self.pixelSize))
-        self.Bx, self.By = B_from_phase(self.phase, thickness=1)</code></pre>
+        self.Bx, self.By = B_from_phase(self.phase, thickness=1)
+        return(self)</code></pre>
 </details>
 </dd>
 </dl>

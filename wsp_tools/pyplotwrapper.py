@@ -148,7 +148,7 @@ class singleAx():
 
 		**Returns**
 
-		* **None**
+		* **self** : _singleAx_
 		"""
 		self.hasAxes = True
 		self.x, self.y = x, y
@@ -158,6 +158,7 @@ class singleAx():
 			self.xmax = window[1]
 			self.ymin = window[2]
 			self.ymax = window[3]
+		return(self)
 
 	def setWindow(self, window=(0,100,0,100)):
 		"""Applies a window to the singleAx object.
@@ -173,13 +174,14 @@ class singleAx():
 
 		**Returns**
 
-		* **None**
+		* **self** : _singleAx_
 		"""
 		self.hasWindow = True
 		self.xmin = window[0]
 		self.xmax = window[1]
 		self.ymin = window[2]
 		self.ymax = window[3]
+		return(self)
 
 	def set_title(self, title='', **kwargs):
 		"""Sets the title of the plot.
@@ -194,9 +196,10 @@ class singleAx():
 
 		**Returns**
 
-		* **None**
+		* **self** : _singleAx_
 		"""
 		self.ax.set_title(title, **kwargs)
+		return(self)
 
 	def set_xlabel(self, xlabel='', **kwargs):
 		"""Sets the xlabel of the plot.
@@ -211,9 +214,10 @@ class singleAx():
 
 		**Returns**
 
-		* **None**
+		* **self** : _singleAx_
 		"""
 		self.ax.set_xlabel(xlabel, **kwargs)
+		return(self)
 
 	def set_ylabel(self, ylabel='', **kwargs):
 		"""Sets the ylabel of the plot.
@@ -228,9 +232,10 @@ class singleAx():
 
 		**Returns**
 
-		* **None**
+		* **self** : _singleAx_
 		"""
 		self.ax.set_ylabel(ylabel, **kwargs)
+		return(self)
 
 	def set_xytitle(self, xlabel='', ylabel='', title='', **kwargs):
 		"""Set the xlabel, ylabel, and title at the same time.
@@ -258,11 +263,12 @@ class singleAx():
 
 		**Returns**
 
-		* **None**
+		* **self** : _singleAx_
 		"""
 		self.ax.set_xlabel(xlabel, **kwargs)
 		self.ax.set_ylabel(ylabel, **kwargs)
 		self.ax.set_title(title, **kwargs)
+		return(self)
 
 	def imshow(self, data, step=1, **kwargs):
 		"""Imshows the (windowed) data. Sets origin to lower, sets the extent.
@@ -283,12 +289,13 @@ class singleAx():
 
 		**Returns**
 
-		* **None**
+		* **self** : _singleAx_
 		"""
 		x, y, data = self.prePlot(data, step)
 		imshowargs = {'extent': self.extent, 'origin': 'lower'}
 		imshowargs.update(kwargs)
 		self.ax.imshow(data, **imshowargs)
+		return(self)
 
 	def quiver(self, data, step=1, **kwargs):
 		"""Shows a quiver plot of complex data.
@@ -309,10 +316,11 @@ class singleAx():
 
 		**Returns**
 
-		* **None**
+		* **self** : _singleAx_
 		"""
 		xr, yr, data = self.prePlot(data, step)
 		self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
+		return(self)
 
 	def rgba(self, data, step=1, brightness='intensity', alpha='uniform', cmap='uniform', **kwargs):
 		"""Shows an rgba interpretation of complex data.
@@ -347,7 +355,7 @@ class singleAx():
 
 		**Returns**
 
-		* **None**
+		* **self** : _singleAx_
 		"""
 
 		x, y, data = self.prePlot(data)
@@ -355,6 +363,7 @@ class singleAx():
 		imshowargs = {'extent': self.extent, 'origin': 'lower'}
 		imshowargs.update(kwargs)
 		self.ax.imshow(data, **imshowargs)
+		return(self)
 
 	def inset(self, window, **kwargs):
 		"""Plots a square box with vertices defined by window.
@@ -372,7 +381,7 @@ class singleAx():
 
 		**Returns**
 
-		* **None**
+		* **self** : _singleAx_
 		"""
 		plotargs = {'color': 'white'}
 		plotargs.update(kwargs)
@@ -385,6 +394,7 @@ class singleAx():
 		self.ax.plot(np.zeros(100) + window[1],
 						np.linspace(window[2], window[3], 100),
 						**plotargs)
+		return(self)
 
 def subplots(rc=11, **kwargs):
 		"""Creates a fig, ax instance but replaces ax with singleAx.

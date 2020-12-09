@@ -197,7 +197,7 @@ class singleAx():
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.hasAxes = True
                 self.x, self.y = x, y
@@ -207,6 +207,7 @@ class singleAx():
                         self.xmax = window[1]
                         self.ymin = window[2]
                         self.ymax = window[3]
+                return(self)
 
         def setWindow(self, window=(0,100,0,100)):
                 &#34;&#34;&#34;Applies a window to the singleAx object.
@@ -222,13 +223,14 @@ class singleAx():
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.hasWindow = True
                 self.xmin = window[0]
                 self.xmax = window[1]
                 self.ymin = window[2]
                 self.ymax = window[3]
+                return(self)
 
         def set_title(self, title=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the title of the plot.
@@ -243,9 +245,10 @@ class singleAx():
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.ax.set_title(title, **kwargs)
+                return(self)
 
         def set_xlabel(self, xlabel=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the xlabel of the plot.
@@ -260,9 +263,10 @@ class singleAx():
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.ax.set_xlabel(xlabel, **kwargs)
+                return(self)
 
         def set_ylabel(self, ylabel=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the ylabel of the plot.
@@ -277,9 +281,10 @@ class singleAx():
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.ax.set_ylabel(ylabel, **kwargs)
+                return(self)
 
         def set_xytitle(self, xlabel=&#39;&#39;, ylabel=&#39;&#39;, title=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Set the xlabel, ylabel, and title at the same time.
@@ -307,11 +312,12 @@ class singleAx():
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.ax.set_xlabel(xlabel, **kwargs)
                 self.ax.set_ylabel(ylabel, **kwargs)
                 self.ax.set_title(title, **kwargs)
+                return(self)
 
         def imshow(self, data, step=1, **kwargs):
                 &#34;&#34;&#34;Imshows the (windowed) data. Sets origin to lower, sets the extent.
@@ -332,12 +338,13 @@ class singleAx():
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 x, y, data = self.prePlot(data, step)
                 imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
                 imshowargs.update(kwargs)
                 self.ax.imshow(data, **imshowargs)
+                return(self)
 
         def quiver(self, data, step=1, **kwargs):
                 &#34;&#34;&#34;Shows a quiver plot of complex data.
@@ -358,10 +365,11 @@ class singleAx():
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 xr, yr, data = self.prePlot(data, step)
                 self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
+                return(self)
 
         def rgba(self, data, step=1, brightness=&#39;intensity&#39;, alpha=&#39;uniform&#39;, cmap=&#39;uniform&#39;, **kwargs):
                 &#34;&#34;&#34;Shows an rgba interpretation of complex data.
@@ -396,7 +404,7 @@ class singleAx():
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
 
                 x, y, data = self.prePlot(data)
@@ -404,6 +412,7 @@ class singleAx():
                 imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
                 imshowargs.update(kwargs)
                 self.ax.imshow(data, **imshowargs)
+                return(self)
 
         def inset(self, window, **kwargs):
                 &#34;&#34;&#34;Plots a square box with vertices defined by window.
@@ -421,7 +430,7 @@ class singleAx():
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 plotargs = {&#39;color&#39;: &#39;white&#39;}
                 plotargs.update(kwargs)
@@ -434,6 +443,7 @@ class singleAx():
                 self.ax.plot(np.zeros(100) + window[1],
                                                 np.linspace(window[2], window[3], 100),
                                                 **plotargs)
+                return(self)
 
 def subplots(rc=11, **kwargs):
                 &#34;&#34;&#34;Creates a fig, ax instance but replaces ax with singleAx.
@@ -717,7 +727,7 @@ plt.show()
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.hasAxes = True
                 self.x, self.y = x, y
@@ -727,6 +737,7 @@ plt.show()
                         self.xmax = window[1]
                         self.ymin = window[2]
                         self.ymax = window[3]
+                return(self)
 
         def setWindow(self, window=(0,100,0,100)):
                 &#34;&#34;&#34;Applies a window to the singleAx object.
@@ -742,13 +753,14 @@ plt.show()
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.hasWindow = True
                 self.xmin = window[0]
                 self.xmax = window[1]
                 self.ymin = window[2]
                 self.ymax = window[3]
+                return(self)
 
         def set_title(self, title=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the title of the plot.
@@ -763,9 +775,10 @@ plt.show()
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.ax.set_title(title, **kwargs)
+                return(self)
 
         def set_xlabel(self, xlabel=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the xlabel of the plot.
@@ -780,9 +793,10 @@ plt.show()
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.ax.set_xlabel(xlabel, **kwargs)
+                return(self)
 
         def set_ylabel(self, ylabel=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Sets the ylabel of the plot.
@@ -797,9 +811,10 @@ plt.show()
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.ax.set_ylabel(ylabel, **kwargs)
+                return(self)
 
         def set_xytitle(self, xlabel=&#39;&#39;, ylabel=&#39;&#39;, title=&#39;&#39;, **kwargs):
                 &#34;&#34;&#34;Set the xlabel, ylabel, and title at the same time.
@@ -827,11 +842,12 @@ plt.show()
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 self.ax.set_xlabel(xlabel, **kwargs)
                 self.ax.set_ylabel(ylabel, **kwargs)
                 self.ax.set_title(title, **kwargs)
+                return(self)
 
         def imshow(self, data, step=1, **kwargs):
                 &#34;&#34;&#34;Imshows the (windowed) data. Sets origin to lower, sets the extent.
@@ -852,12 +868,13 @@ plt.show()
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 x, y, data = self.prePlot(data, step)
                 imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
                 imshowargs.update(kwargs)
                 self.ax.imshow(data, **imshowargs)
+                return(self)
 
         def quiver(self, data, step=1, **kwargs):
                 &#34;&#34;&#34;Shows a quiver plot of complex data.
@@ -878,10 +895,11 @@ plt.show()
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 xr, yr, data = self.prePlot(data, step)
                 self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
+                return(self)
 
         def rgba(self, data, step=1, brightness=&#39;intensity&#39;, alpha=&#39;uniform&#39;, cmap=&#39;uniform&#39;, **kwargs):
                 &#34;&#34;&#34;Shows an rgba interpretation of complex data.
@@ -916,7 +934,7 @@ plt.show()
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
 
                 x, y, data = self.prePlot(data)
@@ -924,6 +942,7 @@ plt.show()
                 imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
                 imshowargs.update(kwargs)
                 self.ax.imshow(data, **imshowargs)
+                return(self)
 
         def inset(self, window, **kwargs):
                 &#34;&#34;&#34;Plots a square box with vertices defined by window.
@@ -941,7 +960,7 @@ plt.show()
 
                 **Returns**
 
-                * **None**
+                * **self** : _singleAx_
                 &#34;&#34;&#34;
                 plotargs = {&#39;color&#39;: &#39;white&#39;}
                 plotargs.update(kwargs)
@@ -953,7 +972,8 @@ plt.show()
                                                 np.linspace(window[2], window[3], 100), **plotargs)
                 self.ax.plot(np.zeros(100) + window[1],
                                                 np.linspace(window[2], window[3], 100),
-                                                **plotargs)</code></pre>
+                                                **plotargs)
+                return(self)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -982,7 +1002,7 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.imshow</code>.</p>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>singleAx</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1007,12 +1027,13 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.imshow</code>.</p>
 
         **Returns**
 
-        * **None**
+        * **self** : _singleAx_
         &#34;&#34;&#34;
         x, y, data = self.prePlot(data, step)
         imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
         imshowargs.update(kwargs)
-        self.ax.imshow(data, **imshowargs)</code></pre>
+        self.ax.imshow(data, **imshowargs)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.inset"><code class="name flex">
@@ -1035,7 +1056,7 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.plot</code>.</p>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>singleAx</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1057,7 +1078,7 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.plot</code>.</p>
 
         **Returns**
 
-        * **None**
+        * **self** : _singleAx_
         &#34;&#34;&#34;
         plotargs = {&#39;color&#39;: &#39;white&#39;}
         plotargs.update(kwargs)
@@ -1069,7 +1090,8 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.plot</code>.</p>
                                         np.linspace(window[2], window[3], 100), **plotargs)
         self.ax.plot(np.zeros(100) + window[1],
                                         np.linspace(window[2], window[3], 100),
-                                        **plotargs)</code></pre>
+                                        **plotargs)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.prePlot"><code class="name flex">
@@ -1213,7 +1235,7 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.quiver</code>.</p>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>singleAx</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1238,10 +1260,11 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.quiver</code>.</p>
 
         **Returns**
 
-        * **None**
+        * **self** : _singleAx_
         &#34;&#34;&#34;
         xr, yr, data = self.prePlot(data, step)
-        self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)</code></pre>
+        self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.rgba"><code class="name flex">
@@ -1286,7 +1309,7 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.imshow</code>.</p>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>singleAx</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1325,14 +1348,15 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.imshow</code>.</p>
 
         **Returns**
 
-        * **None**
+        * **self** : _singleAx_
         &#34;&#34;&#34;
 
         x, y, data = self.prePlot(data)
         data = rgba(data,brightness=brightness,alpha=alpha,cmap=cmap)
         imshowargs = {&#39;extent&#39;: self.extent, &#39;origin&#39;: &#39;lower&#39;}
         imshowargs.update(kwargs)
-        self.ax.imshow(data, **imshowargs)</code></pre>
+        self.ax.imshow(data, **imshowargs)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.setAxes"><code class="name flex">
@@ -1360,7 +1384,7 @@ and y values, rather than their indices.</p>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>singleAx</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1386,7 +1410,7 @@ and y values, rather than their indices.</p>
 
         **Returns**
 
-        * **None**
+        * **self** : _singleAx_
         &#34;&#34;&#34;
         self.hasAxes = True
         self.x, self.y = x, y
@@ -1395,7 +1419,8 @@ and y values, rather than their indices.</p>
                 self.xmin = window[0]
                 self.xmax = window[1]
                 self.ymin = window[2]
-                self.ymax = window[3]</code></pre>
+                self.ymax = window[3]
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.setWindow"><code class="name flex">
@@ -1413,7 +1438,7 @@ and y values, rather than their indices.</li>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>singleAx</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1433,13 +1458,14 @@ and y values, rather than their indices.</li>
 
         **Returns**
 
-        * **None**
+        * **self** : _singleAx_
         &#34;&#34;&#34;
         self.hasWindow = True
         self.xmin = window[0]
         self.xmax = window[1]
         self.ymin = window[2]
-        self.ymax = window[3]</code></pre>
+        self.ymax = window[3]
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.set_title"><code class="name flex">
@@ -1460,7 +1486,7 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.set_title</code>.</
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>singleAx</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1479,9 +1505,10 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.set_title</code>.</
 
         **Returns**
 
-        * **None**
+        * **self** : _singleAx_
         &#34;&#34;&#34;
-        self.ax.set_title(title, **kwargs)</code></pre>
+        self.ax.set_title(title, **kwargs)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.set_xlabel"><code class="name flex">
@@ -1502,7 +1529,7 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.set_xlabel</code>.<
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>singleAx</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1521,9 +1548,10 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.set_xlabel</code>.<
 
         **Returns**
 
-        * **None**
+        * **self** : _singleAx_
         &#34;&#34;&#34;
-        self.ax.set_xlabel(xlabel, **kwargs)</code></pre>
+        self.ax.set_xlabel(xlabel, **kwargs)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.set_xytitle"><code class="name flex">
@@ -1557,7 +1585,7 @@ and <code>matplotlib.axes.Axes.set_title</code>.</p>
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>singleAx</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1589,11 +1617,12 @@ and <code>matplotlib.axes.Axes.set_title</code>.</p>
 
         **Returns**
 
-        * **None**
+        * **self** : _singleAx_
         &#34;&#34;&#34;
         self.ax.set_xlabel(xlabel, **kwargs)
         self.ax.set_ylabel(ylabel, **kwargs)
-        self.ax.set_title(title, **kwargs)</code></pre>
+        self.ax.set_title(title, **kwargs)
+        return(self)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.set_ylabel"><code class="name flex">
@@ -1614,7 +1643,7 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.set_ylabel</code>.<
 </ul>
 <p><strong>Returns</strong></p>
 <ul>
-<li><strong>None</strong></li>
+<li><strong>self</strong> : <em>singleAx</em></li>
 </ul></div>
 <details class="source">
 <summary>
@@ -1633,9 +1662,10 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.set_ylabel</code>.<
 
         **Returns**
 
-        * **None**
+        * **self** : _singleAx_
         &#34;&#34;&#34;
-        self.ax.set_ylabel(ylabel, **kwargs)</code></pre>
+        self.ax.set_ylabel(ylabel, **kwargs)
+        return(self)</code></pre>
 </details>
 </dd>
 </dl>

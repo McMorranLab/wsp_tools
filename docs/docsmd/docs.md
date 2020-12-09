@@ -879,7 +879,7 @@ Imshows the (windowed) data. Sets origin to lower, sets the extent.
 
 **Returns**
 
-  - **None**
+  - **self** : *singleAx*
 
 ##### Method `inset`
 
@@ -906,7 +906,7 @@ Default color is white.
 
 **Returns**
 
-  - **None**
+  - **self** : *singleAx*
 
 ##### Method `prePlot`
 
@@ -983,7 +983,7 @@ Shows a quiver plot of complex data.
 
 **Returns**
 
-  - **None**
+  - **self** : *singleAx*
 
 ##### Method `rgba`
 
@@ -1028,7 +1028,7 @@ Shows an rgba interpretation of complex data.
 
 **Returns**
 
-  - **None**
+  - **self** : *singleAx*
 
 ##### Method `setAxes`
 
@@ -1058,7 +1058,7 @@ whichever was called last, will be used in plotting.
 
 **Returns**
 
-  - **None**
+  - **self** : *singleAx*
 
 ##### Method `setWindow`
 
@@ -1082,7 +1082,7 @@ whichever was called last, will be used in plotting.
 
 **Returns**
 
-  - **None**
+  - **self** : *singleAx*
 
 ##### Method `set_title`
 
@@ -1105,7 +1105,7 @@ Sets the title of the plot.
 
 **Returns**
 
-  - **None**
+  - **self** : *singleAx*
 
 ##### Method `set_xlabel`
 
@@ -1128,7 +1128,7 @@ Sets the xlabel of the plot.
 
 **Returns**
 
-  - **None**
+  - **self** : *singleAx*
 
 ##### Method `set_xytitle`
 
@@ -1168,7 +1168,7 @@ or
 
 **Returns**
 
-  - **None**
+  - **self** : *singleAx*
 
 ##### Method `set_ylabel`
 
@@ -1191,7 +1191,7 @@ Sets the ylabel of the plot.
 
 **Returns**
 
-  - **None**
+  - **self** : *singleAx*
 
 # Module `wsp_tools.sitie`
 
@@ -1435,7 +1435,7 @@ Applies a Gaussian blur to the image data.
 
 **Returns**
 
-  - **None**
+  - **self** : *lorentz*
 
 ##### Method `crop_pixel_counts`
 
@@ -1458,7 +1458,7 @@ deviation).
 
 **Returns**
 
-  - **None**
+  - **self** : *lorentz*
 
 ##### Method `high_pass`
 
@@ -1477,7 +1477,7 @@ Applies a high-pass filter to the image data.
 
 **Returns**
 
-  - **None**
+  - **self** : *lorentz*
 
 ##### Method `low_pass`
 
@@ -1496,7 +1496,7 @@ Applies a low-pass filter to the image data.
 
 **Returns**
 
-  - **None**
+  - **self** : *lorentz*
 
 ##### Method `preview`
 
@@ -1526,6 +1526,10 @@ Note that unlike <code>pyplotwrapper</code>,
 >     )
 
 Resets data to the rawData.
+
+**Returns**
+
+  - **self** : *lorentz*
 
 ##### Method `saveMeta`
 
@@ -1572,7 +1576,7 @@ Assigns phase, Bx, and By attributes.
 
 **Returns**
 
-  - **None**
+  - **self** : *lorentz*
 
 -----
 

@@ -59,8 +59,13 @@ class lorentz:
 
 	def reset(self):
 		"""Resets data to the rawData.
+
+		**Returns**
+
+		* **self** : _lorentz_
 		"""
 		self.data = self.rawData
+		return(self)
 
 	def sitie(self, defocus, wavelength=1.97e-12):
 		"""Carries out phase and B-field reconstruction.
@@ -78,12 +83,13 @@ class lorentz:
 
 		**Returns**
 
-		* **None**
+		* **self** : _lorentz_
 		"""
 		self.metadata.update({'defocus': defocus})
 		dummy = sitie_RHS(self.data, defocus, wavelength)
 		self.phase = np.real(inverse_laplacian(dummy, self.pixelSize))
 		self.Bx, self.By = B_from_phase(self.phase, thickness=1)
+		return(self)
 
 	def crop_pixel_counts(self, sigma=10):
 		"""Crops any pixel counts that are higher or lower than some standard deviation from avg.
@@ -97,10 +103,11 @@ class lorentz:
 
 		**Returns**
 
-		* **None**
+		* **self** : _lorentz_
 		"""
 		self.metadata.update({'crop pixel sigma': sigma})
 		self.data = crop_pixel_counts(self.data, sigma=sigma)
+		return(self)
 
 	def high_pass(self, sigma=20):
 		"""Applies a high-pass filter to the image data.
@@ -112,10 +119,11 @@ class lorentz:
 
 		**Returns**
 
-		* **None**
+		* **self** : _lorentz_
 		"""
 		self.metadata.update({'high pass sigma': sigma})
 		self.data = high_pass(self.data, sigma=sigma)
+		return(self)
 
 	def low_pass(self, sigma=50):
 		"""Applies a low-pass filter to the image data.
@@ -127,10 +135,11 @@ class lorentz:
 
 		**Returns**
 
-		* **None**
+		* **self** : _lorentz_
 		"""
 		self.metadata.update({'low pass sigma': sigma})
 		self.data = low_pass(self.data, sigma=sigma)
+		return(self)
 
 	def blur(self, sigma=5, mode='wrap', cval=0.0):
 		"""Applies a Gaussian blur to the image data.
@@ -150,10 +159,11 @@ class lorentz:
 
 		**Returns**
 
-		* **None**
+		* **self** : _lorentz_
 		"""
 		self.metadata.update({'blur sigma': sigma})
 		self.data = blur(self.data, sigma, mode, cval)
+		return(self)
 
 	def preview(self, window=None):
 		"""Preview the image.
