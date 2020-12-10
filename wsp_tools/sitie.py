@@ -13,10 +13,12 @@ fname = '/path/to/data.dm3'
 dm3file = dm.dmReader(fname)
 
 img = wt.lorentz(dm3file)
-img.clip_data()
-img.high_pass()
-img.blur()
-img.sitie()
+img.sitie(defocus=1e-3)
+img.phase.clip_data(sigma=5).high_pass().low_pass()
+img.Bx.clip_data(sigma=5).high_pass().low_pass()
+img.By.clip_data(sigma=5).high_pass().low_pass()
+
+img.saveMeta(outdir='someDirectory') # Saves defocus, pixelSize, etc
 
 ### plot img.Bx, img.By, img.phase, img.data, img.rawData, etc
 ```
@@ -44,6 +46,7 @@ class lorentz:
 		(_number_, _number_) - the x and y pixel sizes. </li>
 		<li> **pixelUnit** : _tuple_ <br />
 		(_string_, _string_) - the x and y pixel units. </li>
+		<li> **filename** : _string_ <br /></li>
 		</ul>
 	"""
 	def __init__(self, dm3file):
@@ -54,12 +57,25 @@ class lorentz:
 		self.y = np.arange(0,self.data.shape[0]) * self.pixelSize
 		self.metadata = {
 							'pixelSize':float(dm3file['pixelSize'][0]),
-							'pixelUnit':dm3file['pixelUnit'][0]
+							'pixelUnit':dm3file['pixelUnit'][0],
+							'filename':dm3file['filename']
 						}
 		self.phase = None
 		self.Bx, self.By = None, None
+		self.fix_units()
 
 	def fix_units(self, unit=None):
+		"""Change the pixel units to meters.
+
+		**Parameters**
+
+		* **unit** : _number, optional_ <br />
+		The scale to multiply values by (i.e., going from 'µm' to 'm', you would use `unit = 1e-6`). If none is given, `fix_units` will try to convert from `self.pixelUnit` to meters.
+
+		**Returns**
+
+		* **self** : _lorentz_
+		"""
 		if unit is None:
 			if self.pixelUnit == 'nm':
 				unit = 1e-9
@@ -85,10 +101,13 @@ class lorentz:
 
 		Assigns phase, Bx, and By attributes.
 
+		Updates metadata with the defocus and wavelength.
+
 		**Parameters**
 
-		* **defocus** : _number_ <br />
-		The defocus at which the images were taken.
+		* **defocus** : _number, optional_ <br />
+		The defocus at which the images were taken. <br />
+		Default is `defocus = 1`.
 
 		* **wavelength** : _number, optional_ <br />
 		The electron wavelength. <br />
@@ -176,15 +195,19 @@ def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
 
 	* **defocus** : _number_ <br />
 
-	* **pixel_size** : _number_ <br />
+	* **pixel_size** : _number, optional_ <br />
+	Default is `pixel_size = 1`.
 
 	* **wavelength** : _number, optional_ <br />
 	Default is `wavelength = 1.97e-12` (the relativistic wavelength of a 300kV electron).
 
+	**Returns**
+
+	* **phase** : _ndarray_ <br />
 	"""
 	rhs = sitie_RHS(image, defocus, wavelength)
 	phase = inverse_laplacian(rhs, pixel_size)
-	return(phase)
+	return(phase.real)
 
 def sitie_RHS(I, defocus, wavelength=dB(3e5)):
 	return(2 * _.pi / defocus / wavelength * (1 - I/np.mean(I)))
@@ -196,4 +219,4 @@ def inverse_laplacian(f, pixel_size):
 	f = np.fft.fft2(f)
 	f = np.nan_to_num(-f/(qy**2 + qx**2), posinf=0, neginf=0)
 	f = np.fft.ifft2(f)
-	return(np.real(f))
+	return(f)

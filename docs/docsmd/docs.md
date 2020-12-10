@@ -5,25 +5,27 @@ wsp\_tools contains utilities for TEM data analysis and presentation.
 Features:
 
   - Single Image TIE
-  - Lorentz simulations
-  - spatial mode implementations
+  - Lorentz simulations - phase calculations, propagation
+  - spatial mode implementations - LG, Bessel beams, Bessel packets
+  - basic image processing - high\_pass, low\_pass, clipping
   - a matplotlib.pyplot wrapper
-  - an implementation of the cielab colorspace
-  - a scipy.constants wrapper that allows unit scaling (i.e., using
-    nanometers instead of meters)
+  - an implementation of the CIELAB colorspace
+  - a scipy.constants (CODATA values) wrapper that allows unit scaling
+    (i.e., using nanometers instead of meters)
 
 ## Sub-modules
 
   - [wsp\_tools.beam](#wsp_tools.beam)
   - [wsp\_tools.cielab](#wsp_tools.cielab)
   - [wsp\_tools.constants](#wsp_tools.constants)
+  - [wsp\_tools.image\_processing](#wsp_tools.image_processing)
   - [wsp\_tools.lorentzSim](#wsp_tools.lorentzSim)
   - [wsp\_tools.pyplotwrapper](#wsp_tools.pyplotwrapper)
   - [wsp\_tools.sitie](#wsp_tools.sitie)
 
 # Module `wsp_tools.beam`
 
-Module to generate spatial modes and beam parameters.
+Module to generate spatial modes and calculate beam parameters.
 
 ## Functions
 
@@ -545,6 +547,197 @@ length.
 
   - **candela** : *number, optional* <br /> The SI base unit for
     luminous intensity. <br /> Default is `candela = 1`.
+
+# Module `wsp_tools.image_processing`
+
+## Functions
+
+### Function `clip_data`
+
+> 
+> 
+>     def clip_data(
+>         data,
+>         sigma=5
+>     )
+
+Clip data to a certain number of standard deviations from average.
+
+  - **data** : *complex ndarray* <br />
+
+  - **sigma** : *number, optional* <br /> Number of standard deviations
+    from average to clip to. <br /> Default is `sigma = 5`.
+
+**Returns**
+
+  - **data** : *complex ndarray* <br />
+
+### Function `high_pass`
+
+> 
+> 
+>     def high_pass(
+>         data,
+>         sigma=7
+>     )
+
+Apply a high pass filter to a 2d-array.
+
+**Parameters**
+
+  - **data** : *complex ndarray* <br />
+
+  - **sigma** : *number, optional* <br /> Standard deviation of the
+    gaussian filter, measured in pixels. <br /> Default is `sigma = 7`.
+
+**Returns**
+
+  - **FFdata** : *complex ndarray* <br />
+
+### Function `low_pass`
+
+> 
+> 
+>     def low_pass(
+>         data,
+>         sigma=100
+>     )
+
+Apply a low pass filter to a 2d-array.
+
+**Parameters**
+
+  - **data** : *complex ndarray* <br />
+
+  - **sigma** : *number, optional* <br /> Standard deviation of the
+    gaussian filter, measured in pixels. <br /> Default is `sigma
+    = 100`.
+
+**Returns**
+
+  - **FFdata** : *complex ndarray* <br />
+
+### Function `shift_pos`
+
+> 
+> 
+>     def shift_pos(
+>         data
+>     )
+
+Shift data to be all greater than zero.
+
+**Parameters**
+
+  - **data** : *complex ndarray* <br />
+
+**Returns**
+
+  - **data** : *complex ndarray*
+
+## Classes
+
+### Class `ndap`
+
+> 
+> 
+>     class ndap(
+>         data
+>     )
+
+A class that adds all the image processing methods to np.ndarray.
+
+The purpose of this class is just so you can write
+
+``` python-repl
+>>> myarray.high_pass().low_pass()
+instead of
+>>> myarray = high_pass(low_pass(myarray))
+```
+
+**Parameters**
+
+  - **data** : *complex ndarray* <br /> Any type of ndarray - the
+    methods are defined with a 2d array in mind.
+
+#### Ancestors (in MRO)
+
+  - [numpy.ndarray](#numpy.ndarray)
+
+#### Methods
+
+##### Method `clip_data`
+
+> 
+> 
+>     def clip_data(
+>         self,
+>         sigma=5
+>     )
+
+Clip data to a certain number of standard deviations from average.
+
+  - **sigma** : *number, optional* <br /> Number of standard deviations
+    from average to clip to. <br /> Default is `sigma = 5`.
+
+**Returns**
+
+  - **data** : *ndap* <br />
+
+##### Method `high_pass`
+
+> 
+> 
+>     def high_pass(
+>         self,
+>         sigma=7
+>     )
+
+Apply a high pass filter to a 2d-array.
+
+**Parameters**
+
+  - **sigma** : *number, optional* <br /> Standard deviation of the
+    gaussian filter, measured in pixels. <br /> Default is `sigma = 7`.
+
+**Returns**
+
+  - **FFdata** : *ndap* <br />
+
+##### Method `low_pass`
+
+> 
+> 
+>     def low_pass(
+>         self,
+>         sigma=100
+>     )
+
+Apply a low pass filter to a 2d-array.
+
+**Parameters**
+
+  - **sigma** : *number, optional* <br /> Standard deviation of the
+    gaussian filter, measured in pixels. <br /> Default is `sigma
+    = 100`.
+
+**Returns**
+
+  - **FFdata** : *ndap* <br />
+
+##### Method `shift_pos`
+
+> 
+> 
+>     def shift_pos(
+>         self
+>     )
+
+Shift data to be all greater than zero.
+
+**Returns**
+
+  - **data** : *ndap*
 
 # Module `wsp_tools.lorentzSim`
 
@@ -1199,8 +1392,8 @@ Contains utilities for reconstructing phase and magnetization from
 Lorentz images.
 
 The most common use case is to generate a lorentz object from a `.dm3`
-file. Then you can analyze using high\_pass(), sitie(),
-crop\_pixel\_counts(), etc.
+file. Then you can analyze using high\_pass(), sitie(), clip\_data(),
+etc.
 
 Example:
 
@@ -1212,10 +1405,12 @@ fname = '/path/to/data.dm3'
 dm3file = dm.dmReader(fname)
 
 img = wt.lorentz(dm3file)
-img.crop_pixel_counts()
-img.high_pass()
-img.blur()
-img.sitie()
+img.sitie(defocus=1e-3)
+img.phase.clip_data(sigma=5).high_pass().low_pass()
+img.Bx.clip_data(sigma=5).high_pass().low_pass()
+img.By.clip_data(sigma=5).high_pass().low_pass()
+
+img.saveMeta(outdir='someDirectory') # Saves defocus, pixelSize, etc
 
 ### plot img.Bx, img.By, img.phase, img.data, img.rawData, etc
 ```
@@ -1254,7 +1449,7 @@ Reconstructs the B-field from the phase profile.
 >     def SITIE(
 >         image,
 >         defocus,
->         pixel_size,
+>         pixel_size=1,
 >         wavelength=1.97e-12
 >     )
 
@@ -1266,79 +1461,15 @@ Reconstruct the phase from a defocussed image.
 
   - **defocus** : *number* <br />
 
-  - **pixel\_size** : *number* <br />
+  - **pixel\_size** : *number, optional* <br /> Default is `pixel_size
+    = 1`.
 
   - **wavelength** : *number, optional* <br /> Default is `wavelength
     = 1.97e-12` (the relativistic wavelength of a 300kV electron).
 
-### Function `blur`
-
-> 
-> 
->     def blur(
->         image,
->         sigma=5,
->         mode='wrap',
->         cval=0.0
->     )
-
-Applies a Gaussian filter to the image.
-
-**Parameters**
-
-  - **sigma** : *number, optional* <br /> Default is `sigma = 5`.
-
-  - **mode** : *string, optional* <br /> Gets passed to
-    <code>scipy.ndimage.blur</code>. <br /> Default is `mode = 'wrap'`.
-
-  - **cval** : *number, optional* <br /> Gets passed to
-    <code>scipy.ndimage.blur</code>. <br /> Default is `cval = 0.0`.
-
 **Returns**
 
-  - **None**
-
-### Function `crop_pixel_counts`
-
-> 
-> 
->     def crop_pixel_counts(
->         image,
->         sigma=10
->     )
-
-Crops any pixel counts that are higher or lower than some standard
-deviation from avg.
-
-All pixel counts are limited to (average) +/- sigma\*(standard
-deviation).
-
-**Parameters**
-
-  - **sigma** : *number, optional* <br /> Default is `sigma = 10`.
-
-**Returns**
-
-  - **None**
-
-### Function `high_pass`
-
-> 
-> 
->     def high_pass(
->         image,
->         sigma=50
->     )
-
-Applies a high-pass filter to the image data.
-
-**Parameters**
-
-  - **sigma** : *number, optional* <br /> Default is `sigma = 20`.
-
-**Returns**
-
-  - **None**
+  - **phase** : *ndarray* <br />
 
 ### Function `inverse_laplacian`
 
@@ -1348,25 +1479,6 @@ Applies a high-pass filter to the image data.
 >         f,
 >         pixel_size
 >     )
-
-### Function `low_pass`
-
-> 
-> 
->     def low_pass(
->         image,
->         sigma=50
->     )
-
-Applies a low-pass filter to the image data.
-
-**Parameters**
-
-  - **sigma** : *number, optional* <br /> Default is `sigma = 50`.
-
-**Returns**
-
-  - **None**
 
 ### Function `sitie_RHS`
 
@@ -1406,93 +1518,30 @@ Class that contains sitie information about a lorentz image.
     **pixelUnit** : *tuple* <br /> (*string*, *string*) - the x and y
     pixel units.
     </li>
+    <li>
+    **filename** : *string* <br />
+    </li>
     </ul>
 
 #### Methods
 
-##### Method `blur`
+##### Method `fix_units`
 
 > 
 > 
->     def blur(
+>     def fix_units(
 >         self,
->         sigma=5,
->         mode='wrap',
->         cval=0.0
+>         unit=None
 >     )
 
-Applies a Gaussian blur to the image data.
+Change the pixel units to meters.
 
 **Parameters**
 
-  - **sigma** : *number, optional* <br /> Default is `sigma = 5`.
-
-  - **mode** : *string, optional* <br /> Gets passed to
-    <code>scipy.ndimage.blur</code>. <br /> Default is `mode = 'wrap'`.
-
-  - **cval** : *number, optional* <br /> Gets passed to
-    <code>scipy.ndimage.blur</code>. <br /> Default is `cval = 0.0`.
-
-**Returns**
-
-  - **self** : *lorentz*
-
-##### Method `crop_pixel_counts`
-
-> 
-> 
->     def crop_pixel_counts(
->         self,
->         sigma=10
->     )
-
-Crops any pixel counts that are higher or lower than some standard
-deviation from avg.
-
-All pixel counts are limited to (average) +/- sigma\*(standard
-deviation).
-
-**Parameters**
-
-  - **sigma** : *number, optional* <br /> Default is `sigma = 10`.
-
-**Returns**
-
-  - **self** : *lorentz*
-
-##### Method `high_pass`
-
-> 
-> 
->     def high_pass(
->         self,
->         sigma=20
->     )
-
-Applies a high-pass filter to the image data.
-
-**Parameters**
-
-  - **sigma** : *number, optional* <br /> Default is `sigma = 20`.
-
-**Returns**
-
-  - **self** : *lorentz*
-
-##### Method `low_pass`
-
-> 
-> 
->     def low_pass(
->         self,
->         sigma=50
->     )
-
-Applies a low-pass filter to the image data.
-
-**Parameters**
-
-  - **sigma** : *number, optional* <br /> Default is `sigma = 50`.
+  - **unit** : *number, optional* <br /> The scale to multiply values by
+    (i.e., going from ‘µm’ to ‘m’, you would use `unit = 1e-6`). If none
+    is given, <code>fix\_units</code> will try to convert from
+    <code>self.pixelUnit</code> to meters.
 
 **Returns**
 
@@ -1509,27 +1558,14 @@ Applies a low-pass filter to the image data.
 
 Preview the image.
 
-Note that unlike <code>pyplotwrapper</code>,
+Note that unlike <code>pyplotwrapper</code>, window is in units of
+pixels.
 
 **Parameters**
 
   - **window** : *array-like, optional* <br /> Format is `window =
     (xmin, xmax, ymin, ymax)`. <br /> Default is `window = (0, -1, 0,
     -1)`
-
-##### Method `reset`
-
-> 
-> 
->     def reset(
->         self
->     )
-
-Resets data to the rawData.
-
-**Returns**
-
-  - **self** : *lorentz*
 
 ##### Method `saveMeta`
 
@@ -1557,7 +1593,7 @@ Save the metadata of the lorentz object to a file.
 > 
 >     def sitie(
 >         self,
->         defocus,
+>         defocus=1,
 >         wavelength=1.97e-12
 >     )
 
@@ -1565,10 +1601,12 @@ Carries out phase and B-field reconstruction.
 
 Assigns phase, Bx, and By attributes.
 
+Updates metadata with the defocus and wavelength.
+
 **Parameters**
 
-  - **defocus** : *number* <br /> The defocus at which the images were
-    taken.
+  - **defocus** : *number, optional* <br /> The defocus at which the
+    images were taken. <br /> Default is `defocus = 1`.
 
   - **wavelength** : *number, optional* <br /> The electron wavelength.
     <br /> Default is `wavelength = 1.96e-12` (relativistic wavelength

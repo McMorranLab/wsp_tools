@@ -26,11 +26,12 @@
 <p>Features:</p>
 <ul>
 <li>Single Image TIE</li>
-<li>Lorentz simulations</li>
-<li>spatial mode implementations</li>
+<li>Lorentz simulations - phase calculations, propagation</li>
+<li>spatial mode implementations - LG, Bessel beams, Bessel packets</li>
+<li>basic image processing - high_pass, low_pass, clipping</li>
 <li>a matplotlib.pyplot wrapper</li>
-<li>an implementation of the cielab colorspace</li>
-<li>a scipy.constants wrapper that allows unit scaling (i.e., using nanometers
+<li>an implementation of the CIELAB colorspace</li>
+<li>a scipy.constants (CODATA values) wrapper that allows unit scaling (i.e., using nanometers
 instead of meters)</li>
 </ul>
 <details class="source">
@@ -43,25 +44,26 @@ wsp_tools contains utilities for TEM data analysis and presentation.
 Features:
 
 * Single Image TIE
-* Lorentz simulations
-* spatial mode implementations
+* Lorentz simulations - phase calculations, propagation
+* spatial mode implementations - LG, Bessel beams, Bessel packets
+* basic image processing - high_pass, low_pass, clipping
 * a matplotlib.pyplot wrapper
-* an implementation of the cielab colorspace
-* a scipy.constants wrapper that allows unit scaling (i.e., using nanometers
+* an implementation of the CIELAB colorspace
+* a scipy.constants (CODATA values) wrapper that allows unit scaling (i.e., using nanometers
 instead of meters)
 &#34;&#34;&#34;
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import eval_genlaguerre, factorial
-import scipy.ndimage as ndi
 import os
 
-from .constants import setUnits
-from .cielab import *
 from .beam import *
-from .sitie import *
+from .cielab import *
+from .constants import setUnits
+from .image_processing import *
 from .lorentzSim import *
-from .pyplotwrapper import *</code></pre>
+from .pyplotwrapper import *
+from .sitie import *</code></pre>
 </details>
 </section>
 <section>
@@ -69,7 +71,7 @@ from .pyplotwrapper import *</code></pre>
 <dl>
 <dt><code class="name"><a title="wsp_tools.beam" href="beam.html">wsp_tools.beam</a></code></dt>
 <dd>
-<div class="desc"><p>Module to generate spatial modes and beam parameters.</p></div>
+<div class="desc"><p>Module to generate spatial modes and calculate beam parameters.</p></div>
 </dd>
 <dt><code class="name"><a title="wsp_tools.cielab" href="cielab.html">wsp_tools.cielab</a></code></dt>
 <dd>
@@ -78,6 +80,10 @@ from .pyplotwrapper import *</code></pre>
 <dt><code class="name"><a title="wsp_tools.constants" href="constants.html">wsp_tools.constants</a></code></dt>
 <dd>
 <div class="desc"><p>Wrapper for the scipy.constants module that allows unit scaling …</p></div>
+</dd>
+<dt><code class="name"><a title="wsp_tools.image_processing" href="image_processing.html">wsp_tools.image_processing</a></code></dt>
+<dd>
+<div class="desc"></div>
 </dd>
 <dt><code class="name"><a title="wsp_tools.lorentzSim" href="lorentzSim.html">wsp_tools.lorentzSim</a></code></dt>
 <dd>
@@ -111,6 +117,7 @@ from .pyplotwrapper import *</code></pre>
 <li><code><a title="wsp_tools.beam" href="beam.html">wsp_tools.beam</a></code></li>
 <li><code><a title="wsp_tools.cielab" href="cielab.html">wsp_tools.cielab</a></code></li>
 <li><code><a title="wsp_tools.constants" href="constants.html">wsp_tools.constants</a></code></li>
+<li><code><a title="wsp_tools.image_processing" href="image_processing.html">wsp_tools.image_processing</a></code></li>
 <li><code><a title="wsp_tools.lorentzSim" href="lorentzSim.html">wsp_tools.lorentzSim</a></code></li>
 <li><code><a title="wsp_tools.pyplotwrapper" href="pyplotwrapper.html">wsp_tools.pyplotwrapper</a></code></li>
 <li><code><a title="wsp_tools.sitie" href="sitie.html">wsp_tools.sitie</a></code></li>

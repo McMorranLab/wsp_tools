@@ -1,4 +1,4 @@
-"""Module to generate spatial modes and beam parameters.
+"""Module to generate spatial modes and calculate beam parameters.
 """
 
 from . import np, eval_genlaguerre, factorial
@@ -224,6 +224,7 @@ def besselPacket(t = 0, l = 0,
 	phi = np.arctan2(ky,kx)
 	spec = np.exp( -( (kr-kperp)**2 + (kz-kz0)**2 ) / (2*sig**2)) \
 			* np.exp(1j*phi*l-1j*w*t)
+	### Include first ifftshift because spec is [-k0, k0], not [0,k0]
 	mode = np.fft.fftshift(np.fft.ifftn(np.fft.ifftshift(spec)))
 	return(mode)
 

@@ -4,11 +4,12 @@ wsp_tools contains utilities for TEM data analysis and presentation.
 Features:
 
 * Single Image TIE
-* Lorentz simulations
-* spatial mode implementations
+* Lorentz simulations - phase calculations, propagation
+* spatial mode implementations - LG, Bessel beams, Bessel packets
+* basic image processing - high_pass, low_pass, clipping
 * a matplotlib.pyplot wrapper
-* an implementation of the cielab colorspace
-* a scipy.constants wrapper that allows unit scaling (i.e., using nanometers
+* an implementation of the CIELAB colorspace
+* a scipy.constants (CODATA values) wrapper that allows unit scaling (i.e., using nanometers
 instead of meters)
 """
 import numpy as np
