@@ -87,10 +87,7 @@ def shift_pos(data):
 class ndap(np.ndarray):
 	"""A class that adds all the image processing methods to np.ndarray.
 
-	The purpose of this class is just so you can write
-	>>> myarray.high_pass().low_pass()
-	instead of
-	>>> myarray = high_pass(low_pass(myarray))
+	The purpose of this class is just so you can write `myarray.high_pass().low_pass()` instead of `myarray = high_pass(low_pass(myarray))`.
 
 	**Parameters**
 

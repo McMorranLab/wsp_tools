@@ -267,7 +267,7 @@ def inverse_laplacian(f, pixel_size):
         f = np.fft.fft2(f)
         f = np.nan_to_num(-f/(qy**2 + qx**2), posinf=0, neginf=0)
         f = np.fft.ifft2(f)
-        return(np.real(f))</code></pre>
+        return(f)</code></pre>
 </details>
 </section>
 <section>
@@ -407,7 +407,7 @@ Default is <code>wavelength = 1.97e-12</code> (the relativistic wavelength of a 
         f = np.fft.fft2(f)
         f = np.nan_to_num(-f/(qy**2 + qx**2), posinf=0, neginf=0)
         f = np.fft.ifft2(f)
-        return(np.real(f))</code></pre>
+        return(f)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.sitie_RHS"><code class="name flex">

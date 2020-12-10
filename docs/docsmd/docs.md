@@ -648,12 +648,8 @@ Shift data to be all greater than zero.
 A class that adds all the image processing methods to np.ndarray.
 
 The purpose of this class is just so you can write
-
-``` python-repl
->>> myarray.high_pass().low_pass()
-instead of
->>> myarray = high_pass(low_pass(myarray))
-```
+<code>myarray.high\_pass().[low\_pass()](#wsp_tools.image_processing.low_pass "wsp_tools.image_processing.low_pass")</code>
+instead of `myarray = high_pass(low_pass(myarray))`.
 
 **Parameters**
 
