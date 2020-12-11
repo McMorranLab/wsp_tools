@@ -313,7 +313,7 @@ class singleAx():
 
 		* **rgba** : _bool_ <br />
 		If True, arrow color will correspond to the complex angle of the data. <br />
-		Default is `rgba = False`. 
+		Default is `rgba = False`.
 
 		* **\*\*kwargs** <br />
 		All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
@@ -327,7 +327,7 @@ class singleAx():
 			# This is stupid but quiver doesn't plot square unless you do an
 			# imshow first.
 			self.ax.imshow(np.array([[0]]), cmap='binary_r', origin='lower', extent=self.extent)
-			self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), cmap=cielab_cmap())
+			self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), cmap=cielab_cmap(), **kwargs)
 		else:
 			self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
 		return(self)
