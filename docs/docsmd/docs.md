@@ -1502,6 +1502,57 @@ Reconstruct the phase from a defocussed image.
 >         pixel_size
 >     )
 
+### Function `load_lorentz`
+
+> 
+> 
+>     def load_lorentz(
+>         fname
+>     )
+
+Loads a
+<code>[lorentz](#wsp_tools.sitie.lorentz "wsp_tools.sitie.lorentz")</code>
+object that has been saved as a <code>.npz</code> via
+<code>[save\_lorentz()](#wsp_tools.sitie.save_lorentz "wsp_tools.sitie.save_lorentz")</code>.
+
+**Parameters**
+
+  - **fname** : *string* <br />
+
+**Returns**
+
+  - **img** : *lorentz* <br /> The saved lorentz object, converted from
+    a <code>.npz</code>.
+
+### Function `save_lorentz`
+
+> 
+> 
+>     def save_lorentz(
+>         img,
+>         fname=None,
+>         fdir=''
+>     )
+
+Saves a
+<code>[lorentz](#wsp_tools.sitie.lorentz "wsp_tools.sitie.lorentz")</code>
+object as a <code>.npz</code> archive.
+
+**Parameters**
+
+  - **img** : *lorentz* <br /> The lorentz object to save.
+
+  - **fname** : *string, optional* <br /> If not given, the output will
+    be the filename in the lorentz object metadata, with
+    <code>.npz</code> rather than <code>.dm3</code>.
+
+  - **fdir** : *string, optional* <br /> The directory where the lorentz
+    object will be saved. <br /> Default is `fdir = ''`.
+
+**Returns**
+
+  - **None**
+
 ### Function `sitie_RHS`
 
 > 

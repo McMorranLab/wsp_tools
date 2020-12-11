@@ -80,6 +80,55 @@ from . import constants as _
 np.seterr(divide=&#39;ignore&#39;)
 import json
 
+def save_lorentz(img, fname=None, fdir=&#39;&#39;):
+        &#34;&#34;&#34;Saves a `lorentz` object as a `.npz` archive.
+
+        **Parameters**
+
+        * **img** : _lorentz_ &lt;br /&gt;
+        The lorentz object to save.
+
+        * **fname** : _string, optional_ &lt;br /&gt;
+        If not given, the output will be the filename in the lorentz object metadata, with `.npz` rather than `.dm3`.
+
+        * **fdir** : _string, optional_ &lt;br /&gt;
+        The directory where the lorentz object will be saved. &lt;br /&gt;
+        Default is `fdir = &#39;&#39;`.
+
+        **Returns**
+
+        * **None**
+        &#34;&#34;&#34;
+        if fname is None:
+                fname = os.path.splitext(img.metadata[&#39;filename&#39;])[0]
+        np.savez(os.path.join(fdir, fname), **img.__dict__)
+        return(None)
+
+def load_lorentz(fname):
+        &#34;&#34;&#34;Loads a `lorentz` object that has been saved as a `.npz` via `save_lorentz()`.
+
+        **Parameters**
+
+        * **fname** : _string_ &lt;br /&gt;
+
+        **Returns**
+
+        * **img** : _lorentz_ &lt;br /&gt;
+        The saved lorentz object, converted from a `.npz`.
+        &#34;&#34;&#34;
+        f = np.load(fname, allow_pickle=True)
+        fm = f[&#39;metadata&#39;].item()
+        dm3 = {&#39;data&#39;:f[&#39;data&#39;], &#39;pixelSize&#39;:[fm[&#39;pixelSize&#39;],fm[&#39;pixelSize&#39;]], &#39;pixelUnit&#39;:[fm[&#39;pixelUnit&#39;],fm[&#39;pixelUnit&#39;]], &#39;filename&#39;:fm[&#39;filename&#39;]}
+        img = lorentz(dm3)
+        img.phase = ndap(f[&#39;phase&#39;])
+        img.Bx = ndap(f[&#39;Bx&#39;])
+        img.By = ndap(f[&#39;By&#39;])
+        img.x = f[&#39;x&#39;]
+        img.y = f[&#39;y&#39;]
+        fm.update(img.metadata)
+        img.metadata.update(fm)
+        return(img)
+
 class lorentz:
         &#34;&#34;&#34;Class that contains sitie information about a lorentz image.
 
@@ -408,6 +457,104 @@ Default is <code>wavelength = 1.97e-12</code> (the relativistic wavelength of a 
         f = np.nan_to_num(-f/(qy**2 + qx**2), posinf=0, neginf=0)
         f = np.fft.ifft2(f)
         return(f)</code></pre>
+</details>
+</dd>
+<dt id="wsp_tools.sitie.load_lorentz"><code class="name flex">
+<span>def <span class="ident">load_lorentz</span></span>(<span>fname)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads a <code><a title="wsp_tools.sitie.lorentz" href="#wsp_tools.sitie.lorentz">lorentz</a></code> object that has been saved as a <code>.npz</code> via <code><a title="wsp_tools.sitie.save_lorentz" href="#wsp_tools.sitie.save_lorentz">save_lorentz()</a></code>.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>fname</strong> : <em>string</em> <br /></li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>img</strong> : <em>lorentz</em> <br />
+The saved lorentz object, converted from a <code>.npz</code>.</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_lorentz(fname):
+        &#34;&#34;&#34;Loads a `lorentz` object that has been saved as a `.npz` via `save_lorentz()`.
+
+        **Parameters**
+
+        * **fname** : _string_ &lt;br /&gt;
+
+        **Returns**
+
+        * **img** : _lorentz_ &lt;br /&gt;
+        The saved lorentz object, converted from a `.npz`.
+        &#34;&#34;&#34;
+        f = np.load(fname, allow_pickle=True)
+        fm = f[&#39;metadata&#39;].item()
+        dm3 = {&#39;data&#39;:f[&#39;data&#39;], &#39;pixelSize&#39;:[fm[&#39;pixelSize&#39;],fm[&#39;pixelSize&#39;]], &#39;pixelUnit&#39;:[fm[&#39;pixelUnit&#39;],fm[&#39;pixelUnit&#39;]], &#39;filename&#39;:fm[&#39;filename&#39;]}
+        img = lorentz(dm3)
+        img.phase = ndap(f[&#39;phase&#39;])
+        img.Bx = ndap(f[&#39;Bx&#39;])
+        img.By = ndap(f[&#39;By&#39;])
+        img.x = f[&#39;x&#39;]
+        img.y = f[&#39;y&#39;]
+        fm.update(img.metadata)
+        img.metadata.update(fm)
+        return(img)</code></pre>
+</details>
+</dd>
+<dt id="wsp_tools.sitie.save_lorentz"><code class="name flex">
+<span>def <span class="ident">save_lorentz</span></span>(<span>img, fname=None, fdir='')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Saves a <code><a title="wsp_tools.sitie.lorentz" href="#wsp_tools.sitie.lorentz">lorentz</a></code> object as a <code>.npz</code> archive.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>img</strong> : <em>lorentz</em> <br />
+The lorentz object to save.</p>
+</li>
+<li>
+<p><strong>fname</strong> : <em>string, optional</em> <br />
+If not given, the output will be the filename in the lorentz object metadata, with <code>.npz</code> rather than <code>.dm3</code>.</p>
+</li>
+<li>
+<p><strong>fdir</strong> : <em>string, optional</em> <br />
+The directory where the lorentz object will be saved. <br />
+Default is <code>fdir = ''</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>None</strong></li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_lorentz(img, fname=None, fdir=&#39;&#39;):
+        &#34;&#34;&#34;Saves a `lorentz` object as a `.npz` archive.
+
+        **Parameters**
+
+        * **img** : _lorentz_ &lt;br /&gt;
+        The lorentz object to save.
+
+        * **fname** : _string, optional_ &lt;br /&gt;
+        If not given, the output will be the filename in the lorentz object metadata, with `.npz` rather than `.dm3`.
+
+        * **fdir** : _string, optional_ &lt;br /&gt;
+        The directory where the lorentz object will be saved. &lt;br /&gt;
+        Default is `fdir = &#39;&#39;`.
+
+        **Returns**
+
+        * **None**
+        &#34;&#34;&#34;
+        if fname is None:
+                fname = os.path.splitext(img.metadata[&#39;filename&#39;])[0]
+        np.savez(os.path.join(fdir, fname), **img.__dict__)
+        return(None)</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.sitie.sitie_RHS"><code class="name flex">
@@ -781,10 +928,12 @@ Default is <code>wavelength = 1.96e-12</code> (relativistic wavelength of a 300k
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="wsp_tools.sitie.B_from_phase" href="#wsp_tools.sitie.B_from_phase">B_from_phase</a></code></li>
 <li><code><a title="wsp_tools.sitie.SITIE" href="#wsp_tools.sitie.SITIE">SITIE</a></code></li>
 <li><code><a title="wsp_tools.sitie.inverse_laplacian" href="#wsp_tools.sitie.inverse_laplacian">inverse_laplacian</a></code></li>
+<li><code><a title="wsp_tools.sitie.load_lorentz" href="#wsp_tools.sitie.load_lorentz">load_lorentz</a></code></li>
+<li><code><a title="wsp_tools.sitie.save_lorentz" href="#wsp_tools.sitie.save_lorentz">save_lorentz</a></code></li>
 <li><code><a title="wsp_tools.sitie.sitie_RHS" href="#wsp_tools.sitie.sitie_RHS">sitie_RHS</a></code></li>
 </ul>
 </li>

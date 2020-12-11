@@ -362,7 +362,7 @@ class singleAx():
 
                 * **rgba** : _bool_ &lt;br /&gt;
                 If True, arrow color will correspond to the complex angle of the data. &lt;br /&gt;
-                Default is `rgba = False`. 
+                Default is `rgba = False`.
 
                 * **\*\*kwargs** &lt;br /&gt;
                 All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
@@ -372,11 +372,13 @@ class singleAx():
                 * **self** : _singleAx_
                 &#34;&#34;&#34;
                 xr, yr, data = self.prePlot(data, step)
+                qargs = {&#39;cmap&#39; : cielab_cmap()}
+                qargs.update(kwargs)
                 if rgba:
                         # This is stupid but quiver doesn&#39;t plot square unless you do an
                         # imshow first.
                         self.ax.imshow(np.array([[0]]), cmap=&#39;binary_r&#39;, origin=&#39;lower&#39;, extent=self.extent)
-                        self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), cmap=cielab_cmap())
+                        self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), **qargs)
                 else:
                         self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
                 return(self)
@@ -902,7 +904,7 @@ plt.show()
 
                 * **rgba** : _bool_ &lt;br /&gt;
                 If True, arrow color will correspond to the complex angle of the data. &lt;br /&gt;
-                Default is `rgba = False`. 
+                Default is `rgba = False`.
 
                 * **\*\*kwargs** &lt;br /&gt;
                 All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
@@ -912,11 +914,13 @@ plt.show()
                 * **self** : _singleAx_
                 &#34;&#34;&#34;
                 xr, yr, data = self.prePlot(data, step)
+                qargs = {&#39;cmap&#39; : cielab_cmap()}
+                qargs.update(kwargs)
                 if rgba:
                         # This is stupid but quiver doesn&#39;t plot square unless you do an
                         # imshow first.
                         self.ax.imshow(np.array([[0]]), cmap=&#39;binary_r&#39;, origin=&#39;lower&#39;, extent=self.extent)
-                        self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), cmap=cielab_cmap())
+                        self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), **qargs)
                 else:
                         self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
                 return(self)
@@ -1251,7 +1255,7 @@ Default is <code>step = 1</code>.</p>
 <li>
 <p><strong>rgba</strong> : <em>bool</em> <br />
 If True, arrow color will correspond to the complex angle of the data. <br />
-Default is <code>rgba = False</code>. </p>
+Default is <code>rgba = False</code>.</p>
 </li>
 <li>
 <p><strong>**kwargs</strong> <br />
@@ -1282,7 +1286,7 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.quiver</code>.</p>
 
         * **rgba** : _bool_ &lt;br /&gt;
         If True, arrow color will correspond to the complex angle of the data. &lt;br /&gt;
-        Default is `rgba = False`. 
+        Default is `rgba = False`.
 
         * **\*\*kwargs** &lt;br /&gt;
         All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
@@ -1292,11 +1296,13 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.quiver</code>.</p>
         * **self** : _singleAx_
         &#34;&#34;&#34;
         xr, yr, data = self.prePlot(data, step)
+        qargs = {&#39;cmap&#39; : cielab_cmap()}
+        qargs.update(kwargs)
         if rgba:
                 # This is stupid but quiver doesn&#39;t plot square unless you do an
                 # imshow first.
                 self.ax.imshow(np.array([[0]]), cmap=&#39;binary_r&#39;, origin=&#39;lower&#39;, extent=self.extent)
-                self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), cmap=cielab_cmap())
+                self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), **qargs)
         else:
                 self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
         return(self)</code></pre>

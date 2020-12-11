@@ -32,6 +32,55 @@ from . import constants as _
 np.seterr(divide='ignore')
 import json
 
+def save_lorentz(img, fname=None, fdir=''):
+	"""Saves a `lorentz` object as a `.npz` archive.
+
+	**Parameters**
+
+	* **img** : _lorentz_ <br />
+	The lorentz object to save.
+
+	* **fname** : _string, optional_ <br />
+	If not given, the output will be the filename in the lorentz object metadata, with `.npz` rather than `.dm3`.
+
+	* **fdir** : _string, optional_ <br />
+	The directory where the lorentz object will be saved. <br />
+	Default is `fdir = ''`.
+
+	**Returns**
+
+	* **None**
+	"""
+	if fname is None:
+		fname = os.path.splitext(img.metadata['filename'])[0]
+	np.savez(os.path.join(fdir, fname), **img.__dict__)
+	return(None)
+
+def load_lorentz(fname):
+	"""Loads a `lorentz` object that has been saved as a `.npz` via `save_lorentz()`.
+
+	**Parameters**
+
+	* **fname** : _string_ <br />
+
+	**Returns**
+
+	* **img** : _lorentz_ <br />
+	The saved lorentz object, converted from a `.npz`.
+	"""
+	f = np.load(fname, allow_pickle=True)
+	fm = f['metadata'].item()
+	dm3 = {'data':f['data'], 'pixelSize':[fm['pixelSize'],fm['pixelSize']], 'pixelUnit':[fm['pixelUnit'],fm['pixelUnit']], 'filename':fm['filename']}
+	img = lorentz(dm3)
+	img.phase = ndap(f['phase'])
+	img.Bx = ndap(f['Bx'])
+	img.By = ndap(f['By'])
+	img.x = f['x']
+	img.y = f['y']
+	fm.update(img.metadata)
+	img.metadata.update(fm)
+	return(img)
+
 class lorentz:
 	"""Class that contains sitie information about a lorentz image.
 
