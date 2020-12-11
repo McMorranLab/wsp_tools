@@ -323,11 +323,13 @@ class singleAx():
 		* **self** : _singleAx_
 		"""
 		xr, yr, data = self.prePlot(data, step)
+		qargs = {'cmap' : cielab_cmap()}
+		qargs.update(kwargs)
 		if rgba:
 			# This is stupid but quiver doesn't plot square unless you do an
 			# imshow first.
 			self.ax.imshow(np.array([[0]]), cmap='binary_r', origin='lower', extent=self.extent)
-			self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), cmap=cielab_cmap(), **kwargs)
+			self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), **qargs)
 		else:
 			self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
 		return(self)
