@@ -403,6 +403,28 @@ Module to generate rgba data from scalar values.
 
 ## Functions
 
+### Function `cielab_cmap`
+
+> 
+> 
+>     def cielab_cmap(
+>         samples=256
+>     )
+
+Creates a <code>matplotlib.colors.ListedColormap</code> of the CIELAB
+color space.
+
+**Parameters**
+
+  - **samples** : *number, optional* <br /> The number of samples. Any
+    additional values will be nearest-neighbor interpolated, per
+    matplotlib. <br /> Default is `samples = 256`.
+
+**Returns**
+
+  - **cmap** : *ListedColormap* <br /> A colormap, that can be used
+    normally: `plt.imshow(data, cmap=cmap)`.
+
 ### Function `cielab_image`
 
 > 
@@ -1152,6 +1174,7 @@ plt.show()
 >         self,
 >         data,
 >         step=1,
+>         rgba=False,
 >         **kwargs
 >     )
 
@@ -1166,6 +1189,9 @@ Shows a quiver plot of complex data.
   - **step** : *int* <br /> data will be returned as
     `data[::step,::step]` - particularly useful for quiver plots. <br />
     Default is `step = 1`.
+
+  - **rgba** : *bool* <br /> If True, arrow color will correspond to the
+    complex angle of the data. <br /> Default is `rgba = False`.
 
   - **\*\*kwargs** <br /> All other kwargs are passed on to
     <code>matplotlib.axes.Axes.quiver</code>.

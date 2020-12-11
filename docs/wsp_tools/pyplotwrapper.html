@@ -73,7 +73,7 @@ wt.plt.show()
 
 ![asdf](pyplotwrapperExample.png)
 &#34;&#34;&#34;
-from . import plt, np, rgba
+from . import plt, np, rgba, cielab_cmap
 
 class singleAx():
         &#34;&#34;&#34;An extension of the `matplotlib.axes.Axes` class.
@@ -346,7 +346,7 @@ class singleAx():
                 self.ax.imshow(data, **imshowargs)
                 return(self)
 
-        def quiver(self, data, step=1, **kwargs):
+        def quiver(self, data, step=1, rgba=False, **kwargs):
                 &#34;&#34;&#34;Shows a quiver plot of complex data.
 
                 **Parameters**
@@ -360,6 +360,10 @@ class singleAx():
                 quiver plots. &lt;br /&gt;
                 Default is `step = 1`.
 
+                * **rgba** : _bool_ &lt;br /&gt;
+                If True, arrow color will correspond to the complex angle of the data. &lt;br /&gt;
+                Default is `rgba = False`. 
+
                 * **\*\*kwargs** &lt;br /&gt;
                 All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
 
@@ -368,7 +372,13 @@ class singleAx():
                 * **self** : _singleAx_
                 &#34;&#34;&#34;
                 xr, yr, data = self.prePlot(data, step)
-                self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
+                if rgba:
+                        # This is stupid but quiver doesn&#39;t plot square unless you do an
+                        # imshow first.
+                        self.ax.imshow(np.array([[0]]), cmap=&#39;binary_r&#39;, origin=&#39;lower&#39;, extent=self.extent)
+                        self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), cmap=cielab_cmap())
+                else:
+                        self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
                 return(self)
 
         def rgba(self, data, step=1, brightness=&#39;intensity&#39;, alpha=&#39;uniform&#39;, cmap=&#39;uniform&#39;, **kwargs):
@@ -876,7 +886,7 @@ plt.show()
                 self.ax.imshow(data, **imshowargs)
                 return(self)
 
-        def quiver(self, data, step=1, **kwargs):
+        def quiver(self, data, step=1, rgba=False, **kwargs):
                 &#34;&#34;&#34;Shows a quiver plot of complex data.
 
                 **Parameters**
@@ -890,6 +900,10 @@ plt.show()
                 quiver plots. &lt;br /&gt;
                 Default is `step = 1`.
 
+                * **rgba** : _bool_ &lt;br /&gt;
+                If True, arrow color will correspond to the complex angle of the data. &lt;br /&gt;
+                Default is `rgba = False`. 
+
                 * **\*\*kwargs** &lt;br /&gt;
                 All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
 
@@ -898,7 +912,13 @@ plt.show()
                 * **self** : _singleAx_
                 &#34;&#34;&#34;
                 xr, yr, data = self.prePlot(data, step)
-                self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
+                if rgba:
+                        # This is stupid but quiver doesn&#39;t plot square unless you do an
+                        # imshow first.
+                        self.ax.imshow(np.array([[0]]), cmap=&#39;binary_r&#39;, origin=&#39;lower&#39;, extent=self.extent)
+                        self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), cmap=cielab_cmap())
+                else:
+                        self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
                 return(self)
 
         def rgba(self, data, step=1, brightness=&#39;intensity&#39;, alpha=&#39;uniform&#39;, cmap=&#39;uniform&#39;, **kwargs):
@@ -1211,7 +1231,7 @@ either <code>setAxes()</code> or <code>setWindow()</code>, the data will be wind
 </details>
 </dd>
 <dt id="wsp_tools.pyplotwrapper.singleAx.quiver"><code class="name flex">
-<span>def <span class="ident">quiver</span></span>(<span>self, data, step=1, **kwargs)</span>
+<span>def <span class="ident">quiver</span></span>(<span>self, data, step=1, rgba=False, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Shows a quiver plot of complex data.</p>
@@ -1229,6 +1249,11 @@ quiver plots. <br />
 Default is <code>step = 1</code>.</p>
 </li>
 <li>
+<p><strong>rgba</strong> : <em>bool</em> <br />
+If True, arrow color will correspond to the complex angle of the data. <br />
+Default is <code>rgba = False</code>. </p>
+</li>
+<li>
 <p><strong>**kwargs</strong> <br />
 All other kwargs are passed on to <code>matplotlib.axes.Axes.quiver</code>.</p>
 </li>
@@ -1241,7 +1266,7 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.quiver</code>.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def quiver(self, data, step=1, **kwargs):
+<pre><code class="python">def quiver(self, data, step=1, rgba=False, **kwargs):
         &#34;&#34;&#34;Shows a quiver plot of complex data.
 
         **Parameters**
@@ -1255,6 +1280,10 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.quiver</code>.</p>
         quiver plots. &lt;br /&gt;
         Default is `step = 1`.
 
+        * **rgba** : _bool_ &lt;br /&gt;
+        If True, arrow color will correspond to the complex angle of the data. &lt;br /&gt;
+        Default is `rgba = False`. 
+
         * **\*\*kwargs** &lt;br /&gt;
         All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
 
@@ -1263,7 +1292,13 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.quiver</code>.</p>
         * **self** : _singleAx_
         &#34;&#34;&#34;
         xr, yr, data = self.prePlot(data, step)
-        self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
+        if rgba:
+                # This is stupid but quiver doesn&#39;t plot square unless you do an
+                # imshow first.
+                self.ax.imshow(np.array([[0]]), cmap=&#39;binary_r&#39;, origin=&#39;lower&#39;, extent=self.extent)
+                self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), cmap=cielab_cmap())
+        else:
+                self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
         return(self)</code></pre>
 </details>
 </dd>

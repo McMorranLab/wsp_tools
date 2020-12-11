@@ -32,6 +32,27 @@
 from . import np, plt
 from . import constants as _
 
+def cielab_cmap(samples=256):
+        &#34;&#34;&#34;Creates a `matplotlib.colors.ListedColormap` of the CIELAB color space.
+
+        **Parameters**
+
+        * **samples** : _number, optional_ &lt;br /&gt;
+        The number of samples. Any additional values will be nearest-neighbor interpolated, per matplotlib. &lt;br /&gt;
+        Default is `samples = 256`.
+
+        **Returns**
+
+        * **cmap** : _ListedColormap_ &lt;br /&gt;
+        A colormap, that can be used normally: `plt.imshow(data, cmap=cmap)`.
+        &#34;&#34;&#34;
+        from matplotlib.colors import ListedColormap
+        angles = np.linspace(0,2*_.pi,samples)
+        cvals = np.exp(1j*angles).reshape(1, samples)
+        rgbavals = cielab_image(cvals).squeeze()/255
+        cmap = ListedColormap(rgbavals)
+        return(cmap)
+
 def cielab_image(data, brightness = &#39;intensity&#39;, alpha = &#39;uniform&#39;):
         &#34;&#34;&#34;Converts complex values to rgba data based on the CIELAB color space.
 
@@ -152,6 +173,48 @@ def whatIsC():
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="wsp_tools.cielab.cielab_cmap"><code class="name flex">
+<span>def <span class="ident">cielab_cmap</span></span>(<span>samples=256)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates a <code>matplotlib.colors.ListedColormap</code> of the CIELAB color space.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>samples</strong> : <em>number, optional</em> <br />
+The number of samples. Any additional values will be nearest-neighbor interpolated, per matplotlib. <br />
+Default is <code>samples = 256</code>.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>cmap</strong> : <em>ListedColormap</em> <br />
+A colormap, that can be used normally: <code>plt.imshow(data, cmap=cmap)</code>.</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cielab_cmap(samples=256):
+        &#34;&#34;&#34;Creates a `matplotlib.colors.ListedColormap` of the CIELAB color space.
+
+        **Parameters**
+
+        * **samples** : _number, optional_ &lt;br /&gt;
+        The number of samples. Any additional values will be nearest-neighbor interpolated, per matplotlib. &lt;br /&gt;
+        Default is `samples = 256`.
+
+        **Returns**
+
+        * **cmap** : _ListedColormap_ &lt;br /&gt;
+        A colormap, that can be used normally: `plt.imshow(data, cmap=cmap)`.
+        &#34;&#34;&#34;
+        from matplotlib.colors import ListedColormap
+        angles = np.linspace(0,2*_.pi,samples)
+        cvals = np.exp(1j*angles).reshape(1, samples)
+        rgbavals = cielab_image(cvals).squeeze()/255
+        cmap = ListedColormap(rgbavals)
+        return(cmap)</code></pre>
+</details>
+</dd>
 <dt id="wsp_tools.cielab.cielab_image"><code class="name flex">
 <span>def <span class="ident">cielab_image</span></span>(<span>data, brightness='intensity', alpha='uniform')</span>
 </code></dt>
@@ -372,6 +435,7 @@ shape NxN, the output array will have shape NxNx4.</li>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="wsp_tools.cielab.cielab_cmap" href="#wsp_tools.cielab.cielab_cmap">cielab_cmap</a></code></li>
 <li><code><a title="wsp_tools.cielab.cielab_image" href="#wsp_tools.cielab.cielab_image">cielab_image</a></code></li>
 <li><code><a title="wsp_tools.cielab.rgba" href="#wsp_tools.cielab.rgba">rgba</a></code></li>
 <li><code><a title="wsp_tools.cielab.whatIsC" href="#wsp_tools.cielab.whatIsC">whatIsC</a></code></li>

@@ -24,7 +24,7 @@ wt.plt.show()
 
 ![asdf](pyplotwrapperExample.png)
 """
-from . import plt, np, rgba
+from . import plt, np, rgba, cielab_cmap
 
 class singleAx():
 	"""An extension of the `matplotlib.axes.Axes` class.
@@ -297,7 +297,7 @@ class singleAx():
 		self.ax.imshow(data, **imshowargs)
 		return(self)
 
-	def quiver(self, data, step=1, **kwargs):
+	def quiver(self, data, step=1, rgba=False, **kwargs):
 		"""Shows a quiver plot of complex data.
 
 		**Parameters**
@@ -311,6 +311,10 @@ class singleAx():
 		quiver plots. <br />
 		Default is `step = 1`.
 
+		* **rgba** : _bool_ <br />
+		If True, arrow color will correspond to the complex angle of the data. <br />
+		Default is `rgba = False`. 
+
 		* **\*\*kwargs** <br />
 		All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
 
@@ -319,7 +323,13 @@ class singleAx():
 		* **self** : _singleAx_
 		"""
 		xr, yr, data = self.prePlot(data, step)
-		self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
+		if rgba:
+			# This is stupid but quiver doesn't plot square unless you do an
+			# imshow first.
+			self.ax.imshow(np.array([[0]]), cmap='binary_r', origin='lower', extent=self.extent)
+			self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), cmap=cielab_cmap())
+		else:
+			self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
 		return(self)
 
 	def rgba(self, data, step=1, brightness='intensity', alpha='uniform', cmap='uniform', **kwargs):

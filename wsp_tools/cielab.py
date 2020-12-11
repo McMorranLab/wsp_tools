@@ -3,6 +3,27 @@
 from . import np, plt
 from . import constants as _
 
+def cielab_cmap(samples=256):
+	"""Creates a `matplotlib.colors.ListedColormap` of the CIELAB color space.
+
+	**Parameters**
+
+	* **samples** : _number, optional_ <br />
+	The number of samples. Any additional values will be nearest-neighbor interpolated, per matplotlib. <br />
+	Default is `samples = 256`.
+
+	**Returns**
+
+	* **cmap** : _ListedColormap_ <br />
+	A colormap, that can be used normally: `plt.imshow(data, cmap=cmap)`.
+	"""
+	from matplotlib.colors import ListedColormap
+	angles = np.linspace(0,2*_.pi,samples)
+	cvals = np.exp(1j*angles).reshape(1, samples)
+	rgbavals = cielab_image(cvals).squeeze()/255
+	cmap = ListedColormap(rgbavals)
+	return(cmap)
+
 def cielab_image(data, brightness = 'intensity', alpha = 'uniform'):
 	"""Converts complex values to rgba data based on the CIELAB color space.
 
