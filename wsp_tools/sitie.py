@@ -136,7 +136,6 @@ class lorentz:
 				unit = 1e-6
 			elif self.pixelUnit == 'm':
 				unit = 1
-		print("Setting unit from {:0.0e} meters to 1 meter".format(unit))
 		self.pixelSize *= unit
 		self.pixelUnit = 'm'
 		self.x *= unit
