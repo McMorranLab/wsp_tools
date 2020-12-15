@@ -29,7 +29,7 @@ from . import dB, rgba, np, plt, os
 from .image_processing import *
 from .pyplotwrapper import subplots
 from . import constants as _
-np.seterr(divide='ignore')
+np.seterr(divide='ignore', invalid='ignore')
 import json
 
 def save_lorentz(img, fname=None, fdir=''):
