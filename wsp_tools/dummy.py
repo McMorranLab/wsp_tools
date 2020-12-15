@@ -7,3 +7,11 @@
 # 4. git push --tags
 
 # Then, I'll try an install
+
+#################################################################################
+# This time, I'll try:
+# 1. updating setup.py version to 1.0.5
+# 2. git add .
+# 3. git commit -m 'asdf1.0.5'
+# 4. git tag 1.0.5
+# 5. git push origin --tags
