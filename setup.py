@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name = 'wsp_tools',
     packages = find_packages(),
-	version = '1.0.6',
+	version = '1.0.7',
     author = 'William Parker',
     author_email = 'wparker4@uoregon.edu',
     description = 'McMorran Lab tools developed by WSP. ',
