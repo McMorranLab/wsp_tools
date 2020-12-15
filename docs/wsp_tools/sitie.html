@@ -77,7 +77,7 @@ from . import dB, rgba, np, plt, os
 from .image_processing import *
 from .pyplotwrapper import subplots
 from . import constants as _
-np.seterr(divide=&#39;ignore&#39;)
+np.seterr(divide=&#39;ignore&#39;, invalid=&#39;ignore&#39;)
 import json
 
 def save_lorentz(img, fname=None, fdir=&#39;&#39;):
@@ -101,6 +101,9 @@ def save_lorentz(img, fname=None, fdir=&#39;&#39;):
         &#34;&#34;&#34;
         if fname is None:
                 fname = os.path.splitext(img.metadata[&#39;filename&#39;])[0]
+        if not os.path.exists(fdir):
+                if not fdir == &#39;&#39;:
+                        os.makedirs(fdir)
         np.savez(os.path.join(fdir, fname), **img.__dict__)
         return(None)
 
@@ -182,7 +185,6 @@ class lorentz:
                                 unit = 1e-6
                         elif self.pixelUnit == &#39;m&#39;:
                                 unit = 1
-                print(&#34;Setting unit from {:0.0e} meters to 1 meter&#34;.format(unit))
                 self.pixelSize *= unit
                 self.pixelUnit = &#39;m&#39;
                 self.x *= unit
@@ -253,6 +255,8 @@ class lorentz:
                 The name of the metadata file. &lt;br /&gt;
                 Default is `outname = &#39;metadata.json&#39;`.
                 &#34;&#34;&#34;
+                if not os.path.exists(outdir):
+                        os.makedirs(outdir)
                 with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
                         json.dump(self.metadata, fp, indent=&#34;&#34;)
 
@@ -553,6 +557,9 @@ Default is <code>fdir = ''</code>.</p>
         &#34;&#34;&#34;
         if fname is None:
                 fname = os.path.splitext(img.metadata[&#39;filename&#39;])[0]
+        if not os.path.exists(fdir):
+                if not fdir == &#39;&#39;:
+                        os.makedirs(fdir)
         np.savez(os.path.join(fdir, fname), **img.__dict__)
         return(None)</code></pre>
 </details>
@@ -652,7 +659,6 @@ An array carrying the electron counts. </li>
                                 unit = 1e-6
                         elif self.pixelUnit == &#39;m&#39;:
                                 unit = 1
-                print(&#34;Setting unit from {:0.0e} meters to 1 meter&#34;.format(unit))
                 self.pixelSize *= unit
                 self.pixelUnit = &#39;m&#39;
                 self.x *= unit
@@ -723,6 +729,8 @@ An array carrying the electron counts. </li>
                 The name of the metadata file. &lt;br /&gt;
                 Default is `outname = &#39;metadata.json&#39;`.
                 &#34;&#34;&#34;
+                if not os.path.exists(outdir):
+                        os.makedirs(outdir)
                 with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
                         json.dump(self.metadata, fp, indent=&#34;&#34;)</code></pre>
 </details>
@@ -767,7 +775,6 @@ The scale to multiply values by (i.e., going from 'µm' to 'm', you would use <c
                         unit = 1e-6
                 elif self.pixelUnit == &#39;m&#39;:
                         unit = 1
-        print(&#34;Setting unit from {:0.0e} meters to 1 meter&#34;.format(unit))
         self.pixelSize *= unit
         self.pixelUnit = &#39;m&#39;
         self.x *= unit
@@ -852,6 +859,8 @@ Default is <code>outname = 'metadata.json'</code>.</p>
         The name of the metadata file. &lt;br /&gt;
         Default is `outname = &#39;metadata.json&#39;`.
         &#34;&#34;&#34;
+        if not os.path.exists(outdir):
+                os.makedirs(outdir)
         with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
                 json.dump(self.metadata, fp, indent=&#34;&#34;)</code></pre>
 </details>

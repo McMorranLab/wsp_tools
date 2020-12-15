@@ -374,10 +374,9 @@ class singleAx():
                 xr, yr, data = self.prePlot(data, step)
                 qargs = {&#39;cmap&#39; : cielab_cmap()}
                 qargs.update(kwargs)
+                self.ax.set_aspect(&#39;equal&#39;)
                 if rgba:
-                        # This is stupid but quiver doesn&#39;t plot square unless you do an
-                        # imshow first.
-                        self.ax.imshow(np.array([[0]]), cmap=&#39;binary_r&#39;, origin=&#39;lower&#39;, extent=self.extent)
+                        self.ax.set_facecolor(&#39;black&#39;)
                         self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), **qargs)
                 else:
                         self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
@@ -916,10 +915,9 @@ plt.show()
                 xr, yr, data = self.prePlot(data, step)
                 qargs = {&#39;cmap&#39; : cielab_cmap()}
                 qargs.update(kwargs)
+                self.ax.set_aspect(&#39;equal&#39;)
                 if rgba:
-                        # This is stupid but quiver doesn&#39;t plot square unless you do an
-                        # imshow first.
-                        self.ax.imshow(np.array([[0]]), cmap=&#39;binary_r&#39;, origin=&#39;lower&#39;, extent=self.extent)
+                        self.ax.set_facecolor(&#39;black&#39;)
                         self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), **qargs)
                 else:
                         self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)
@@ -1298,10 +1296,9 @@ All other kwargs are passed on to <code>matplotlib.axes.Axes.quiver</code>.</p>
         xr, yr, data = self.prePlot(data, step)
         qargs = {&#39;cmap&#39; : cielab_cmap()}
         qargs.update(kwargs)
+        self.ax.set_aspect(&#39;equal&#39;)
         if rgba:
-                # This is stupid but quiver doesn&#39;t plot square unless you do an
-                # imshow first.
-                self.ax.imshow(np.array([[0]]), cmap=&#39;binary_r&#39;, origin=&#39;lower&#39;, extent=self.extent)
+                self.ax.set_facecolor(&#39;black&#39;)
                 self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), **qargs)
         else:
                 self.ax.quiver(xr,yr,np.real(data),np.imag(data),**kwargs)

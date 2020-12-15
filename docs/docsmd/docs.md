@@ -622,7 +622,7 @@ Apply a high pass filter to a 2d-array.
 > 
 >     def low_pass(
 >         data,
->         sigma=100
+>         sigma=10
 >     )
 
 Apply a low pass filter to a 2d-array.
@@ -632,8 +632,8 @@ Apply a low pass filter to a 2d-array.
   - **data** : *complex ndarray* <br />
 
   - **sigma** : *number, optional* <br /> Standard deviation of the
-    gaussian filter, measured in pixels. <br /> Default is `sigma
-    = 100`.
+    gaussian kernel (in real space), measured in pixels. <br /> Default
+    is `sigma = 10`.
 
 **Returns**
 

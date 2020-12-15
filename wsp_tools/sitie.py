@@ -54,7 +54,8 @@ def save_lorentz(img, fname=None, fdir=''):
 	if fname is None:
 		fname = os.path.splitext(img.metadata['filename'])[0]
 	if not os.path.exists(fdir):
-		os.makedirs(fdir)
+		if not fdir == '':
+			os.makedirs(fdir)
 	np.savez(os.path.join(fdir, fname), **img.__dict__)
 	return(None)
 
