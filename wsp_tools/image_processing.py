@@ -25,7 +25,7 @@ def high_pass(data, sigma = 7):
 	FFdata = np.fft.ifft2(g * Fdata)
 	return(FFdata)
 
-def low_pass(data, sigma = 100):
+def low_pass(data, sigma = 10):
 	"""Apply a low pass filter to a 2d-array.
 
 	**Parameters**
@@ -33,20 +33,21 @@ def low_pass(data, sigma = 100):
 	* **data** : _complex ndarray_ <br />
 
 	* **sigma** : _number, optional_ <br />
-	Standard deviation of the gaussian filter, measured in pixels. <br />
-	Default is `sigma = 100`.
+	Standard deviation of the gaussian kernel (in real space), measured in pixels. <br />
+	Default is `sigma = 10`.
 
 	**Returns**
 
 	* **FFdata** : _complex ndarray_ <br />
 	"""
+	X = np.linspace(-data.shape[1]/2, data.shape[1]/2, data.shape[1])
+	Y = np.linspace(-data.shape[1]/2, data.shape[0]/2, data.shape[0])
+	x, y = np.meshgrid(X, Y)
+	g = np.exp(-(x**2 + y**2)/2/sigma**2)
 	Fdata = np.fft.fft2(data)
-	Xfreqs = np.fft.fftfreq(data.shape[1], 1/data.shape[1])
-	Yfreqs = np.fft.fftfreq(data.shape[0], 1/data.shape[0])
-	xfreqs, yfreqs = np.meshgrid(Xfreqs, Yfreqs)
-
-	g = np.exp(-(xfreqs**2 + yfreqs**2)/2/sigma**2)
-	FFdata = np.fft.ifft2(g * Fdata)
+	Fg = np.fft.fft2(np.fft.fftshift(g))
+	Fg = Fg/np.max(Fg)
+	FFdata = np.fft.ifft2(Fg * Fdata)
 	return(FFdata)
 
 def clip_data(data, sigma = 5):
