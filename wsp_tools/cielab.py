@@ -75,10 +75,10 @@ def cielab_image(data, brightness = 'intensity', alpha = 'uniform'):
 	r = sin2(hue, .15*pi6) + 0.35 * sin2(hue, 3.15 * pi6)
 	b = sin2(hue, 4.25 * pi6)
 	g = .6*sin2(hue, 2*pi6) + 0.065 * sin2(hue, 5.05 * pi6) + 0.445*b + 0.33*r
-	rgba_image_components[:,:,0] = (r * bvalue).astype(np.uint8)
-	rgba_image_components[:,:,1] = (g * bvalue).astype(np.uint8)
-	rgba_image_components[:,:,2] = (b * bvalue).astype(np.uint8)
-	rgba_image_components[:,:,3] = np.full(data.shape, fill_value=avalue, dtype=np.uint8)
+	rgba_image_components[...,0] = (r * bvalue).astype(np.uint8)
+	rgba_image_components[...,1] = (g * bvalue).astype(np.uint8)
+	rgba_image_components[...,2] = (b * bvalue).astype(np.uint8)
+	rgba_image_components[...,3] = np.full(data.shape, fill_value=avalue, dtype=np.uint8)
 	return(rgba_image_components)
 
 def rgba(mode, cmap = 'uniform', brightness = 'intensity', alpha = 'uniform'):

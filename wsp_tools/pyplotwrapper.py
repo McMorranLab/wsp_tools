@@ -327,8 +327,6 @@ class singleAx():
 		qargs.update(kwargs)
 		self.ax.set_aspect('equal')
 		if rgba:
-			# This is stupid but quiver doesn't plot square unless you do an
-			# imshow first.
 			self.ax.set_facecolor('black')
 			self.ax.quiver(xr, yr, np.real(data), np.imag(data), np.angle(data), **qargs)
 		else:
