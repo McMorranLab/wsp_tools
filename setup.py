@@ -11,5 +11,5 @@ setup(
     long_description = open('README.md').read(),
     long_description_content_type = "text/markdown",
     python_requires='>=3.6',
-    install_requires=['numpy','matplotlib','scipy']
+    install_requires=['wheel','numpy','matplotlib','scipy']
 )
