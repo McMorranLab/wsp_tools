@@ -95,8 +95,8 @@ class ndap(np.ndarray):
 	* **data** : _complex ndarray_ <br />
 	Any type of ndarray - the methods are defined with a 2d array in mind.
 	"""
-	def __new__(cls, data):
-		dummy = np.asarray(data).copy().view(cls)
+	def __new__(cls, data, dtype=np.float64):
+		dummy = np.asarray(data, dtype=dtype).copy().view(cls)
 		return(dummy)
 
 	def __init__(self, data):

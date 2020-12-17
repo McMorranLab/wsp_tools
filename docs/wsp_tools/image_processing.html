@@ -123,8 +123,8 @@ class ndap(np.ndarray):
         * **data** : _complex ndarray_ &lt;br /&gt;
         Any type of ndarray - the methods are defined with a 2d array in mind.
         &#34;&#34;&#34;
-        def __new__(cls, data):
-                dummy = np.asarray(data).copy().view(cls)
+        def __new__(cls, data, dtype=np.float64):
+                dummy = np.asarray(data, dtype=dtype).copy().view(cls)
                 return(dummy)
 
         def __init__(self, data):
@@ -406,8 +406,8 @@ Any type of ndarray - the methods are defined with a 2d array in mind.</li>
         * **data** : _complex ndarray_ &lt;br /&gt;
         Any type of ndarray - the methods are defined with a 2d array in mind.
         &#34;&#34;&#34;
-        def __new__(cls, data):
-                dummy = np.asarray(data).copy().view(cls)
+        def __new__(cls, data, dtype=np.float64):
+                dummy = np.asarray(data, dtype=dtype).copy().view(cls)
                 return(dummy)
 
         def __init__(self, data):
