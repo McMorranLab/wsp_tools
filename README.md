@@ -12,8 +12,10 @@ Features:
 
 ## Installation
 ```Bash
-pip install git+https://github.com/McMorranLab/wsp_tools
+pip install -e git+https://github.com/McMorranLab/wsp_tools#egg=wsp-tools
 ```
+
+Installing in editable mode `-e` ensures that pip records the install url, with the correct commit. 
 
 ## Documentation
 
