@@ -1,4 +1,4 @@
-from . import np
+from . import np, os
 
 # %%
 def high_pass(data, sigma = 7):
@@ -83,6 +83,50 @@ def shift_pos(data):
 	* **data** : _complex ndarray_
 	"""
 	return(data - np.min(data))
+
+def outpath(datadir, outdir, fname):
+	"""A util to get the output filename.
+
+	An example is easiest to explain:
+
+	datadir: `/abs/path/to/data`
+
+	fname: `/abs/path/to/data/plus/some/structure/too.dm3`
+
+	outdir: `/where/i/want/to/write/data`
+
+	This util will create the folder (if not exists):
+
+	`/where/i/want/to/write/data/plus/some/structure`
+
+	and return the filename:
+
+	`/where/i/want/to/write/data/plus/some/structure/too`.
+
+	**Parameters**
+
+	* **datadir** : _string_ <br />
+	The directory for the experiment's data. (abspath)
+
+	* **outdir** : _string_ <br />
+	The main directory where you want outputs to go. (abspath)
+
+	* **fname** : _string_ <br />
+	The name of the file in datadir. (abspath)
+
+	**Returns**
+
+	* **outname** : _string_ <br />
+	The name of the file to save. (abspath)
+	"""
+	if not os.path.exists(outdir):
+		os.makedirs(outdir)
+	fname = os.path.splitext(fname)[0]
+	subpath = os.path.relpath(os.path.dirname(fname), datadir)
+	finoutdir = os.path.join(outdir, subpath)
+	if not os.path.exists(finoutdir):
+		os.makedirs(finoutdir)
+	return(os.path.join(finoutdir, os.path.basename(fname)))
 
 # %%
 class ndap(np.ndarray):
