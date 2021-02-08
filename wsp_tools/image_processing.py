@@ -16,12 +16,13 @@ def high_pass(data, sigma = 7):
 
 	* **FFdata** : _complex ndarray_ <br />
 	"""
-	Fdata = np.fft.fft2(data)
-	Xfreqs = np.fft.fftfreq(data.shape[1], 1/data.shape[1])
-	Yfreqs = np.fft.fftfreq(data.shape[0], 1/data.shape[0])
-	xfreqs, yfreqs = np.meshgrid(Xfreqs, Yfreqs)
+	X = np.fft.fftfreq(data.shape[1], 1/data.shape[1])
+	Y = np.fft.fftfreq(data.shape[0], 1/data.shape[0])
+	x, y = np.meshgrid(X, Y)
 
-	g = 1 - np.exp(-(xfreqs**2 + yfreqs**2)/2/sigma**2)
+	g = 1 - np.exp(-(x**2+y**2)/2/sigma**2)
+
+	Fdata = np.fft.fft2(data)
 	FFdata = np.fft.ifft2(g * Fdata)
 	return(FFdata)
 
