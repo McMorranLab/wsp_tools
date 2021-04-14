@@ -3,6 +3,8 @@
 from . import np, plt
 from . import constants as _
 
+__all__ = ['cielab_cmap','cielab_image','rgba']
+
 def cielab_cmap(samples=256):
 	"""Creates a `matplotlib.colors.ListedColormap` of the CIELAB color space.
 
@@ -130,8 +132,3 @@ def rgba(mode, cmap = 'uniform', brightness = 'intensity', alpha = 'uniform'):
 		out[...,1] *= np.abs(mode)
 		out[...,2] *= np.abs(mode)
 	return(out)
-
-def whatIsC():
-	"""Used for testing the constants functionality of the module.
-	"""
-	return(_.c)

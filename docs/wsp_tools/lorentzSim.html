@@ -29,6 +29,8 @@
 <pre><code class="python">from . import constants as _
 from . import np
 
+__all__ = [&#39;abphase2d&#39;,&#39;propagate&#39;,&#39;T&#39;,&#39;chi&#39;,&#39;aperture&#39;,&#39;jchessmodel&#39;]
+
 def abphase2d(mx, my, mz, Lx=1e-6, Ly=1e-6, p=np.array([0,0,1]), t=60e-9):
         &#34;&#34;&#34;Calculates the Aharonov-Bohm phase acquired by an electron passing through a 2d
         magnetization.

@@ -2,6 +2,8 @@
 
 wsp\_tools contains utilities for TEM data analysis and presentation.
 
+asdf
+
 Features:
 
   - Single Image TIE
@@ -500,14 +502,6 @@ Converts a 2d complex array to rgba data.
     calculated from scalar values. If the input array has shape NxN, the
     output array will have shape NxNx4.
 
-### Function `whatIsC`
-
-> 
-> 
->     def whatIsC()
-
-Used for testing the constants functionality of the module.
-
 # Module `wsp_tools.constants`
 
 Wrapper for the scipy.constants module that allows unit scaling.
@@ -638,6 +632,50 @@ Apply a low pass filter to a 2d-array.
 **Returns**
 
   - **FFdata** : *complex ndarray* <br />
+
+### Function `outpath`
+
+> 
+> 
+>     def outpath(
+>         datadir,
+>         outdir,
+>         fname
+>     )
+
+A util to get the output filename.
+
+An example is easiest to explain:
+
+datadir: `/abs/path/to/data`
+
+fname: `/abs/path/to/data/plus/some/structure/too.dm3`
+
+outdir: `/where/i/want/to/write/data`
+
+This util will create the folder (if not exists):
+
+`/where/i/want/to/write/data/plus/some/structure`
+
+and return the filename:
+
+`/where/i/want/to/write/data/plus/some/structure/too`.
+
+**Parameters**
+
+  - **datadir** : *string* <br /> The directory for the experiment’s
+    data. (abspath)
+
+  - **outdir** : *string* <br /> The main directory where you want
+    outputs to go. (abspath)
+
+  - **fname** : *string* <br /> The name of the file in datadir.
+    (abspath)
+
+**Returns**
+
+  - **outname** : *string* <br /> The name of the file to save.
+    (abspath)
 
 ### Function `shift_pos`
 

@@ -1,8 +1,11 @@
 """Module to generate spatial modes and calculate beam parameters.
 """
 
-from . import np, eval_genlaguerre, factorial
+from . import np
 from . import constants as _
+from scipy.special import eval_genlaguerre, factorial
+
+__all__ = ['energy','p','dB','k','omega','v_g','v_p','bessel','besselPacket','zR','w','roc','LG']
 
 def energy(T_eV):
 	"""Calculates the total electron energy from its kinetic energy.

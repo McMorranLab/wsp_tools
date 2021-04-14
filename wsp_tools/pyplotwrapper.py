@@ -26,6 +26,8 @@ wt.plt.show()
 """
 from . import plt, np, rgba, cielab_cmap
 
+__all__ = ['singleAx','subplots']
+
 class singleAx():
 	"""An extension of the `matplotlib.axes.Axes` class.
 

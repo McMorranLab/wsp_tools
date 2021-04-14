@@ -32,6 +32,8 @@
 from . import np, plt
 from . import constants as _
 
+__all__ = [&#39;cielab_cmap&#39;,&#39;cielab_image&#39;,&#39;rgba&#39;]
+
 def cielab_cmap(samples=256):
         &#34;&#34;&#34;Creates a `matplotlib.colors.ListedColormap` of the CIELAB color space.
 
@@ -158,12 +160,7 @@ def rgba(mode, cmap = &#39;uniform&#39;, brightness = &#39;intensity&#39;, alpha
                 out[...,0] *= np.abs(mode)
                 out[...,1] *= np.abs(mode)
                 out[...,2] *= np.abs(mode)
-        return(out)
-
-def whatIsC():
-        &#34;&#34;&#34;Used for testing the constants functionality of the module.
-        &#34;&#34;&#34;
-        return(_.c)</code></pre>
+        return(out)</code></pre>
 </details>
 </section>
 <section>
@@ -402,21 +399,6 @@ shape NxN, the output array will have shape NxNx4.</li>
         return(out)</code></pre>
 </details>
 </dd>
-<dt id="wsp_tools.cielab.whatIsC"><code class="name flex">
-<span>def <span class="ident">whatIsC</span></span>(<span>)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Used for testing the constants functionality of the module.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def whatIsC():
-        &#34;&#34;&#34;Used for testing the constants functionality of the module.
-        &#34;&#34;&#34;
-        return(_.c)</code></pre>
-</details>
-</dd>
 </dl>
 </section>
 <section>
@@ -438,7 +420,6 @@ shape NxN, the output array will have shape NxNx4.</li>
 <li><code><a title="wsp_tools.cielab.cielab_cmap" href="#wsp_tools.cielab.cielab_cmap">cielab_cmap</a></code></li>
 <li><code><a title="wsp_tools.cielab.cielab_image" href="#wsp_tools.cielab.cielab_image">cielab_image</a></code></li>
 <li><code><a title="wsp_tools.cielab.rgba" href="#wsp_tools.cielab.rgba">rgba</a></code></li>
-<li><code><a title="wsp_tools.cielab.whatIsC" href="#wsp_tools.cielab.whatIsC">whatIsC</a></code></li>
 </ul>
 </li>
 </ul>

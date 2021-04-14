@@ -26,7 +26,9 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from . import np
+<pre><code class="python">from . import np, os
+
+__all__ = [&#39;high_pass&#39;,&#39;low_pass&#39;,&#39;clip_data&#39;,&#39;shift_pos&#39;,&#39;outpath&#39;,&#39;ndap&#39;]
 
 # %%
 def high_pass(data, sigma = 7):
@@ -44,12 +46,13 @@ def high_pass(data, sigma = 7):
 
         * **FFdata** : _complex ndarray_ &lt;br /&gt;
         &#34;&#34;&#34;
-        Fdata = np.fft.fft2(data)
-        Xfreqs = np.fft.fftfreq(data.shape[1], 1/data.shape[1])
-        Yfreqs = np.fft.fftfreq(data.shape[0], 1/data.shape[0])
-        xfreqs, yfreqs = np.meshgrid(Xfreqs, Yfreqs)
+        X = np.fft.fftfreq(data.shape[1], 1/data.shape[1])
+        Y = np.fft.fftfreq(data.shape[0], 1/data.shape[0])
+        x, y = np.meshgrid(X, Y)
 
-        g = 1 - np.exp(-(xfreqs**2 + yfreqs**2)/2/sigma**2)
+        g = 1 - np.exp(-(x**2+y**2)/2/sigma**2)
+
+        Fdata = np.fft.fft2(data)
         FFdata = np.fft.ifft2(g * Fdata)
         return(FFdata)
 
@@ -111,6 +114,50 @@ def shift_pos(data):
         * **data** : _complex ndarray_
         &#34;&#34;&#34;
         return(data - np.min(data))
+
+def outpath(datadir, outdir, fname):
+        &#34;&#34;&#34;A util to get the output filename.
+
+        An example is easiest to explain:
+
+        datadir: `/abs/path/to/data`
+
+        fname: `/abs/path/to/data/plus/some/structure/too.dm3`
+
+        outdir: `/where/i/want/to/write/data`
+
+        This util will create the folder (if not exists):
+
+        `/where/i/want/to/write/data/plus/some/structure`
+
+        and return the filename:
+
+        `/where/i/want/to/write/data/plus/some/structure/too`.
+
+        **Parameters**
+
+        * **datadir** : _string_ &lt;br /&gt;
+        The directory for the experiment&#39;s data. (abspath)
+
+        * **outdir** : _string_ &lt;br /&gt;
+        The main directory where you want outputs to go. (abspath)
+
+        * **fname** : _string_ &lt;br /&gt;
+        The name of the file in datadir. (abspath)
+
+        **Returns**
+
+        * **outname** : _string_ &lt;br /&gt;
+        The name of the file to save. (abspath)
+        &#34;&#34;&#34;
+        if not os.path.exists(outdir):
+                os.makedirs(outdir)
+        fname = os.path.splitext(fname)[0]
+        subpath = os.path.relpath(os.path.dirname(fname), datadir)
+        finoutdir = os.path.join(outdir, subpath)
+        if not os.path.exists(finoutdir):
+                os.makedirs(finoutdir)
+        return(os.path.join(finoutdir, os.path.basename(fname)))
 
 # %%
 class ndap(np.ndarray):
@@ -284,12 +331,13 @@ Default is <code>sigma = 7</code>.</p>
 
         * **FFdata** : _complex ndarray_ &lt;br /&gt;
         &#34;&#34;&#34;
-        Fdata = np.fft.fft2(data)
-        Xfreqs = np.fft.fftfreq(data.shape[1], 1/data.shape[1])
-        Yfreqs = np.fft.fftfreq(data.shape[0], 1/data.shape[0])
-        xfreqs, yfreqs = np.meshgrid(Xfreqs, Yfreqs)
+        X = np.fft.fftfreq(data.shape[1], 1/data.shape[1])
+        Y = np.fft.fftfreq(data.shape[0], 1/data.shape[0])
+        x, y = np.meshgrid(X, Y)
 
-        g = 1 - np.exp(-(xfreqs**2 + yfreqs**2)/2/sigma**2)
+        g = 1 - np.exp(-(x**2+y**2)/2/sigma**2)
+
+        Fdata = np.fft.fft2(data)
         FFdata = np.fft.ifft2(g * Fdata)
         return(FFdata)</code></pre>
 </details>
@@ -342,6 +390,88 @@ Default is <code>sigma = 10</code>.</p>
         Fg = Fg/np.max(Fg)
         FFdata = np.fft.ifft2(Fg * Fdata)
         return(FFdata)</code></pre>
+</details>
+</dd>
+<dt id="wsp_tools.image_processing.outpath"><code class="name flex">
+<span>def <span class="ident">outpath</span></span>(<span>datadir, outdir, fname)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A util to get the output filename.</p>
+<p>An example is easiest to explain:</p>
+<p>datadir: <code>/abs/path/to/data</code></p>
+<p>fname: <code>/abs/path/to/data/plus/some/structure/too.dm3</code></p>
+<p>outdir: <code>/where/i/want/to/write/data</code></p>
+<p>This util will create the folder (if not exists):</p>
+<p><code>/where/i/want/to/write/data/plus/some/structure</code></p>
+<p>and return the filename:</p>
+<p><code>/where/i/want/to/write/data/plus/some/structure/too</code>.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>datadir</strong> : <em>string</em> <br />
+The directory for the experiment's data. (abspath)</p>
+</li>
+<li>
+<p><strong>outdir</strong> : <em>string</em> <br />
+The main directory where you want outputs to go. (abspath)</p>
+</li>
+<li>
+<p><strong>fname</strong> : <em>string</em> <br />
+The name of the file in datadir. (abspath)</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>outname</strong> : <em>string</em> <br />
+The name of the file to save. (abspath)</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def outpath(datadir, outdir, fname):
+        &#34;&#34;&#34;A util to get the output filename.
+
+        An example is easiest to explain:
+
+        datadir: `/abs/path/to/data`
+
+        fname: `/abs/path/to/data/plus/some/structure/too.dm3`
+
+        outdir: `/where/i/want/to/write/data`
+
+        This util will create the folder (if not exists):
+
+        `/where/i/want/to/write/data/plus/some/structure`
+
+        and return the filename:
+
+        `/where/i/want/to/write/data/plus/some/structure/too`.
+
+        **Parameters**
+
+        * **datadir** : _string_ &lt;br /&gt;
+        The directory for the experiment&#39;s data. (abspath)
+
+        * **outdir** : _string_ &lt;br /&gt;
+        The main directory where you want outputs to go. (abspath)
+
+        * **fname** : _string_ &lt;br /&gt;
+        The name of the file in datadir. (abspath)
+
+        **Returns**
+
+        * **outname** : _string_ &lt;br /&gt;
+        The name of the file to save. (abspath)
+        &#34;&#34;&#34;
+        if not os.path.exists(outdir):
+                os.makedirs(outdir)
+        fname = os.path.splitext(fname)[0]
+        subpath = os.path.relpath(os.path.dirname(fname), datadir)
+        finoutdir = os.path.join(outdir, subpath)
+        if not os.path.exists(finoutdir):
+                os.makedirs(finoutdir)
+        return(os.path.join(finoutdir, os.path.basename(fname)))</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.image_processing.shift_pos"><code class="name flex">
@@ -637,6 +767,7 @@ Default is <code>sigma = 100</code>.</li>
 <li><code><a title="wsp_tools.image_processing.clip_data" href="#wsp_tools.image_processing.clip_data">clip_data</a></code></li>
 <li><code><a title="wsp_tools.image_processing.high_pass" href="#wsp_tools.image_processing.high_pass">high_pass</a></code></li>
 <li><code><a title="wsp_tools.image_processing.low_pass" href="#wsp_tools.image_processing.low_pass">low_pass</a></code></li>
+<li><code><a title="wsp_tools.image_processing.outpath" href="#wsp_tools.image_processing.outpath">outpath</a></code></li>
 <li><code><a title="wsp_tools.image_processing.shift_pos" href="#wsp_tools.image_processing.shift_pos">shift_pos</a></code></li>
 </ul>
 </li>

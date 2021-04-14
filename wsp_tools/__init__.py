@@ -12,9 +12,9 @@ Features:
 * a scipy.constants (CODATA values) wrapper that allows unit scaling (i.e., using nanometers
 instead of meters)
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.special import eval_genlaguerre, factorial
 import os
 
 from .beam import *
