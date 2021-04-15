@@ -2,8 +2,6 @@
 
 wsp\_tools contains utilities for TEM data analysis and presentation.
 
-asdf
-
 Features:
 
   - Single Image TIE
@@ -24,6 +22,23 @@ Features:
   - [wsp\_tools.lorentzSim](#wsp_tools.lorentzSim)
   - [wsp\_tools.pyplotwrapper](#wsp_tools.pyplotwrapper)
   - [wsp\_tools.sitie](#wsp_tools.sitie)
+
+## Functions
+
+### Function `docs`
+
+> 
+> 
+>     def docs(
+>         outdir='.'
+>     )
+
+Auto-generate documentation for wsp-tools in html.
+
+**Parameters**
+
+  - **outdir** : *string* <br /> The directory to write the output
+    documentation. <br /> Default is “./”.
 
 # Module `wsp_tools.beam`
 

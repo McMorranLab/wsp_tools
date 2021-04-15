@@ -23,7 +23,6 @@
 </header>
 <section id="section-intro">
 <p>wsp_tools contains utilities for TEM data analysis and presentation.</p>
-<p>asdf</p>
 <p>Features:</p>
 <ul>
 <li>Single Image TIE</li>
@@ -42,8 +41,6 @@ instead of meters)</li>
 <pre><code class="python">&#34;&#34;&#34;
 wsp_tools contains utilities for TEM data analysis and presentation.
 
-asdf
-
 Features:
 
 * Single Image TIE
@@ -58,7 +55,8 @@ instead of meters)
 
 import numpy as np
 import matplotlib.pyplot as plt
-import os
+import os, pdoc
+from pathlib import Path
 
 from .beam import *
 from .cielab import *
@@ -66,7 +64,36 @@ from .constants import setUnits
 from .image_processing import *
 from .lorentzSim import *
 from .pyplotwrapper import *
-from .sitie import *</code></pre>
+from .sitie import *
+
+def docs(outdir = &#34;.&#34;):
+        &#34;&#34;&#34;Auto-generate documentation for wsp-tools in html.
+
+        **Parameters**
+
+        * **outdir** : _string_ &lt;br /&gt;
+        The directory to write the output documentation. &lt;br /&gt;
+        Default is &#34;./&#34;.
+        &#34;&#34;&#34;
+        modules = [&#39;wsp_tools&#39;]
+        context = pdoc.Context()
+        modules = [pdoc.Module(mod, context=context)
+                           for mod in modules]
+        pdoc.link_inheritance(context)
+
+        def recursive_htmls(mod):
+                yield mod.url(), mod.html()
+                for submod in mod.submodules():
+                        yield from recursive_htmls(submod)
+
+        for mod in modules:
+                for module_url, html in recursive_htmls(mod):
+                        output_url = Path(outdir).expanduser().joinpath(module_url)
+                        if not Path(output_url).parent.exists():
+                                Path(output_url).parent.mkdir(parents=True)
+                        with open(output_url, &#34;w+&#34;) as f:
+                                f.write(html)
+        print(&#34;Documentation for wsp-tools written to: \n{}:&#34;.format(Path(outdir).joinpath(modules[0].url())))</code></pre>
 </details>
 </section>
 <section>
@@ -105,6 +132,54 @@ from .sitie import *</code></pre>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="wsp_tools.docs"><code class="name flex">
+<span>def <span class="ident">docs</span></span>(<span>outdir='.')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Auto-generate documentation for wsp-tools in html.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>outdir</strong> : <em>string</em> <br />
+The directory to write the output documentation. <br />
+Default is "./".</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def docs(outdir = &#34;.&#34;):
+        &#34;&#34;&#34;Auto-generate documentation for wsp-tools in html.
+
+        **Parameters**
+
+        * **outdir** : _string_ &lt;br /&gt;
+        The directory to write the output documentation. &lt;br /&gt;
+        Default is &#34;./&#34;.
+        &#34;&#34;&#34;
+        modules = [&#39;wsp_tools&#39;]
+        context = pdoc.Context()
+        modules = [pdoc.Module(mod, context=context)
+                           for mod in modules]
+        pdoc.link_inheritance(context)
+
+        def recursive_htmls(mod):
+                yield mod.url(), mod.html()
+                for submod in mod.submodules():
+                        yield from recursive_htmls(submod)
+
+        for mod in modules:
+                for module_url, html in recursive_htmls(mod):
+                        output_url = Path(outdir).expanduser().joinpath(module_url)
+                        if not Path(output_url).parent.exists():
+                                Path(output_url).parent.mkdir(parents=True)
+                        with open(output_url, &#34;w+&#34;) as f:
+                                f.write(html)
+        print(&#34;Documentation for wsp-tools written to: \n{}:&#34;.format(Path(outdir).joinpath(modules[0].url())))</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
 </section>
@@ -124,6 +199,11 @@ from .sitie import *</code></pre>
 <li><code><a title="wsp_tools.lorentzSim" href="lorentzSim.html">wsp_tools.lorentzSim</a></code></li>
 <li><code><a title="wsp_tools.pyplotwrapper" href="pyplotwrapper.html">wsp_tools.pyplotwrapper</a></code></li>
 <li><code><a title="wsp_tools.sitie" href="sitie.html">wsp_tools.sitie</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="wsp_tools.docs" href="#wsp_tools.docs">docs</a></code></li>
 </ul>
 </li>
 </ul>
