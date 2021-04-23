@@ -2,6 +2,7 @@ __pycache__
 *.egg-info
 *.ser
 *.dm3
+dev
 venv
 testingsitie.py
 testingAB.py
