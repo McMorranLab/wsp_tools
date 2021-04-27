@@ -1,7 +1,7 @@
 """Module to generate spatial modes and calculate beam parameters.
 """
 
-from . import np
+import numpy as np
 from . import constants as _
 from scipy.special import eval_genlaguerre, factorial
 

@@ -1,0 +1,30 @@
+import os, sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import wsp_tools as wt
+from wsp_tools import np, plt
+
+wt.cielab_cmap()
+X = np.linspace(0,1,100)
+x, y = np.meshgrid(X, X)
+data = x + 1j * y
+
+plt.imshow(wt.cielab_image(data))
+plt.title("intensity, uniform")
+plt.show()
+
+plt.imshow(wt.cielab_image(data, brightness='amplitude'))
+plt.title("amplitude, uniform")
+plt.show()
+
+plt.imshow(wt.cielab_image(data, alpha='intensity'))
+plt.title("intensity, intensity")
+plt.show()
+
+plt.imshow(wt.cielab_image(data, alpha='amplitude'))
+plt.title("intensity, amplitude")
+plt.show()
+
+plt.imshow(wt.rgba(data), cmap='viridis')
+plt.title("rgba, cmap=viridis")
+plt.show()

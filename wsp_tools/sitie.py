@@ -25,15 +25,21 @@ img.saveMeta(outdir='someDirectory') # Saves defocus, pixelSize, etc
 """
 
 # %%
-from . import dB, rgba, np, plt, os
-from .image_processing import *
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+from deprecated import deprecated
+
+from . import image_processing as ip
 from .pyplotwrapper import subplots
 from . import constants as _
+from .ltem import phase_from_img, ind_from_phase
 np.seterr(divide='ignore', invalid='ignore')
 import json
 
-__all__ = ['save_lorentz','load_lorentz','lorentz','B_from_phase','SITIE','sitie_RHS','inverse_laplacian']
+__all__ = ['lorentz','B_from_phase','SITIE']
 
+@deprecated(version='1.2.0', reason='This function has not found much use and will not be maintained')
 def save_lorentz(img, fname=None, fdir=''):
 	"""Saves a `lorentz` object as a `.npz` archive.
 
@@ -61,6 +67,7 @@ def save_lorentz(img, fname=None, fdir=''):
 	np.savez(os.path.join(fdir, fname), **img.__dict__)
 	return(None)
 
+@deprecated(version='1.2.0', reason='This function has not found much use and will not be maintained')
 def load_lorentz(fname):
 	"""Loads a `lorentz` object that has been saved as a `.npz` via `save_lorentz()`.
 
@@ -77,9 +84,9 @@ def load_lorentz(fname):
 	fm = f['metadata'].item()
 	dm3 = {'data':f['data'], 'pixelSize':[fm['pixelSize'],fm['pixelSize']], 'pixelUnit':[fm['pixelUnit'],fm['pixelUnit']], 'filename':fm['filename']}
 	img = lorentz(dm3)
-	img.phase = ndap(f['phase'])
-	img.Bx = ndap(f['Bx'])
-	img.By = ndap(f['By'])
+	img.phase = ip.ndap(f['phase'])
+	img.Bx = ip.ndap(f['Bx'])
+	img.By = ip.ndap(f['By'])
 	img.x = f['x']
 	img.y = f['y']
 	fm.update(img.metadata)
@@ -104,21 +111,25 @@ class lorentz:
 		</ul>
 	"""
 	def __init__(self, dm3file):
-		self.data = ndap(dm3file['data'])
-		self.pixelSize = dm3file['pixelSize'][0]
-		self.pixelUnit = dm3file['pixelUnit'][0]
-		self.x = np.arange(0,self.data.shape[1]) * self.pixelSize
-		self.y = np.arange(0,self.data.shape[0]) * self.pixelSize
+		self.data = ip.ndap(dm3file['data'])
+		self.dx = dm3file['pixelSize'][0]
+		self.dy = dm3file['pixelSize'][1]
+		self.xUnit = dm3file['pixelUnit'][0]
+		self.yUnit = dm3file['pixelUnit'][1]
+		self.x = np.arange(0,self.data.shape[1]) * self.dx
+		self.y = np.arange(0,self.data.shape[0]) * self.dy
 		self.metadata = {
-							'pixelSize':float(dm3file['pixelSize'][0]),
-							'pixelUnit':dm3file['pixelUnit'][0],
+							'dx':float(dm3file['pixelSize'][0]),
+							'dy':float(dm3file['pixelSize'][1]),
+							'xUnit':dm3file['pixelUnit'][0],
+							'yUnit':dm3file['pixelUnit'][1],
 							'filename':dm3file['filename']
 						}
 		self.phase = None
 		self.Bx, self.By = None, None
 		self.fix_units()
 
-	def fix_units(self, unit=None):
+	def fix_units(self, xunit=None, yunit=None):
 		"""Change the pixel units to meters.
 
 		**Parameters**
@@ -130,26 +141,39 @@ class lorentz:
 
 		* **self** : _lorentz_
 		"""
-		if unit is None:
-			if self.pixelUnit == 'nm':
-				unit = 1e-9
-			elif self.pixelUnit == 'mm':
-				unit = 1e-3
-			elif self.pixelUnit == 'µm':
-				unit = 1e-6
-			elif self.pixelUnit == 'm':
-				unit = 1
-		self.pixelSize *= unit
-		self.pixelUnit = 'm'
-		self.x *= unit
-		self.y *= unit
+		if xunit is None:
+			if self.xUnit == 'nm':
+				xunit = 1e-9
+			elif self.xUnit == 'mm':
+				xunit = 1e-3
+			elif self.xUnit == 'µm':
+				xunit = 1e-6
+			elif self.xUnit == 'm':
+				xunit = 1
+		if yunit is None:
+			if self.yUnit == 'nm':
+				yunit = 1e-9
+			elif self.yUnit == 'mm':
+				yunit = 1e-3
+			elif self.yUnit == 'µm':
+				yunit = 1e-6
+			elif self.yUnit == 'm':
+				yunit = 1
+		self.dx *= xunit
+		self.dy *= yunit
+		self.xUnit = 'm'
+		self.yUnit = 'm'
+		self.x *= xunit
+		self.y *= yunit
 		self.metadata.update({
-			'pixelSize': float(self.pixelSize),
-			'pixelUnit': self.pixelUnit
+			'dx': float(self.dx),
+			'dy': float(self.dy),
+			'xUnit': self.xUnit,
+			'yUnit': self.yUnit
 		})
 		return(None)
 
-	def sitie(self, defocus = 1, wavelength=1.97e-12):
+	def sitie(self, defocus = 1, thickness = 60e-9, wavelength=1.97e-12):
 		"""Carries out phase and B-field reconstruction.
 
 		Assigns phase, Bx, and By attributes.
@@ -170,9 +194,9 @@ class lorentz:
 
 		* **self** : _lorentz_
 		"""
-		self.metadata.update({'defocus': defocus, 'wavelength': wavelength})
-		self.phase = ndap(SITIE(self.data, defocus, self.pixelSize, wavelength))
-		self.Bx, self.By = [ndap(arr) for arr in B_from_phase(self.phase, thickness=1)]
+		self.metadata.update({'defocus': defocus, 'wavelength': wavelength, 'thickness': thickness})
+		self.phase = ip.ndap(phase_from_img(self.data, defocus, self.dx, self.dy, wavelength))
+		self.Bx, self.By = [ip.ndap(arr) for arr in ind_from_phase(self.phase, thickness)]
 		return(None)
 
 	def preview(self, window=None):
@@ -189,10 +213,10 @@ class lorentz:
 		fig, ax = subplots(11)
 		if not window is None:
 			ax[0,0].setWindow(window)
-		data = clip_data(self.data, sigma=10)
+		data = ip.clip_data(self.data, sigma=10)
 		ax[0,0].setAxes(self.x, self.y)
-		ax[0,0].set_xlabel("x ({:})".format(self.pixelUnit))
-		ax[0,0].set_ylabel("y ({:})".format(self.pixelUnit))
+		ax[0,0].set_xlabel("x ({:})".format(self.dx))
+		ax[0,0].set_ylabel("y ({:})".format(self.dy))
 		ax[0,0].imshow(data)
 		plt.show()
 
@@ -215,6 +239,7 @@ class lorentz:
 			json.dump(self.metadata, fp, indent="")
 
 ################################## SITIE #######################################
+@deprecated(version='1.2.0', reason='You should now use wsp_tools.ltem.ind_from_phase. As of this version, B_from_phase just calls ind_from_phase.')
 def B_from_phase(phase, thickness=1):
 	"""Reconstructs the B-field from the phase profile.
 
@@ -235,11 +260,9 @@ def B_from_phase(phase, thickness=1):
 	* **By** : _ndarray_ <br />
 	The y-component of the magnetic field.
 	"""
-	dpdy, dpdx = np.gradient(phase)
-	Bx = _.hbar/_.e/thickness * dpdy
-	By = -_.hbar/_.e/thickness * dpdx
-	return(Bx, By)
+	return(ind_from_phase(phase, thickness))
 
+@deprecated(version='1.2.0', reason='You should now use wsp_tools.ltem.phase_from_img. As of this version, SITIE just calls phase_from_img.')
 def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
 	"""Reconstruct the phase from a defocussed image.
 
@@ -260,18 +283,4 @@ def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
 
 	* **phase** : _ndarray_ <br />
 	"""
-	rhs = sitie_RHS(image, defocus, wavelength)
-	phase = inverse_laplacian(rhs, pixel_size)
-	return(phase.real)
-
-def sitie_RHS(I, defocus, wavelength=dB(3e5)):
-	return(2 * _.pi / defocus / wavelength * (1 - I/np.mean(I)))
-
-def inverse_laplacian(f, pixel_size):
-	QX = np.fft.fftfreq(f.shape[1], pixel_size)
-	QY = np.fft.fftfreq(f.shape[0], pixel_size)
-	qx,qy = np.meshgrid(QX,QY)
-	f = np.fft.fft2(f)
-	f = np.nan_to_num(-f/(qy**2 + qx**2), posinf=0, neginf=0)
-	f = np.fft.ifft2(f)
-	return(f)
+	return(phase_from_img(img, defocus, pixel_size, pixel_size, wavelength))

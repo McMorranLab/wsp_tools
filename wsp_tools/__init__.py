@@ -17,14 +17,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os, pdoc
 from pathlib import Path
+from deprecated import deprecated
 
 from .beam import *
 from .cielab import *
 from .constants import setUnits
 from .image_processing import *
-from .lorentzSim import *
 from .pyplotwrapper import *
 from .sitie import *
+from .ltem import *
 
 def docs(outdir = "."):
 	"""Auto-generate documentation for wsp-tools in html.

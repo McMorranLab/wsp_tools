@@ -1,6 +1,7 @@
 """Module to generate rgba data from scalar values.
 """
-from . import np, plt
+import numpy as np
+import matplotlib.pyplot as plt
 from . import constants as _
 
 __all__ = ['cielab_cmap','cielab_image','rgba']

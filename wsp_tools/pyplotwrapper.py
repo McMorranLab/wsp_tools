@@ -24,7 +24,9 @@ wt.plt.show()
 
 ![asdf](pyplotwrapperExample.png)
 """
-from . import plt, np, rgba, cielab_cmap
+import matplotlib.pyplot as plt
+import numpy as np
+from .cielab import rgba, cielab_cmap
 
 __all__ = ['singleAx','subplots']
 

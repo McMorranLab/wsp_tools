@@ -1,4 +1,5 @@
-from . import np, os
+import os
+import numpy as np
 
 __all__ = ['high_pass','low_pass','clip_data','shift_pos','outpath','ndap']
 

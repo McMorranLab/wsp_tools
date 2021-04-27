@@ -5,10 +5,10 @@ Features:
 
 * Single Image TIE
 * Lorentz simulations
-* spatial mode implementations
-* a matplotlib.pyplot wrapper
-* an implementation of the cielab colorspace
-* a scipy.constants wrapper that allows unit scaling (i.e., using nanometers instead of meters)
+* spatial modes
+* a `matplotlib.pyplot` wrapper
+* an implementation of the CIELAB colorspace
+* a `scipy.constants` wrapper that allows arbitrary units (i.e., using nanometers instead of meters)
 
 ## Installation
 ```Bash

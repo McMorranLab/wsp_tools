@@ -10,7 +10,7 @@ testingimports.py
 testingplots.py
 testingdocs.py
 testingconstants.py
-tests
+docs_test
 *.sh
 *.zsh
 howToVersion
