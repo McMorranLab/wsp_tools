@@ -3,6 +3,8 @@ __pycache__
 *.ser
 *.dm3
 dev
+dist
+build
 venv
 testingsitie.py
 testingAB.py
@@ -11,8 +13,8 @@ testingplots.py
 testingdocs.py
 testingconstants.py
 docs_test
-*.sh
 *.zsh
 howToVersion
 Pipfile
 Pipfile.lock
+.pytest_cache

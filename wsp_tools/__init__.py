@@ -1,3 +1,19 @@
+# wsp-tools is TEM data analysis and simulation tools developed by WSP as a grad student in the McMorran Lab.
+# Copyright (C) 2021  William S. Parker
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 """
 wsp_tools contains utilities for TEM data analysis and presentation.
 

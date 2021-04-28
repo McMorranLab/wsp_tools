@@ -1,4 +1,21 @@
+# wsp-tools is TEM data analysis and simulation tools developed by WSP as a grad student in the McMorran Lab.
+# Copyright (C) 2021  William S. Parker
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import os
+from pathlib import Path
 import numpy as np
 
 __all__ = ['high_pass','low_pass','clip_data','shift_pos','outpath','ndap']
@@ -130,7 +147,7 @@ def outpath(datadir, outdir, fname):
 	finoutdir = os.path.join(outdir, subpath)
 	if not os.path.exists(finoutdir):
 		os.makedirs(finoutdir)
-	return(os.path.join(finoutdir, os.path.basename(fname)))
+	return(Path(os.path.join(finoutdir, os.path.basename(fname))))
 
 # %%
 class ndap(np.ndarray):
@@ -143,8 +160,8 @@ class ndap(np.ndarray):
 	* **data** : _complex ndarray_ <br />
 	Any type of ndarray - the methods are defined with a 2d array in mind.
 	"""
-	def __new__(cls, data, dtype=np.float64):
-		dummy = np.asarray(data, dtype=dtype).copy().view(cls)
+	def __new__(cls, data):
+		dummy = np.asarray(data, dtype=data.dtype).copy().view(cls)
 		return(dummy)
 
 	def __init__(self, data):
