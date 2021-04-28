@@ -18,7 +18,7 @@ plt.show()
 # %%
 m3 = wt.jchessmodel(x3, y3, z3, n=1)
 plt.imshow(wt.rgba(m3[0][:,:,0]+1j*m3[1][:,:,0]))
-plt.title("3d mag")
+plt.title("3d mag (slice)")
 plt.show()
 
 # %%
@@ -31,7 +31,7 @@ plt.show()
 # %%
 abp3 = wt.ab_phase(m3[0], m3[1], m3[2], dx, dy)
 plt.imshow(np.sum(abp3, axis=-1))
-plt.title("ab phase 3d")
+plt.title("ab phase 3d (slice)")
 plt.show()
 
 # %%
@@ -43,7 +43,7 @@ plt.show()
 # %%
 Bfm3 = wt.B_from_mag(m2[0], m2[1], m2[2], z=Z, dx=dx, dy=dy)
 plt.imshow(wt.rgba(np.sum(Bfm3[0], axis=-1) + 1j * np.sum(Bfm3[1], axis=-1)))
-plt.title("B from mag 3d")
+plt.title("B from mag 3d (slice)")
 plt.show()
 
 # %%
@@ -55,7 +55,7 @@ plt.show()
 # %%
 Afm3 = wt.A_from_mag(m2[0], m2[1], m2[2], z=Z, dx=dx, dy=dy)
 plt.imshow(wt.rgba(np.sum(Afm3[0], axis=-1) + 1j * np.sum(Afm3[1], axis=-1)))
-plt.title("A from mag 3d")
+plt.title("A from mag 3d (slice)")
 plt.show()
 
 # %%
@@ -68,7 +68,7 @@ plt.show()
 # %%
 ifm3 = wt.img_from_mag(m3[0], m3[1], m3[2], dx, dy, defocus=1e-3)
 plt.imshow(ifm3)
-plt.title("img from mag 3d")
+plt.title("img from mag 3d (slice)")
 plt.colorbar()
 plt.show()
 

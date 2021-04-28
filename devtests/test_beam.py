@@ -28,11 +28,11 @@ plt.title("2d Bessel")
 plt.show()
 
 plt.imshow(np.abs(bessel3[:,:,0])**2)
-plt.title("3d Bessel")
+plt.title("3d Bessel (slice)")
 plt.show()
 
 plt.imshow(np.abs(besselPacket[:,:,0])**2)
-plt.title("Bessel Packet")
+plt.title("Bessel Packet (slice)")
 plt.show()
 
 LG2 = wt.LG(x2, y2, z=0)
@@ -43,5 +43,5 @@ plt.title("2d LG")
 plt.show()
 
 plt.imshow(np.abs(LG3[:,:,0])**2)
-plt.title("3d LG")
+plt.title("3d LG (slice)")
 plt.show()
