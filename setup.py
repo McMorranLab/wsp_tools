@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-	name = 'wsp_tools-test-0',
+	name = 'wsp_tools',
 	packages = find_packages(),
 	version = '1.2.02',
 	author = 'William S. Parker',
