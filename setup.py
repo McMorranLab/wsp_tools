@@ -9,7 +9,7 @@ setup(
 	description = 'Utilities for TEM data analysis and simulation.',
 	url = 'https://github.com/McMorranLab/wsp_tools',
 	project_urls={
-		"Documentation" : "https://mcmorranlab.github.io/wsp_tools/"
+		"Documentation" : "https://mcmorranlab.github.io/wsp_tools/",
         "Bug Tracker": "https://github.com/McMorranLab/wsp_tools/issues",
     },
 	classifiers=[
