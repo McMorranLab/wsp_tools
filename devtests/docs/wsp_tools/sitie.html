@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>wsp_tools.sitie API documentation</title>
+<meta name="description" content="Contains utilities for reconstructing phase and magnetization from Lorentz images …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>wsp_tools.sitie</code></h1>
+</header>
+<section id="section-intro">
+<p>Contains utilities for reconstructing phase and magnetization from Lorentz images.</p>
+<p>The most common use case is to generate a lorentz object from a <code>.dm3</code> file.
+Then you can analyze using high_pass(), sitie(), clip_data(), etc.</p>
+<p>Example:</p>
+<pre><code class="language-python">import ncempy.io.dm as dm
+import wsp_tools as wt
+
+fname = '/path/to/data.dm3'
+dm3file = dm.dmReader(fname)
+
+img = wt.lorentz(dm3file)
+img.sitie(defocus=1e-3)
+img.phase.clip_data(sigma=5).high_pass().low_pass()
+img.Bx.clip_data(sigma=5).high_pass().low_pass()
+img.By.clip_data(sigma=5).high_pass().low_pass()
+
+img.saveMeta(outdir='someDirectory') # Saves defocus, pixelSize, etc
+
+### plot img.Bx, img.By, img.phase, img.data, img.rawData, etc
+</code></pre>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># wsp-tools is TEM data analysis and simulation tools developed by WSP as a grad student in the McMorran Lab.
+# Copyright (C) 2021  William S. Parker
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.
+
+&#34;&#34;&#34;Contains utilities for reconstructing phase and magnetization from Lorentz images.
+
+The most common use case is to generate a lorentz object from a ```.dm3``` file.
+Then you can analyze using high_pass(), sitie(), clip_data(), etc.
+
+Example:
+
+```python
+import ncempy.io.dm as dm
+import wsp_tools as wt
+
+fname = &#39;/path/to/data.dm3&#39;
+dm3file = dm.dmReader(fname)
+
+img = wt.lorentz(dm3file)
+img.sitie(defocus=1e-3)
+img.phase.clip_data(sigma=5).high_pass().low_pass()
+img.Bx.clip_data(sigma=5).high_pass().low_pass()
+img.By.clip_data(sigma=5).high_pass().low_pass()
+
+img.saveMeta(outdir=&#39;someDirectory&#39;) # Saves defocus, pixelSize, etc
+
+### plot img.Bx, img.By, img.phase, img.data, img.rawData, etc
+```
+&#34;&#34;&#34;
+
+# %%
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+from deprecated import deprecated
+
+from . import image_processing as ip
+from .pyplotwrapper import subplots
+from . import constants as _
+from .ltem import phase_from_img, ind_from_phase
+np.seterr(divide=&#39;ignore&#39;, invalid=&#39;ignore&#39;)
+import json
+
+__all__ = [&#39;lorentz&#39;,&#39;B_from_phase&#39;,&#39;SITIE&#39;]
+
+@deprecated(version=&#39;1.2.0&#39;, reason=&#39;This function has not found much use and will not be maintained&#39;)
+def save_lorentz(img, fname=None, fdir=&#39;&#39;):
+        &#34;&#34;&#34;Saves a `lorentz` object as a `.npz` archive.
+
+        **Parameters**
+
+        * **img** : _lorentz_ &lt;br /&gt;
+        The lorentz object to save.
+
+        * **fname** : _string, optional_ &lt;br /&gt;
+        If not given, the output will be the filename in the lorentz object metadata, with `.npz` rather than `.dm3`.
+
+        * **fdir** : _string, optional_ &lt;br /&gt;
+        The directory where the lorentz object will be saved. &lt;br /&gt;
+        Default is `fdir = &#39;&#39;`.
+
+        **Returns**
+
+        * **None**
+        &#34;&#34;&#34;
+        if fname is None:
+                fname = os.path.splitext(img.metadata[&#39;filename&#39;])[0]
+        if not os.path.exists(fdir):
+                if not fdir == &#39;&#39;:
+                        os.makedirs(fdir)
+        np.savez(os.path.join(fdir, fname), **img.__dict__)
+        return(None)
+
+@deprecated(version=&#39;1.2.0&#39;, reason=&#39;This function has not found much use and will not be maintained&#39;)
+def load_lorentz(fname):
+        &#34;&#34;&#34;Loads a `lorentz` object that has been saved as a `.npz` via `save_lorentz()`.
+
+        **Parameters**
+
+        * **fname** : _string_ &lt;br /&gt;
+
+        **Returns**
+
+        * **img** : _lorentz_ &lt;br /&gt;
+        The saved lorentz object, converted from a `.npz`.
+        &#34;&#34;&#34;
+        f = np.load(fname, allow_pickle=True)
+        fm = f[&#39;metadata&#39;].item()
+        dm3 = {&#39;data&#39;:f[&#39;data&#39;], &#39;pixelSize&#39;:[fm[&#39;pixelSize&#39;],fm[&#39;pixelSize&#39;]], &#39;pixelUnit&#39;:[fm[&#39;pixelUnit&#39;],fm[&#39;pixelUnit&#39;]], &#39;filename&#39;:fm[&#39;filename&#39;]}
+        img = lorentz(dm3)
+        img.phase = ip.ndap(f[&#39;phase&#39;])
+        img.Bx = ip.ndap(f[&#39;Bx&#39;])
+        img.By = ip.ndap(f[&#39;By&#39;])
+        img.x = f[&#39;x&#39;]
+        img.y = f[&#39;y&#39;]
+        fm.update(img.metadata)
+        img.metadata.update(fm)
+        return(img)
+
+class lorentz:
+        &#34;&#34;&#34;Class that contains sitie information about a lorentz image.
+
+        **Parameters**
+
+        * **dm3file** : _dictionary-like_ &lt;br /&gt;
+        a dm3-like file with the following keys: &lt;br /&gt;
+                &lt;ul&gt;
+                &lt;li&gt; **data** : _ndarray_ &lt;br /&gt;
+                An array carrying the electron counts. &lt;/li&gt;
+                &lt;li&gt; **pixelSize** : _tuple_ &lt;br /&gt;
+                (_number_, _number_) - the x and y pixel sizes. &lt;/li&gt;
+                &lt;li&gt; **pixelUnit** : _tuple_ &lt;br /&gt;
+                (_string_, _string_) - the x and y pixel units. &lt;/li&gt;
+                &lt;li&gt; **filename** : _string_ &lt;br /&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+        &#34;&#34;&#34;
+        def __init__(self, dm3file):
+                self.data = ip.ndap(dm3file[&#39;data&#39;])
+                self.dx = dm3file[&#39;pixelSize&#39;][0]
+                self.dy = dm3file[&#39;pixelSize&#39;][1]
+                self.xUnit = dm3file[&#39;pixelUnit&#39;][0]
+                self.yUnit = dm3file[&#39;pixelUnit&#39;][1]
+                self.x = np.arange(0,self.data.shape[1]) * self.dx
+                self.y = np.arange(0,self.data.shape[0]) * self.dy
+                self.metadata = {
+                                                        &#39;dx&#39;:float(dm3file[&#39;pixelSize&#39;][0]),
+                                                        &#39;dy&#39;:float(dm3file[&#39;pixelSize&#39;][1]),
+                                                        &#39;xUnit&#39;:dm3file[&#39;pixelUnit&#39;][0],
+                                                        &#39;yUnit&#39;:dm3file[&#39;pixelUnit&#39;][1],
+                                                        &#39;filename&#39;:dm3file[&#39;filename&#39;]
+                                                }
+                self.phase = None
+                self.Bx, self.By = None, None
+                self.fix_units()
+
+        def fix_units(self, xunit=None, yunit=None):
+                &#34;&#34;&#34;Change the pixel units to meters.
+
+                **Parameters**
+
+                * **unit** : _number, optional_ &lt;br /&gt;
+                The scale to multiply values by (i.e., going from &#39;µm&#39; to &#39;m&#39;, you would use `unit = 1e-6`). If none is given, `fix_units` will try to convert from `self.pixelUnit` to meters.
+
+                **Returns**
+
+                * **self** : _lorentz_
+                &#34;&#34;&#34;
+                if xunit is None:
+                        if self.xUnit == &#39;nm&#39;:
+                                xunit = 1e-9
+                        elif self.xUnit == &#39;mm&#39;:
+                                xunit = 1e-3
+                        elif self.xUnit == &#39;µm&#39;:
+                                xunit = 1e-6
+                        elif self.xUnit == &#39;m&#39;:
+                                xunit = 1
+                if yunit is None:
+                        if self.yUnit == &#39;nm&#39;:
+                                yunit = 1e-9
+                        elif self.yUnit == &#39;mm&#39;:
+                                yunit = 1e-3
+                        elif self.yUnit == &#39;µm&#39;:
+                                yunit = 1e-6
+                        elif self.yUnit == &#39;m&#39;:
+                                yunit = 1
+                self.dx *= xunit
+                self.dy *= yunit
+                self.xUnit = &#39;m&#39;
+                self.yUnit = &#39;m&#39;
+                self.x *= xunit
+                self.y *= yunit
+                self.metadata.update({
+                        &#39;dx&#39;: float(self.dx),
+                        &#39;dy&#39;: float(self.dy),
+                        &#39;xUnit&#39;: self.xUnit,
+                        &#39;yUnit&#39;: self.yUnit
+                })
+                return(None)
+
+        def sitie(self, defocus = 1, thickness = 60e-9, wavelength=1.97e-12):
+                &#34;&#34;&#34;Carries out phase and B-field reconstruction.
+
+                Assigns phase, Bx, and By attributes.
+
+                Updates metadata with the defocus and wavelength.
+
+                **Parameters**
+
+                * **defocus** : _number, optional_ &lt;br /&gt;
+                The defocus at which the images were taken. &lt;br /&gt;
+                Default is `defocus = 1`.
+
+                * **wavelength** : _number, optional_ &lt;br /&gt;
+                The electron wavelength. &lt;br /&gt;
+                Default is `wavelength = 1.96e-12` (relativistic wavelength of a 300kV electron).
+
+                **Returns**
+
+                * **self** : _lorentz_
+                &#34;&#34;&#34;
+                self.metadata.update({&#39;defocus&#39;: defocus, &#39;wavelength&#39;: wavelength, &#39;thickness&#39;: thickness})
+                self.phase = ip.ndap(phase_from_img(self.data, defocus, self.dx, self.dy, wavelength))
+                self.Bx, self.By = [ip.ndap(arr) for arr in ind_from_phase(self.phase, thickness)]
+                return(None)
+
+        def preview(self, window=None):
+                &#34;&#34;&#34;Preview the image.
+
+                Note that unlike `pyplotwrapper`, window is in units of pixels.
+
+                **Parameters**
+
+                * **window** : _array-like, optional_ &lt;br /&gt;
+                Format is `window = (xmin, xmax, ymin, ymax)`. &lt;br /&gt;
+                Default is `window = (0, -1, 0, -1)`
+                &#34;&#34;&#34;
+                fig, ax = subplots(11)
+                if not window is None:
+                        ax[0,0].setWindow(window)
+                data = ip.clip_data(self.data, sigma=10)
+                ax[0,0].setAxes(self.x, self.y)
+                ax[0,0].set_xlabel(&#34;x ({:})&#34;.format(self.dx))
+                ax[0,0].set_ylabel(&#34;y ({:})&#34;.format(self.dy))
+                ax[0,0].imshow(data)
+                plt.show()
+
+        def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
+                &#34;&#34;&#34;Save the metadata of the lorentz object to a file.
+
+                **Parameters**
+
+                * **outdir** : _string, optional_ &lt;br /&gt;
+                The directory where you&#39;d like to save the metadata. &lt;br /&gt;
+                Default is `outdir = &#39;&#39;`.
+
+                * **outname** : _string, optional_ &lt;br /&gt;
+                The name of the metadata file. &lt;br /&gt;
+                Default is `outname = &#39;metadata.json&#39;`.
+                &#34;&#34;&#34;
+                if not os.path.exists(outdir):
+                        os.makedirs(outdir)
+                with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
+                        json.dump(self.metadata, fp, indent=&#34;&#34;)
+
+################################## SITIE #######################################
+@deprecated(version=&#39;1.2.0&#39;, reason=&#39;You should now use wsp_tools.ltem.ind_from_phase. As of this version, B_from_phase just calls ind_from_phase.&#39;)
+def B_from_phase(phase, thickness=1):
+        &#34;&#34;&#34;Reconstructs the B-field from the phase profile.
+
+        **Parameters**
+
+        * **phase** : _ndarray_ &lt;br /&gt;
+        a 2d array representing the electron&#39;s phase.
+
+        * **thickness** : _number_ &lt;br /&gt;
+        the thickness of the sample. &lt;br /&gt;
+        Default is `thickness = 1`.
+
+        **Returns**
+
+        * **Bx** : _ndarray_ &lt;br /&gt;
+        The x-component of the magnetic field.
+
+        * **By** : _ndarray_ &lt;br /&gt;
+        The y-component of the magnetic field.
+        &#34;&#34;&#34;
+        return(ind_from_phase(phase, thickness))
+
+@deprecated(version=&#39;1.2.0&#39;, reason=&#39;You should now use wsp_tools.ltem.phase_from_img. As of this version, SITIE just calls phase_from_img.&#39;)
+def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
+        &#34;&#34;&#34;Reconstruct the phase from a defocussed image.
+
+        **Parameters**
+
+        * **image** : _ndarray_ &lt;br /&gt;
+        the 2d image data. &lt;br /&gt;
+
+        * **defocus** : _number_ &lt;br /&gt;
+
+        * **pixel_size** : _number, optional_ &lt;br /&gt;
+        Default is `pixel_size = 1`.
+
+        * **wavelength** : _number, optional_ &lt;br /&gt;
+        Default is `wavelength = 1.97e-12` (the relativistic wavelength of a 300kV electron).
+
+        **Returns**
+
+        * **phase** : _ndarray_ &lt;br /&gt;
+        &#34;&#34;&#34;
+        return(phase_from_img(img, defocus, pixel_size, pixel_size, wavelength))</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="wsp_tools.sitie.B_from_phase"><code class="name flex">
+<span>def <span class="ident">B_from_phase</span></span>(<span>phase, thickness=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reconstructs the B-field from the phase profile.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>phase</strong> : <em>ndarray</em> <br />
+a 2d array representing the electron's phase.</p>
+</li>
+<li>
+<p><strong>thickness</strong> : <em>number</em> <br />
+the thickness of the sample. <br />
+Default is <code>thickness = 1</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li>
+<p><strong>Bx</strong> : <em>ndarray</em> <br />
+The x-component of the magnetic field.</p>
+</li>
+<li>
+<p><strong>By</strong> : <em>ndarray</em> <br />
+The y-component of the magnetic field.</p>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@deprecated(version=&#39;1.2.0&#39;, reason=&#39;You should now use wsp_tools.ltem.ind_from_phase. As of this version, B_from_phase just calls ind_from_phase.&#39;)
+def B_from_phase(phase, thickness=1):
+        &#34;&#34;&#34;Reconstructs the B-field from the phase profile.
+
+        **Parameters**
+
+        * **phase** : _ndarray_ &lt;br /&gt;
+        a 2d array representing the electron&#39;s phase.
+
+        * **thickness** : _number_ &lt;br /&gt;
+        the thickness of the sample. &lt;br /&gt;
+        Default is `thickness = 1`.
+
+        **Returns**
+
+        * **Bx** : _ndarray_ &lt;br /&gt;
+        The x-component of the magnetic field.
+
+        * **By** : _ndarray_ &lt;br /&gt;
+        The y-component of the magnetic field.
+        &#34;&#34;&#34;
+        return(ind_from_phase(phase, thickness))</code></pre>
+</details>
+</dd>
+<dt id="wsp_tools.sitie.SITIE"><code class="name flex">
+<span>def <span class="ident">SITIE</span></span>(<span>image, defocus, pixel_size=1, wavelength=1.97e-12)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reconstruct the phase from a defocussed image.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>image</strong> : <em>ndarray</em> <br />
+the 2d image data. <br /></p>
+</li>
+<li>
+<p><strong>defocus</strong> : <em>number</em> <br /></p>
+</li>
+<li>
+<p><strong>pixel_size</strong> : <em>number, optional</em> <br />
+Default is <code>pixel_size = 1</code>.</p>
+</li>
+<li>
+<p><strong>wavelength</strong> : <em>number, optional</em> <br />
+Default is <code>wavelength = 1.97e-12</code> (the relativistic wavelength of a 300kV electron).</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>phase</strong> : <em>ndarray</em> <br /></li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@deprecated(version=&#39;1.2.0&#39;, reason=&#39;You should now use wsp_tools.ltem.phase_from_img. As of this version, SITIE just calls phase_from_img.&#39;)
+def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
+        &#34;&#34;&#34;Reconstruct the phase from a defocussed image.
+
+        **Parameters**
+
+        * **image** : _ndarray_ &lt;br /&gt;
+        the 2d image data. &lt;br /&gt;
+
+        * **defocus** : _number_ &lt;br /&gt;
+
+        * **pixel_size** : _number, optional_ &lt;br /&gt;
+        Default is `pixel_size = 1`.
+
+        * **wavelength** : _number, optional_ &lt;br /&gt;
+        Default is `wavelength = 1.97e-12` (the relativistic wavelength of a 300kV electron).
+
+        **Returns**
+
+        * **phase** : _ndarray_ &lt;br /&gt;
+        &#34;&#34;&#34;
+        return(phase_from_img(img, defocus, pixel_size, pixel_size, wavelength))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="wsp_tools.sitie.lorentz"><code class="flex name class">
+<span>class <span class="ident">lorentz</span></span>
+<span>(</span><span>dm3file)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class that contains sitie information about a lorentz image.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>dm3file</strong> : <em>dictionary-like</em> <br />
+a dm3-like file with the following keys: <br />
+<ul>
+<li> <strong>data</strong> : <em>ndarray</em> <br />
+An array carrying the electron counts. </li>
+<li> <strong>pixelSize</strong> : <em>tuple</em> <br />
+(<em>number</em>, <em>number</em>) - the x and y pixel sizes. </li>
+<li> <strong>pixelUnit</strong> : <em>tuple</em> <br />
+(<em>string</em>, <em>string</em>) - the x and y pixel units. </li>
+<li> <strong>filename</strong> : <em>string</em> <br /></li>
+</ul></li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class lorentz:
+        &#34;&#34;&#34;Class that contains sitie information about a lorentz image.
+
+        **Parameters**
+
+        * **dm3file** : _dictionary-like_ &lt;br /&gt;
+        a dm3-like file with the following keys: &lt;br /&gt;
+                &lt;ul&gt;
+                &lt;li&gt; **data** : _ndarray_ &lt;br /&gt;
+                An array carrying the electron counts. &lt;/li&gt;
+                &lt;li&gt; **pixelSize** : _tuple_ &lt;br /&gt;
+                (_number_, _number_) - the x and y pixel sizes. &lt;/li&gt;
+                &lt;li&gt; **pixelUnit** : _tuple_ &lt;br /&gt;
+                (_string_, _string_) - the x and y pixel units. &lt;/li&gt;
+                &lt;li&gt; **filename** : _string_ &lt;br /&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+        &#34;&#34;&#34;
+        def __init__(self, dm3file):
+                self.data = ip.ndap(dm3file[&#39;data&#39;])
+                self.dx = dm3file[&#39;pixelSize&#39;][0]
+                self.dy = dm3file[&#39;pixelSize&#39;][1]
+                self.xUnit = dm3file[&#39;pixelUnit&#39;][0]
+                self.yUnit = dm3file[&#39;pixelUnit&#39;][1]
+                self.x = np.arange(0,self.data.shape[1]) * self.dx
+                self.y = np.arange(0,self.data.shape[0]) * self.dy
+                self.metadata = {
+                                                        &#39;dx&#39;:float(dm3file[&#39;pixelSize&#39;][0]),
+                                                        &#39;dy&#39;:float(dm3file[&#39;pixelSize&#39;][1]),
+                                                        &#39;xUnit&#39;:dm3file[&#39;pixelUnit&#39;][0],
+                                                        &#39;yUnit&#39;:dm3file[&#39;pixelUnit&#39;][1],
+                                                        &#39;filename&#39;:dm3file[&#39;filename&#39;]
+                                                }
+                self.phase = None
+                self.Bx, self.By = None, None
+                self.fix_units()
+
+        def fix_units(self, xunit=None, yunit=None):
+                &#34;&#34;&#34;Change the pixel units to meters.
+
+                **Parameters**
+
+                * **unit** : _number, optional_ &lt;br /&gt;
+                The scale to multiply values by (i.e., going from &#39;µm&#39; to &#39;m&#39;, you would use `unit = 1e-6`). If none is given, `fix_units` will try to convert from `self.pixelUnit` to meters.
+
+                **Returns**
+
+                * **self** : _lorentz_
+                &#34;&#34;&#34;
+                if xunit is None:
+                        if self.xUnit == &#39;nm&#39;:
+                                xunit = 1e-9
+                        elif self.xUnit == &#39;mm&#39;:
+                                xunit = 1e-3
+                        elif self.xUnit == &#39;µm&#39;:
+                                xunit = 1e-6
+                        elif self.xUnit == &#39;m&#39;:
+                                xunit = 1
+                if yunit is None:
+                        if self.yUnit == &#39;nm&#39;:
+                                yunit = 1e-9
+                        elif self.yUnit == &#39;mm&#39;:
+                                yunit = 1e-3
+                        elif self.yUnit == &#39;µm&#39;:
+                                yunit = 1e-6
+                        elif self.yUnit == &#39;m&#39;:
+                                yunit = 1
+                self.dx *= xunit
+                self.dy *= yunit
+                self.xUnit = &#39;m&#39;
+                self.yUnit = &#39;m&#39;
+                self.x *= xunit
+                self.y *= yunit
+                self.metadata.update({
+                        &#39;dx&#39;: float(self.dx),
+                        &#39;dy&#39;: float(self.dy),
+                        &#39;xUnit&#39;: self.xUnit,
+                        &#39;yUnit&#39;: self.yUnit
+                })
+                return(None)
+
+        def sitie(self, defocus = 1, thickness = 60e-9, wavelength=1.97e-12):
+                &#34;&#34;&#34;Carries out phase and B-field reconstruction.
+
+                Assigns phase, Bx, and By attributes.
+
+                Updates metadata with the defocus and wavelength.
+
+                **Parameters**
+
+                * **defocus** : _number, optional_ &lt;br /&gt;
+                The defocus at which the images were taken. &lt;br /&gt;
+                Default is `defocus = 1`.
+
+                * **wavelength** : _number, optional_ &lt;br /&gt;
+                The electron wavelength. &lt;br /&gt;
+                Default is `wavelength = 1.96e-12` (relativistic wavelength of a 300kV electron).
+
+                **Returns**
+
+                * **self** : _lorentz_
+                &#34;&#34;&#34;
+                self.metadata.update({&#39;defocus&#39;: defocus, &#39;wavelength&#39;: wavelength, &#39;thickness&#39;: thickness})
+                self.phase = ip.ndap(phase_from_img(self.data, defocus, self.dx, self.dy, wavelength))
+                self.Bx, self.By = [ip.ndap(arr) for arr in ind_from_phase(self.phase, thickness)]
+                return(None)
+
+        def preview(self, window=None):
+                &#34;&#34;&#34;Preview the image.
+
+                Note that unlike `pyplotwrapper`, window is in units of pixels.
+
+                **Parameters**
+
+                * **window** : _array-like, optional_ &lt;br /&gt;
+                Format is `window = (xmin, xmax, ymin, ymax)`. &lt;br /&gt;
+                Default is `window = (0, -1, 0, -1)`
+                &#34;&#34;&#34;
+                fig, ax = subplots(11)
+                if not window is None:
+                        ax[0,0].setWindow(window)
+                data = ip.clip_data(self.data, sigma=10)
+                ax[0,0].setAxes(self.x, self.y)
+                ax[0,0].set_xlabel(&#34;x ({:})&#34;.format(self.dx))
+                ax[0,0].set_ylabel(&#34;y ({:})&#34;.format(self.dy))
+                ax[0,0].imshow(data)
+                plt.show()
+
+        def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
+                &#34;&#34;&#34;Save the metadata of the lorentz object to a file.
+
+                **Parameters**
+
+                * **outdir** : _string, optional_ &lt;br /&gt;
+                The directory where you&#39;d like to save the metadata. &lt;br /&gt;
+                Default is `outdir = &#39;&#39;`.
+
+                * **outname** : _string, optional_ &lt;br /&gt;
+                The name of the metadata file. &lt;br /&gt;
+                Default is `outname = &#39;metadata.json&#39;`.
+                &#34;&#34;&#34;
+                if not os.path.exists(outdir):
+                        os.makedirs(outdir)
+                with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
+                        json.dump(self.metadata, fp, indent=&#34;&#34;)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="wsp_tools.sitie.lorentz.fix_units"><code class="name flex">
+<span>def <span class="ident">fix_units</span></span>(<span>self, xunit=None, yunit=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Change the pixel units to meters.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>unit</strong> : <em>number, optional</em> <br />
+The scale to multiply values by (i.e., going from 'µm' to 'm', you would use <code>unit = 1e-6</code>). If none is given, <code>fix_units</code> will try to convert from <code>self.pixelUnit</code> to meters.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>self</strong> : <em>lorentz</em></li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fix_units(self, xunit=None, yunit=None):
+        &#34;&#34;&#34;Change the pixel units to meters.
+
+        **Parameters**
+
+        * **unit** : _number, optional_ &lt;br /&gt;
+        The scale to multiply values by (i.e., going from &#39;µm&#39; to &#39;m&#39;, you would use `unit = 1e-6`). If none is given, `fix_units` will try to convert from `self.pixelUnit` to meters.
+
+        **Returns**
+
+        * **self** : _lorentz_
+        &#34;&#34;&#34;
+        if xunit is None:
+                if self.xUnit == &#39;nm&#39;:
+                        xunit = 1e-9
+                elif self.xUnit == &#39;mm&#39;:
+                        xunit = 1e-3
+                elif self.xUnit == &#39;µm&#39;:
+                        xunit = 1e-6
+                elif self.xUnit == &#39;m&#39;:
+                        xunit = 1
+        if yunit is None:
+                if self.yUnit == &#39;nm&#39;:
+                        yunit = 1e-9
+                elif self.yUnit == &#39;mm&#39;:
+                        yunit = 1e-3
+                elif self.yUnit == &#39;µm&#39;:
+                        yunit = 1e-6
+                elif self.yUnit == &#39;m&#39;:
+                        yunit = 1
+        self.dx *= xunit
+        self.dy *= yunit
+        self.xUnit = &#39;m&#39;
+        self.yUnit = &#39;m&#39;
+        self.x *= xunit
+        self.y *= yunit
+        self.metadata.update({
+                &#39;dx&#39;: float(self.dx),
+                &#39;dy&#39;: float(self.dy),
+                &#39;xUnit&#39;: self.xUnit,
+                &#39;yUnit&#39;: self.yUnit
+        })
+        return(None)</code></pre>
+</details>
+</dd>
+<dt id="wsp_tools.sitie.lorentz.preview"><code class="name flex">
+<span>def <span class="ident">preview</span></span>(<span>self, window=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Preview the image.</p>
+<p>Note that unlike <code>pyplotwrapper</code>, window is in units of pixels.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><strong>window</strong> : <em>array-like, optional</em> <br />
+Format is <code>window = (xmin, xmax, ymin, ymax)</code>. <br />
+Default is <code>window = (0, -1, 0, -1)</code></li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def preview(self, window=None):
+        &#34;&#34;&#34;Preview the image.
+
+        Note that unlike `pyplotwrapper`, window is in units of pixels.
+
+        **Parameters**
+
+        * **window** : _array-like, optional_ &lt;br /&gt;
+        Format is `window = (xmin, xmax, ymin, ymax)`. &lt;br /&gt;
+        Default is `window = (0, -1, 0, -1)`
+        &#34;&#34;&#34;
+        fig, ax = subplots(11)
+        if not window is None:
+                ax[0,0].setWindow(window)
+        data = ip.clip_data(self.data, sigma=10)
+        ax[0,0].setAxes(self.x, self.y)
+        ax[0,0].set_xlabel(&#34;x ({:})&#34;.format(self.dx))
+        ax[0,0].set_ylabel(&#34;y ({:})&#34;.format(self.dy))
+        ax[0,0].imshow(data)
+        plt.show()</code></pre>
+</details>
+</dd>
+<dt id="wsp_tools.sitie.lorentz.saveMeta"><code class="name flex">
+<span>def <span class="ident">saveMeta</span></span>(<span>self, outdir='', outname='metadata.json')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Save the metadata of the lorentz object to a file.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>outdir</strong> : <em>string, optional</em> <br />
+The directory where you'd like to save the metadata. <br />
+Default is <code>outdir = ''</code>.</p>
+</li>
+<li>
+<p><strong>outname</strong> : <em>string, optional</em> <br />
+The name of the metadata file. <br />
+Default is <code>outname = 'metadata.json'</code>.</p>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
+        &#34;&#34;&#34;Save the metadata of the lorentz object to a file.
+
+        **Parameters**
+
+        * **outdir** : _string, optional_ &lt;br /&gt;
+        The directory where you&#39;d like to save the metadata. &lt;br /&gt;
+        Default is `outdir = &#39;&#39;`.
+
+        * **outname** : _string, optional_ &lt;br /&gt;
+        The name of the metadata file. &lt;br /&gt;
+        Default is `outname = &#39;metadata.json&#39;`.
+        &#34;&#34;&#34;
+        if not os.path.exists(outdir):
+                os.makedirs(outdir)
+        with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
+                json.dump(self.metadata, fp, indent=&#34;&#34;)</code></pre>
+</details>
+</dd>
+<dt id="wsp_tools.sitie.lorentz.sitie"><code class="name flex">
+<span>def <span class="ident">sitie</span></span>(<span>self, defocus=1, thickness=6e-08, wavelength=1.97e-12)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Carries out phase and B-field reconstruction.</p>
+<p>Assigns phase, Bx, and By attributes.</p>
+<p>Updates metadata with the defocus and wavelength.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>defocus</strong> : <em>number, optional</em> <br />
+The defocus at which the images were taken. <br />
+Default is <code>defocus = 1</code>.</p>
+</li>
+<li>
+<p><strong>wavelength</strong> : <em>number, optional</em> <br />
+The electron wavelength. <br />
+Default is <code>wavelength = 1.96e-12</code> (relativistic wavelength of a 300kV electron).</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><strong>self</strong> : <em>lorentz</em></li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sitie(self, defocus = 1, thickness = 60e-9, wavelength=1.97e-12):
+        &#34;&#34;&#34;Carries out phase and B-field reconstruction.
+
+        Assigns phase, Bx, and By attributes.
+
+        Updates metadata with the defocus and wavelength.
+
+        **Parameters**
+
+        * **defocus** : _number, optional_ &lt;br /&gt;
+        The defocus at which the images were taken. &lt;br /&gt;
+        Default is `defocus = 1`.
+
+        * **wavelength** : _number, optional_ &lt;br /&gt;
+        The electron wavelength. &lt;br /&gt;
+        Default is `wavelength = 1.96e-12` (relativistic wavelength of a 300kV electron).
+
+        **Returns**
+
+        * **self** : _lorentz_
+        &#34;&#34;&#34;
+        self.metadata.update({&#39;defocus&#39;: defocus, &#39;wavelength&#39;: wavelength, &#39;thickness&#39;: thickness})
+        self.phase = ip.ndap(phase_from_img(self.data, defocus, self.dx, self.dy, wavelength))
+        self.Bx, self.By = [ip.ndap(arr) for arr in ind_from_phase(self.phase, thickness)]
+        return(None)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="wsp_tools" href="index.html">wsp_tools</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="wsp_tools.sitie.B_from_phase" href="#wsp_tools.sitie.B_from_phase">B_from_phase</a></code></li>
+<li><code><a title="wsp_tools.sitie.SITIE" href="#wsp_tools.sitie.SITIE">SITIE</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="wsp_tools.sitie.lorentz" href="#wsp_tools.sitie.lorentz">lorentz</a></code></h4>
+<ul class="">
+<li><code><a title="wsp_tools.sitie.lorentz.fix_units" href="#wsp_tools.sitie.lorentz.fix_units">fix_units</a></code></li>
+<li><code><a title="wsp_tools.sitie.lorentz.preview" href="#wsp_tools.sitie.lorentz.preview">preview</a></code></li>
+<li><code><a title="wsp_tools.sitie.lorentz.saveMeta" href="#wsp_tools.sitie.lorentz.saveMeta">saveMeta</a></code></li>
+<li><code><a title="wsp_tools.sitie.lorentz.sitie" href="#wsp_tools.sitie.lorentz.sitie">sitie</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
