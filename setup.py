@@ -3,13 +3,13 @@ from setuptools import setup, find_packages
 setup(
 	name = 'wsp_tools',
 	packages = find_packages(),
-	version = '1.2.03',
+	version = '1.2.4',
 	author = 'William S. Parker',
 	author_email = 'wparker4@uoregon.edu',
 	description = 'Utilities for TEM data analysis and simulation.',
 	url = 'https://github.com/McMorranLab/wsp_tools',
 	project_urls={
-        "Bug Tracker": "https://github.com/pypa/sampleproject/issues",
+        "Bug Tracker": "https://github.com/McMorranLab/wsp_tools/issues",
     },
 	classifiers=[
         "Programming Language :: Python :: 3",

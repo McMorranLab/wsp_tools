@@ -43,6 +43,7 @@
 # along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.
 
 import os
+from pathlib import Path
 import numpy as np
 
 __all__ = [&#39;high_pass&#39;,&#39;low_pass&#39;,&#39;clip_data&#39;,&#39;shift_pos&#39;,&#39;outpath&#39;,&#39;ndap&#39;]
@@ -174,7 +175,7 @@ def outpath(datadir, outdir, fname):
         finoutdir = os.path.join(outdir, subpath)
         if not os.path.exists(finoutdir):
                 os.makedirs(finoutdir)
-        return(os.path.join(finoutdir, os.path.basename(fname)))
+        return(Path(os.path.join(finoutdir, os.path.basename(fname))))
 
 # %%
 class ndap(np.ndarray):
@@ -187,8 +188,8 @@ class ndap(np.ndarray):
         * **data** : _complex ndarray_ &lt;br /&gt;
         Any type of ndarray - the methods are defined with a 2d array in mind.
         &#34;&#34;&#34;
-        def __new__(cls, data, dtype=np.float64):
-                dummy = np.asarray(data, dtype=dtype).copy().view(cls)
+        def __new__(cls, data):
+                dummy = np.asarray(data, dtype=data.dtype).copy().view(cls)
                 return(dummy)
 
         def __init__(self, data):
@@ -488,7 +489,7 @@ The name of the file to save. (abspath)</li>
         finoutdir = os.path.join(outdir, subpath)
         if not os.path.exists(finoutdir):
                 os.makedirs(finoutdir)
-        return(os.path.join(finoutdir, os.path.basename(fname)))</code></pre>
+        return(Path(os.path.join(finoutdir, os.path.basename(fname))))</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.image_processing.shift_pos"><code class="name flex">
@@ -553,8 +554,8 @@ Any type of ndarray - the methods are defined with a 2d array in mind.</li>
         * **data** : _complex ndarray_ &lt;br /&gt;
         Any type of ndarray - the methods are defined with a 2d array in mind.
         &#34;&#34;&#34;
-        def __new__(cls, data, dtype=np.float64):
-                dummy = np.asarray(data, dtype=dtype).copy().view(cls)
+        def __new__(cls, data):
+                dummy = np.asarray(data, dtype=data.dtype).copy().view(cls)
                 return(dummy)
 
         def __init__(self, data):

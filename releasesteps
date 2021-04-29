@@ -1,0 +1,30 @@
+###################### Testing ################
+cd tests
+pytest
+cd ../devtests
+bash devtests.sh
+
+###################### Write docs #############
+pdoc --html --force -o docs wsp_tools
+
+###################### Update version #########
+update version in: setup.py, setup.cfg
+
+##################### VCS #####################
+git add .
+git commit -m 'commit message'
+git tag 0.0.0
+git push origin --tags
+
+##################### Build the Dist and upload to PyPi
+rm -rf build dist *.egg-info
+pip install --upgrade build twine
+python -m build
+python -m twine upload (--repository testpypi) dist/*
+
+################### Check the install from PyPi #######
+python -m venv ivenv
+source ivenv/bin/activate
+pip install (--extra-index-url https://test.pypi.org/simple/) wsp-tools
+
+Parentheses for deployment to test.pypi.org rather than pypi.org

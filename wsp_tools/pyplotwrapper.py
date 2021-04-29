@@ -210,7 +210,7 @@ class singleAx():
 		* **title** : _string_ <br />
 		The plot title.
 
-		* **\*\*kwargs** <br />
+		* ****kwargs** <br />
 		All other kwargs are passed on to `matplotlib.axes.Axes.set_title`.
 
 		**Returns**
@@ -228,7 +228,7 @@ class singleAx():
 		* **xlabel** : _string_ <br />
 		The xlabel.
 
-		* **\*\*kwargs** <br />
+		* ****kwargs** <br />
 		All other kwargs are passed on to `matplotlib.axes.Axes.set_xlabel`.
 
 		**Returns**
@@ -246,7 +246,7 @@ class singleAx():
 		* **ylabel** : _string_ <br />
 		The ylabel.
 
-		* **\*\*kwargs** <br />
+		* ****kwargs** <br />
 		All other kwargs are passed on to `matplotlib.axes.Axes.set_ylabel`.
 
 		**Returns**
@@ -275,7 +275,7 @@ class singleAx():
 		* **title** : _string_ <br />
 		The plot title.
 
-		* **\*\*kwargs** <br />
+		* ****kwargs** <br />
 		All other kwargs are passed on
 		to `matplotlib.axes.Axes.set_xlabel`, `matplotlib.axes.Axes.set_ylabel`,
 		and `matplotlib.axes.Axes.set_title`.
@@ -303,7 +303,7 @@ class singleAx():
 		quiver plots. <br />
 		Default is `step = 1`.
 
-		* **\*\*kwargs** <br />
+		* ****kwargs** <br />
 		All other kwargs are passed on to `matplotlib.axes.Axes.imshow`.
 
 		**Returns**
@@ -334,7 +334,7 @@ class singleAx():
 		If True, arrow color will correspond to the complex angle of the data. <br />
 		Default is `rgba = False`.
 
-		* **\*\*kwargs** <br />
+		* ****kwargs** <br />
 		All other kwargs are passed on to `matplotlib.axes.Axes.quiver`.
 
 		**Returns**
@@ -380,7 +380,7 @@ class singleAx():
 		component of the rgba value. <br />
 		Default is `alpha = 'uniform'`.
 
-		* **\*\*kwargs** <br />
+		* ****kwargs** <br />
 		All other kwargs are passed on to `matplotlib.axes.Axes.imshow`.
 
 		**Returns**
@@ -406,7 +406,7 @@ class singleAx():
 		Format: `window = [xmin, xmax, ymin, ymax]`. Note that these are the x
 		and y values, rather than their indices.
 
-		* **\*\*kwargs** <br />
+		* ****kwargs** <br />
 		All other kwargs are passed on to `matplotlib.axes.Axes.plot`.
 
 		**Returns**
@@ -446,7 +446,7 @@ def subplots(rc=11, **kwargs):
 		If true, extra dimensions are squeezed out from the returned array of Axes. <br />
 		Default is `squeeze = False`.
 
-		* **\*\*kwargs** <br />
+		* ****kwargs** <br />
 		All other kwargs are passed on to `matplotlib.axes.Axes.subplots`.
 
 		**Returns**
