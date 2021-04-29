@@ -22,7 +22,9 @@ __all__ = ['abphase2d']
 
 @deprecated(version='1.2.0', reason='You should now use wsp_tools.ltem.ab_phase.')
 def abphase2d(mx, my, mz, Lx=1e-6, Ly=1e-6, p=np.array([0,0,1]), t=60e-9):
-	"""Calculates the Aharonov-Bohm phase acquired by an electron passing through a 2d
+	"""DEPRECATED. You should instead use `wsp_tools.ltem.ab_phase.`
+
+	Calculates the Aharonov-Bohm phase acquired by an electron passing through a 2d
 	magnetization.
 
 	**Parameters**

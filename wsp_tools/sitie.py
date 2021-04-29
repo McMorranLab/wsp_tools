@@ -57,7 +57,9 @@ __all__ = ['lorentz','B_from_phase','SITIE']
 
 @deprecated(version='1.2.0', reason='This function has not found much use and will not be maintained')
 def save_lorentz(img, fname=None, fdir=''):
-	"""Saves a `lorentz` object as a `.npz` archive.
+	"""DEPRECATED. This function will no longer be maintained.
+
+	Saves a `lorentz` object as a `.npz` archive.
 
 	**Parameters**
 
@@ -85,7 +87,9 @@ def save_lorentz(img, fname=None, fdir=''):
 
 @deprecated(version='1.2.0', reason='This function has not found much use and will not be maintained')
 def load_lorentz(fname):
-	"""Loads a `lorentz` object that has been saved as a `.npz` via `save_lorentz()`.
+	"""DEPRECATED. This function will no longer be maintained.
+
+	Loads a `lorentz` object that has been saved as a `.npz` via `save_lorentz()`.
 
 	**Parameters**
 
@@ -257,7 +261,9 @@ class lorentz:
 ################################## SITIE #######################################
 @deprecated(version='1.2.0', reason='You should now use wsp_tools.ltem.ind_from_phase. As of this version, B_from_phase just calls ind_from_phase.')
 def B_from_phase(phase, thickness=1):
-	"""Reconstructs the B-field from the phase profile.
+	"""DEPRECATED. You should instead use `wsp_tools.ltem.ind_from_phase`.
+
+	Reconstructs the B-field from the phase profile.
 
 	**Parameters**
 
@@ -280,7 +286,9 @@ def B_from_phase(phase, thickness=1):
 
 @deprecated(version='1.2.0', reason='You should now use wsp_tools.ltem.phase_from_img. As of this version, SITIE just calls phase_from_img.')
 def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
-	"""Reconstruct the phase from a defocussed image.
+	"""DEPRECATED. You should instead use `wsp_tools.ltem.phase_from_img`.
+
+	Reconstruct the phase from a defocussed image.
 
 	**Parameters**
 

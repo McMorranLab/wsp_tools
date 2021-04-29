@@ -4,11 +4,12 @@ pytest
 cd ../devtests
 bash devtests.sh
 
+###################### Update version #########
+update version in: setup.py, setup.cfg
+
 ###################### Write docs #############
 pdoc --html --force -o docs wsp_tools
 
-###################### Update version #########
-update version in: setup.py, setup.cfg
 
 ##################### VCS #####################
 git add .
