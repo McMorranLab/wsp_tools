@@ -13,7 +13,7 @@ Features:
 ## Installation
 
 ### Pip
-As of version 1.3.0, `wsp_tools` is available on PyPi, and can be installed with `pip`:
+As of version 1.3.1, `wsp_tools` is available on PyPi, and can be installed with `pip`:
 
 ```Bash
 python -m pip install wsp-tools
@@ -35,7 +35,7 @@ pip install -e git+https://github.com/McMorranLab/wsp_tools@{commit id or tag nu
 
 ## Documentation
 
-As of version 1.3.0, documentation is available at [https://wsparker.github.io/wsp_tools/](https://wsparker.github.io/wsp_tools/).
+As of version 1.3.1, documentation is available at [https://mcmorranlab.github.io/wsp_tools/](https://mcmorranlab.github.io/wsp_tools/).
 
 As of version 1.0.94, wsp_tools includes a helper function `docs(outdir=".")`, which uses ```pdoc3``` to auto-generate html documentation and save it to an outdir of your choice, thus avoiding the need to clone this repository just to see the documentation. For example:
 
