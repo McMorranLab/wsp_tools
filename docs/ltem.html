@@ -55,7 +55,54 @@ __all__ = [
                         &#39;ind_from_phase&#39;,
                         &#39;ind_from_img&#39;,
                         &#39;phase_from_img&#39;,
-                        &#39;jchessmodel&#39;]
+                        &#39;jchessmodel&#39;,
+                        &#39;ind_from_mag&#39;]
+
+def ind_from_mag(mx, my, mz, dx=1, dy=1, thickness=60e-9, p = np.array([0,0,1])):
+        &#34;&#34;&#34;Calculate the magnetic induction imparted on a fast electron by a magnetized sample.
+
+        This is shorthand for `ind_from_phase(ab_phase(*args))`.
+
+        **Parameters**
+
+        * **mx** : _ndarray_ &lt;br /&gt;
+        The x-component of magnetization. Should be two or three dimensions.
+
+        * **my** : _ndarray_ &lt;br /&gt;
+        The y-component of magnetization. Should be two or three dimensions.
+
+        * **mz** : _ndarray_ &lt;br /&gt;
+        The z-component of magnetization. Should be two or three dimensions.
+
+        * **dx** : _number, optional_ &lt;br /&gt;
+        The spacing between pixels/samples in mx, my, mz, in the x-direction. &lt;br /&gt;
+        Default is `dx = 1`.
+
+        * **dy** : _number, optional_ &lt;br /&gt;
+        The spacing between pixels/samples in mx, my, mz, in the y-direction. &lt;br /&gt;
+        Default is `dy = 1`.
+
+        * **thickness** : _number, optional_ &lt;br /&gt;
+        The thickness of each slice of the x-y plane (if no z-dependence, the thickness of the sample). &lt;br /&gt;
+        Default is `thickness = 60e-9`.
+
+        * **p** : _ndarray, optional_ &lt;br /&gt;
+        A unit vector representing the direction of the electron&#39;s path. Shape should be (3,). &lt;br /&gt;
+        Default is `p = np.array([0,0,1])`.
+
+        **Returns**
+
+        * **Bx** : _ndarray_ &lt;br /&gt;
+        The x-component of the magnetic induction.
+
+        * **By** : _ndarray_ &lt;br /&gt;
+        The y-component of the magnetic induction.
+        &#34;&#34;&#34;
+        phase = ab_phase(mx, my, mz, dx, dy, thickness, p)
+        if len(phase.shape) &gt; 2:
+                phase = np.sum(phase, axis=-1)
+        Bx, By = ind_from_phase(phase, thickness)
+        return(Bx, By)
 
 def ab_phase(mx, my, mz, dx=1, dy=1, thickness=60e-9, p = np.array([0,0,1])):
         &#34;&#34;&#34;Calculate the Aharanov-Bohm phase imparted on a fast electron by a magnetized sample.
@@ -1174,6 +1221,109 @@ A 2d array containing the reconstructed y-component of magnetic induction.</p>
         return(Bx.real, By.real)</code></pre>
 </details>
 </dd>
+<dt id="wsp_tools.ltem.ind_from_mag"><code class="name flex">
+<span>def <span class="ident">ind_from_mag</span></span>(<span>mx, my, mz, dx=1, dy=1, thickness=6e-08, p=array([0, 0, 1]))</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate the magnetic induction imparted on a fast electron by a magnetized sample.</p>
+<p>This is shorthand for <code>ind_from_phase(ab_phase(*args))</code>.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><strong>mx</strong> : <em>ndarray</em> <br />
+The x-component of magnetization. Should be two or three dimensions.</p>
+</li>
+<li>
+<p><strong>my</strong> : <em>ndarray</em> <br />
+The y-component of magnetization. Should be two or three dimensions.</p>
+</li>
+<li>
+<p><strong>mz</strong> : <em>ndarray</em> <br />
+The z-component of magnetization. Should be two or three dimensions.</p>
+</li>
+<li>
+<p><strong>dx</strong> : <em>number, optional</em> <br />
+The spacing between pixels/samples in mx, my, mz, in the x-direction. <br />
+Default is <code>dx = 1</code>.</p>
+</li>
+<li>
+<p><strong>dy</strong> : <em>number, optional</em> <br />
+The spacing between pixels/samples in mx, my, mz, in the y-direction. <br />
+Default is <code>dy = 1</code>.</p>
+</li>
+<li>
+<p><strong>thickness</strong> : <em>number, optional</em> <br />
+The thickness of each slice of the x-y plane (if no z-dependence, the thickness of the sample). <br />
+Default is <code>thickness = 60e-9</code>.</p>
+</li>
+<li>
+<p><strong>p</strong> : <em>ndarray, optional</em> <br />
+A unit vector representing the direction of the electron's path. Shape should be (3,). <br />
+Default is <code>p = np.array([0,0,1])</code>.</p>
+</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li>
+<p><strong>Bx</strong> : <em>ndarray</em> <br />
+The x-component of the magnetic induction.</p>
+</li>
+<li>
+<p><strong>By</strong> : <em>ndarray</em> <br />
+The y-component of the magnetic induction.</p>
+</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def ind_from_mag(mx, my, mz, dx=1, dy=1, thickness=60e-9, p = np.array([0,0,1])):
+        &#34;&#34;&#34;Calculate the magnetic induction imparted on a fast electron by a magnetized sample.
+
+        This is shorthand for `ind_from_phase(ab_phase(*args))`.
+
+        **Parameters**
+
+        * **mx** : _ndarray_ &lt;br /&gt;
+        The x-component of magnetization. Should be two or three dimensions.
+
+        * **my** : _ndarray_ &lt;br /&gt;
+        The y-component of magnetization. Should be two or three dimensions.
+
+        * **mz** : _ndarray_ &lt;br /&gt;
+        The z-component of magnetization. Should be two or three dimensions.
+
+        * **dx** : _number, optional_ &lt;br /&gt;
+        The spacing between pixels/samples in mx, my, mz, in the x-direction. &lt;br /&gt;
+        Default is `dx = 1`.
+
+        * **dy** : _number, optional_ &lt;br /&gt;
+        The spacing between pixels/samples in mx, my, mz, in the y-direction. &lt;br /&gt;
+        Default is `dy = 1`.
+
+        * **thickness** : _number, optional_ &lt;br /&gt;
+        The thickness of each slice of the x-y plane (if no z-dependence, the thickness of the sample). &lt;br /&gt;
+        Default is `thickness = 60e-9`.
+
+        * **p** : _ndarray, optional_ &lt;br /&gt;
+        A unit vector representing the direction of the electron&#39;s path. Shape should be (3,). &lt;br /&gt;
+        Default is `p = np.array([0,0,1])`.
+
+        **Returns**
+
+        * **Bx** : _ndarray_ &lt;br /&gt;
+        The x-component of the magnetic induction.
+
+        * **By** : _ndarray_ &lt;br /&gt;
+        The y-component of the magnetic induction.
+        &#34;&#34;&#34;
+        phase = ab_phase(mx, my, mz, dx, dy, thickness, p)
+        if len(phase.shape) &gt; 2:
+                phase = np.sum(phase, axis=-1)
+        Bx, By = ind_from_phase(phase, thickness)
+        return(Bx, By)</code></pre>
+</details>
+</dd>
 <dt id="wsp_tools.ltem.ind_from_phase"><code class="name flex">
 <span>def <span class="ident">ind_from_phase</span></span>(<span>phase, thickness=6e-08)</span>
 </code></dt>
@@ -1473,6 +1623,7 @@ A 2d array containing the reconstructed Aharanov-Bohm phase shift.</li>
 <li><code><a title="wsp_tools.ltem.img_from_mag" href="#wsp_tools.ltem.img_from_mag">img_from_mag</a></code></li>
 <li><code><a title="wsp_tools.ltem.img_from_phase" href="#wsp_tools.ltem.img_from_phase">img_from_phase</a></code></li>
 <li><code><a title="wsp_tools.ltem.ind_from_img" href="#wsp_tools.ltem.ind_from_img">ind_from_img</a></code></li>
+<li><code><a title="wsp_tools.ltem.ind_from_mag" href="#wsp_tools.ltem.ind_from_mag">ind_from_mag</a></code></li>
 <li><code><a title="wsp_tools.ltem.ind_from_phase" href="#wsp_tools.ltem.ind_from_phase">ind_from_phase</a></code></li>
 <li><code><a title="wsp_tools.ltem.jchessmodel" href="#wsp_tools.ltem.jchessmodel">jchessmodel</a></code></li>
 <li><code><a title="wsp_tools.ltem.phase_from_img" href="#wsp_tools.ltem.phase_from_img">phase_from_img</a></code></li>

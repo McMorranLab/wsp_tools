@@ -9,13 +9,16 @@ update version in: setup.py, setup.cfg
 
 ###################### Write docs #############
 pdoc --html --force -o docs wsp_tools
+mv docs/wsp_tools/* docs/
+rm -r docs/wsp_tools
 
 
 ##################### VCS #####################
 git add .
 git commit -m 'commit message'
-git tag 0.0.0
-git push origin --tags
+git tag {version number}
+git push --tags
+git push origin
 
 ##################### Build the Dist and upload to PyPi
 rm -rf build dist *.egg-info

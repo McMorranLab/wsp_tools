@@ -4,20 +4,38 @@ Utilities for TEM data analysis and simulation.
 Features:
 
 * Single Image TIE
-* Lorentz simulations
+* Lorentz TEM simulations
 * spatial modes
 * a `matplotlib.pyplot` wrapper
 * an implementation of the CIELAB colorspace
 * a `scipy.constants` wrapper that allows arbitrary units (i.e., using nanometers instead of meters)
 
 ## Installation
+
+### Pip
+As of version 1.3.0, `wsp_tools` is available on PyPi, and can be installed with `pip`:
+
+```Bash
+python -m pip install wsp_tools
+```
+
+### GitHub
+`wsp_tools` can also be installed directly from GitHub via
 ```Bash
 pip install -e git+https://github.com/McMorranLab/wsp_tools#egg=wsp-tools
 ```
 
-Installing in editable mode `-e` ensures that pip records the install url, with the correct commit.
+Installing in editable mode `-e` ensures that `pip freeze` records the install url, not just the version.
+
+You can specify the commit or tag to install, via
+
+```Bash
+pip install -e git+https://github.com/McMorranLab/wsp_tools@{commit id or tag number}#egg=wsp_tools
+```
 
 ## Documentation
+
+As of version 1.3.0, documentation is available at [https://wsparker.github.io/wsp_tools/](https://wsparker.github.io/wsp_tools/).
 
 As of version 1.0.94, wsp_tools includes a helper function `docs(outdir=".")`, which uses ```pdoc3``` to auto-generate html documentation and save it to an outdir of your choice, thus avoiding the need to clone this repository just to see the documentation. For example:
 

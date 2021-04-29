@@ -105,7 +105,9 @@ __all__ = [&#39;lorentz&#39;,&#39;B_from_phase&#39;,&#39;SITIE&#39;]
 
 @deprecated(version=&#39;1.2.0&#39;, reason=&#39;This function has not found much use and will not be maintained&#39;)
 def save_lorentz(img, fname=None, fdir=&#39;&#39;):
-        &#34;&#34;&#34;Saves a `lorentz` object as a `.npz` archive.
+        &#34;&#34;&#34;DEPRECATED. This function will no longer be maintained.
+
+        Saves a `lorentz` object as a `.npz` archive.
 
         **Parameters**
 
@@ -133,7 +135,9 @@ def save_lorentz(img, fname=None, fdir=&#39;&#39;):
 
 @deprecated(version=&#39;1.2.0&#39;, reason=&#39;This function has not found much use and will not be maintained&#39;)
 def load_lorentz(fname):
-        &#34;&#34;&#34;Loads a `lorentz` object that has been saved as a `.npz` via `save_lorentz()`.
+        &#34;&#34;&#34;DEPRECATED. This function will no longer be maintained.
+
+        Loads a `lorentz` object that has been saved as a `.npz` via `save_lorentz()`.
 
         **Parameters**
 
@@ -305,7 +309,9 @@ class lorentz:
 ################################## SITIE #######################################
 @deprecated(version=&#39;1.2.0&#39;, reason=&#39;You should now use wsp_tools.ltem.ind_from_phase. As of this version, B_from_phase just calls ind_from_phase.&#39;)
 def B_from_phase(phase, thickness=1):
-        &#34;&#34;&#34;Reconstructs the B-field from the phase profile.
+        &#34;&#34;&#34;DEPRECATED. You should instead use `wsp_tools.ltem.ind_from_phase`.
+
+        Reconstructs the B-field from the phase profile.
 
         **Parameters**
 
@@ -328,7 +334,9 @@ def B_from_phase(phase, thickness=1):
 
 @deprecated(version=&#39;1.2.0&#39;, reason=&#39;You should now use wsp_tools.ltem.phase_from_img. As of this version, SITIE just calls phase_from_img.&#39;)
 def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
-        &#34;&#34;&#34;Reconstruct the phase from a defocussed image.
+        &#34;&#34;&#34;DEPRECATED. You should instead use `wsp_tools.ltem.phase_from_img`.
+
+        Reconstruct the phase from a defocussed image.
 
         **Parameters**
 
@@ -361,7 +369,8 @@ def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
 <span>def <span class="ident">B_from_phase</span></span>(<span>phase, thickness=1)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Reconstructs the B-field from the phase profile.</p>
+<div class="desc"><p>DEPRECATED. You should instead use <code><a title="wsp_tools.ltem.ind_from_phase" href="ltem.html#wsp_tools.ltem.ind_from_phase">ind_from_phase()</a></code>.</p>
+<p>Reconstructs the B-field from the phase profile.</p>
 <p><strong>Parameters</strong></p>
 <ul>
 <li>
@@ -391,7 +400,9 @@ The y-component of the magnetic field.</p>
 </summary>
 <pre><code class="python">@deprecated(version=&#39;1.2.0&#39;, reason=&#39;You should now use wsp_tools.ltem.ind_from_phase. As of this version, B_from_phase just calls ind_from_phase.&#39;)
 def B_from_phase(phase, thickness=1):
-        &#34;&#34;&#34;Reconstructs the B-field from the phase profile.
+        &#34;&#34;&#34;DEPRECATED. You should instead use `wsp_tools.ltem.ind_from_phase`.
+
+        Reconstructs the B-field from the phase profile.
 
         **Parameters**
 
@@ -417,7 +428,8 @@ def B_from_phase(phase, thickness=1):
 <span>def <span class="ident">SITIE</span></span>(<span>image, defocus, pixel_size=1, wavelength=1.97e-12)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Reconstruct the phase from a defocussed image.</p>
+<div class="desc"><p>DEPRECATED. You should instead use <code><a title="wsp_tools.ltem.phase_from_img" href="ltem.html#wsp_tools.ltem.phase_from_img">phase_from_img()</a></code>.</p>
+<p>Reconstruct the phase from a defocussed image.</p>
 <p><strong>Parameters</strong></p>
 <ul>
 <li>
@@ -446,7 +458,9 @@ Default is <code>wavelength = 1.97e-12</code> (the relativistic wavelength of a 
 </summary>
 <pre><code class="python">@deprecated(version=&#39;1.2.0&#39;, reason=&#39;You should now use wsp_tools.ltem.phase_from_img. As of this version, SITIE just calls phase_from_img.&#39;)
 def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
-        &#34;&#34;&#34;Reconstruct the phase from a defocussed image.
+        &#34;&#34;&#34;DEPRECATED. You should instead use `wsp_tools.ltem.phase_from_img`.
+
+        Reconstruct the phase from a defocussed image.
 
         **Parameters**
 

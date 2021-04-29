@@ -27,7 +27,54 @@ __all__ = [
 			'ind_from_phase',
 			'ind_from_img',
 			'phase_from_img',
-			'jchessmodel']
+			'jchessmodel',
+			'ind_from_mag']
+
+def ind_from_mag(mx, my, mz, dx=1, dy=1, thickness=60e-9, p = np.array([0,0,1])):
+	"""Calculate the magnetic induction imparted on a fast electron by a magnetized sample.
+
+	This is shorthand for `ind_from_phase(ab_phase(*args))`.
+
+	**Parameters**
+
+	* **mx** : _ndarray_ <br />
+	The x-component of magnetization. Should be two or three dimensions.
+
+	* **my** : _ndarray_ <br />
+	The y-component of magnetization. Should be two or three dimensions.
+
+	* **mz** : _ndarray_ <br />
+	The z-component of magnetization. Should be two or three dimensions.
+
+	* **dx** : _number, optional_ <br />
+	The spacing between pixels/samples in mx, my, mz, in the x-direction. <br />
+	Default is `dx = 1`.
+
+	* **dy** : _number, optional_ <br />
+	The spacing between pixels/samples in mx, my, mz, in the y-direction. <br />
+	Default is `dy = 1`.
+
+	* **thickness** : _number, optional_ <br />
+	The thickness of each slice of the x-y plane (if no z-dependence, the thickness of the sample). <br />
+	Default is `thickness = 60e-9`.
+
+	* **p** : _ndarray, optional_ <br />
+	A unit vector representing the direction of the electron's path. Shape should be (3,). <br />
+	Default is `p = np.array([0,0,1])`.
+
+	**Returns**
+
+	* **Bx** : _ndarray_ <br />
+	The x-component of the magnetic induction.
+
+	* **By** : _ndarray_ <br />
+	The y-component of the magnetic induction.
+	"""
+	phase = ab_phase(mx, my, mz, dx, dy, thickness, p)
+	if len(phase.shape) > 2:
+		phase = np.sum(phase, axis=-1)
+	Bx, By = ind_from_phase(phase, thickness)
+	return(Bx, By)
 
 def ab_phase(mx, my, mz, dx=1, dy=1, thickness=60e-9, p = np.array([0,0,1])):
 	"""Calculate the Aharanov-Bohm phase imparted on a fast electron by a magnetized sample.

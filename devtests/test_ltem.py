@@ -43,7 +43,7 @@ plt.show()
 # %%
 Bfm3 = wt.B_from_mag(m2[0], m2[1], m2[2], z=Z, dx=dx, dy=dy)
 plt.imshow(wt.rgba(np.sum(Bfm3[0], axis=-1) + 1j * np.sum(Bfm3[1], axis=-1)))
-plt.title("B from mag 3d (slice)")
+plt.title("B from mag 3d (sum)")
 plt.show()
 
 # %%
@@ -55,7 +55,7 @@ plt.show()
 # %%
 Afm3 = wt.A_from_mag(m2[0], m2[1], m2[2], z=Z, dx=dx, dy=dy)
 plt.imshow(wt.rgba(np.sum(Afm3[0], axis=-1) + 1j * np.sum(Afm3[1], axis=-1)))
-plt.title("A from mag 3d (slice)")
+plt.title("A from mag 3d (sum)")
 plt.show()
 
 # %%
@@ -96,4 +96,16 @@ plt.show()
 ifi = wt.ind_from_img(ifm2, defocus=1e-3, dx=dx, dy=dy)
 plt.imshow(wt.rgba(ifi[0] + 1j*ifi[1]))
 plt.title("induction from image")
+plt.show()
+
+# %%
+ifm = wt.ind_from_mag(m2[0], m2[1], m2[2], dx=dx, dy=dy)
+plt.imshow(wt.rgba(ifm[0] + 1j*ifm[1]))
+plt.title("induction from mag (2)")
+plt.show()
+
+# %%
+ifm = wt.ind_from_mag(m3[0], m3[1], m3[2], dx=dx, dy=dy)
+plt.imshow(wt.rgba(ifm[0]+1j*ifm[1]))
+plt.title("induction from mag (3)")
 plt.show()
