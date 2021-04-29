@@ -16,7 +16,7 @@ Features:
 As of version 1.3.0, `wsp_tools` is available on PyPi, and can be installed with `pip`:
 
 ```Bash
-python -m pip install wsp_tools
+python -m pip install wsp-tools
 ```
 
 ### GitHub
