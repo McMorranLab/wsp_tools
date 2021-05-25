@@ -8,6 +8,7 @@ bash devtests.sh
 update version in: setup.py, setup.cfg
 
 ###################### Write docs #############
+######### (from root wsp_tools directory)
 pdoc --html --force -o docs wsp_tools
 mv docs/wsp_tools/* docs/
 rm -r docs/wsp_tools

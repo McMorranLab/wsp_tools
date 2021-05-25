@@ -77,11 +77,11 @@ def ind_from_mag(mx, my, mz, dx=1, dy=1, thickness=60e-9, p = np.array([0,0,1]))
 	return(Bx, By)
 
 def ab_phase(mx, my, mz, dx=1, dy=1, thickness=60e-9, p = np.array([0,0,1])):
-	"""Calculate the Aharanov-Bohm phase imparted on a fast electron by a magnetized sample.
+	"""Calculate the Aharonov-Bohm phase imparted on a fast electron by a magnetized sample.
 
 	This is an implementation of the algorithm described in Mansuripur et. al, _Computation of electron diffraction patterns in Lorentz TEM_, Eq (13) specifically.
 
-	The shape of the output array is the same as mx, my, and mz. If mx, my, mz are three dimensional (i.e., have z-dependence as well as x and y), the third dimension of the output array represents the Aharanov-Bohm phase of each z-slice of the magnetization.
+	The shape of the output array is the same as mx, my, and mz. If mx, my, mz are three dimensional (i.e., have z-dependence as well as x and y), the third dimension of the output array represents the Aharonov-Bohm phase of each z-slice of the magnetization.
 
 	**Parameters**
 
@@ -113,7 +113,7 @@ def ab_phase(mx, my, mz, dx=1, dy=1, thickness=60e-9, p = np.array([0,0,1])):
 	**Returns**
 
 	* **phase** : _ndarray_ <br />
-	The Aharanov-Bohm phase imparted on the electron by the magnetization. Shape will be the same as mx, my, mz.
+	The Aharonov-Bohm phase imparted on the electron by the magnetization. Shape will be the same as mx, my, mz.
 	"""
 	M, s, s_mag, sig, z_hat = common_stuff(mx, my, mz, dx, dy)
 	Gp = G(p, sig, z_hat, thickness * s_mag)
@@ -342,7 +342,7 @@ def img_from_phase(phase, dx = 1, dy = 1, defocus = 0, wavelength = 1.97e-12):
 	return(img.real)
 
 def ind_from_phase(phase, thickness = 60e-9):
-	"""Calculate the magnetic induction given the Aharanov-Bohm phase shift.
+	"""Calculate the magnetic induction given the Aharonov-Bohm phase shift.
 
 	This is an implementation of Eq (11) from J. Chess et al., 2017, _Streamlined approach to mapping the magnetic induction of skyrmionic materials_.
 
@@ -369,7 +369,7 @@ def ind_from_phase(phase, thickness = 60e-9):
 	return(Bx.real, By.real)
 
 def phase_from_img(img, defocus = 0, dx = 1, dy = 1, wavelength = 1.97e-12):
-	"""Reconstruct the Aharanov-Bohm phase from a defocussed image.
+	"""Reconstruct the Aharonov-Bohm phase from a defocussed image.
 
 	This is an implementation of the SITIE equation (Eq 10) from J. Chess et al., 2017, _Streamlined approach to mapping the magnetic induction of skyrmionic materials_.
 
@@ -396,7 +396,7 @@ def phase_from_img(img, defocus = 0, dx = 1, dy = 1, wavelength = 1.97e-12):
 	**Returns**
 
 	* **phase** : _ndarray_ <br />
-	A 2d array containing the reconstructed Aharanov-Bohm phase shift.
+	A 2d array containing the reconstructed Aharonov-Bohm phase shift.
 	"""
 	Sx = np.fft.fftfreq(img.shape[1], dx)
 	Sy = np.fft.fftfreq(img.shape[0], dy)
