@@ -53,7 +53,7 @@ from .ltem import phase_from_img, ind_from_phase
 np.seterr(divide='ignore', invalid='ignore')
 import json
 
-__all__ = ['lorentz','B_from_phase','SITIE']
+__all__ = ['Lorentz','lorentz','B_from_phase','SITIE']
 
 @deprecated(version='1.2.0', reason='This function has not found much use and will not be maintained')
 def save_lorentz(img, fname=None, fdir=''):
@@ -137,9 +137,9 @@ def lorentz(file):
 	**Returns**
 	* **out** : _list, Lorentz_ <br />
 	a list of `wsp-tools.sitie.Lorentz` instances, if the `.dm3` file is an image sequence.
-	Otherwise, a single `wsp-tools.sitie.Lorentz` instance. 
+	Otherwise, a single `wsp-tools.sitie.Lorentz` instance.
 	"""
-	if len(file['data'].shape) == 2:
+	if len(file['data'].shape) <= 2:
 		return Lorentz(file)
 	else:
 		f1 = file.copy()
