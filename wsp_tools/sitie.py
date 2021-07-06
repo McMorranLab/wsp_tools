@@ -113,7 +113,46 @@ def load_lorentz(fname):
 	img.metadata.update(fm)
 	return(img)
 
-class lorentz:
+def lorentz(file):
+	"""Creates a `Lorentz` class instance for each image in a `.dm3` sequence.
+
+	This function essentially acts as a wrapper for the `Lorentz` class, adding an extra handler
+	for `.dm3` image sequences. When the `.dm3` file contains a sequence of images, it is split into
+	individual `Lorentz` instances.
+
+	**Parameters**
+
+	* **dm3file** : _dictionary-like_ <br />
+	a dm3-like file with the following keys: <br />
+		<ul>
+		<li> **data** : _ndarray_ <br />
+		An array carrying the electron counts. </li>
+		<li> **pixelSize** : _tuple_ <br />
+		(_number_, _number_) - the x and y pixel sizes. </li>
+		<li> **pixelUnit** : _tuple_ <br />
+		(_string_, _string_) - the x and y pixel units. </li>
+		<li> **filename** : _string_ <br /></li>
+		</ul>
+
+	**Returns**
+	* **out** : _list, Lorentz_ <br />
+	a list of `wsp-tools.sitie.Lorentz` instances, if the `.dm3` file is an image sequence.
+	Otherwise, a single `wsp-tools.sitie.Lorentz` instance. 
+	"""
+	if len(file['data'].shape) == 2:
+		return Lorentz(file)
+	else:
+		f1 = file.copy()
+		out = []
+		for dataset in file['data']:
+			f1['data'] = dataset
+			f1['pixelSize'] = [file['pixelSize'][-2], file['pixelSize'][-1]]
+			f1['pixelUnit'] = [file['pixelUnit'][-2], file['pixelUnit'][-1]]
+			f1['coords'] = [file['coords'][-2], file['coords'][-1]]
+			out.append(Lorentz(f1))
+		return(out)
+
+class Lorentz:
 	"""Class that contains sitie information about a lorentz image.
 
 	**Parameters**

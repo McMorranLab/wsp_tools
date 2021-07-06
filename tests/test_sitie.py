@@ -1,17 +1,16 @@
 import wsp_tools as wt
 from wsp_tools import plt, np
 import pickle
+import ncempy.io.dm as dm
 
 # %%
-def load_data():
-	with open("001_parallel.pkl", "rb") as f:
-		return(pickle.load(f))
-
-file = load_data()
-file['data'] = np.array(file['data'])
-file['coords'] = np.array(file['coords'])
-
+file = dm.dmReader('init_center.dm3')
 img = wt.lorentz(file)
+
+# %%
+file2 = dm.dmReader('TimeSeriesImages_10images05.dm3')
+imgs = wt.lorentz(file2)
+img2 = imgs[0]
 
 # %%
 img.data.clip_data().high_pass().shift_pos()
@@ -26,3 +25,17 @@ def test_B():
 def test_units():
 	assert(img.xUnit == 'm')
 	assert(np.isclose(img.dx,2.443537348881364e-09))
+
+# %%
+img2.data.clip_data().high_pass().shift_pos()
+img2.sitie(defocus=1e-3)
+
+def test_phase():
+	assert(len(img2.phase.shape) == 2)
+
+def test_B():
+	assert(len(img2.Bx.shape) == 2)
+
+def test_units():
+	assert(img2.xUnit == 'm')
+	assert(np.isclose(img2.dx,1.32e-08))

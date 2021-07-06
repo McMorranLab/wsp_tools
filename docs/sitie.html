@@ -161,7 +161,46 @@ def load_lorentz(fname):
         img.metadata.update(fm)
         return(img)
 
-class lorentz:
+def lorentz(file):
+        &#34;&#34;&#34;Creates a `Lorentz` class instance for each image in a `.dm3` sequence.
+
+        This function essentially acts as a wrapper for the `Lorentz` class, adding an extra handler
+        for `.dm3` image sequences. When the `.dm3` file contains a sequence of images, it is split into
+        individual `Lorentz` instances.
+
+        **Parameters**
+
+        * **dm3file** : _dictionary-like_ &lt;br /&gt;
+        a dm3-like file with the following keys: &lt;br /&gt;
+                &lt;ul&gt;
+                &lt;li&gt; **data** : _ndarray_ &lt;br /&gt;
+                An array carrying the electron counts. &lt;/li&gt;
+                &lt;li&gt; **pixelSize** : _tuple_ &lt;br /&gt;
+                (_number_, _number_) - the x and y pixel sizes. &lt;/li&gt;
+                &lt;li&gt; **pixelUnit** : _tuple_ &lt;br /&gt;
+                (_string_, _string_) - the x and y pixel units. &lt;/li&gt;
+                &lt;li&gt; **filename** : _string_ &lt;br /&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+
+        **Returns**
+        * **out** : _list, Lorentz_ &lt;br /&gt;
+        a list of `wsp-tools.sitie.Lorentz` instances, if the `.dm3` file is an image sequence.
+        Otherwise, a single `wsp-tools.sitie.Lorentz` instance. 
+        &#34;&#34;&#34;
+        if len(file[&#39;data&#39;].shape) == 2:
+                return Lorentz(file)
+        else:
+                f1 = file.copy()
+                out = []
+                for dataset in file[&#39;data&#39;]:
+                        f1[&#39;data&#39;] = dataset
+                        f1[&#39;pixelSize&#39;] = [file[&#39;pixelSize&#39;][-2], file[&#39;pixelSize&#39;][-1]]
+                        f1[&#39;pixelUnit&#39;] = [file[&#39;pixelUnit&#39;][-2], file[&#39;pixelUnit&#39;][-1]]
+                        f1[&#39;coords&#39;] = [file[&#39;coords&#39;][-2], file[&#39;coords&#39;][-1]]
+                        out.append(Lorentz(f1))
+                return(out)
+
+class Lorentz:
         &#34;&#34;&#34;Class that contains sitie information about a lorentz image.
 
         **Parameters**
@@ -482,17 +521,14 @@ def SITIE(image, defocus, pixel_size = 1, wavelength=1.97e-12):
         return(phase_from_img(img, defocus, pixel_size, pixel_size, wavelength))</code></pre>
 </details>
 </dd>
-</dl>
-</section>
-<section>
-<h2 class="section-title" id="header-classes">Classes</h2>
-<dl>
-<dt id="wsp_tools.sitie.lorentz"><code class="flex name class">
-<span>class <span class="ident">lorentz</span></span>
-<span>(</span><span>dm3file)</span>
+<dt id="wsp_tools.sitie.lorentz"><code class="name flex">
+<span>def <span class="ident">lorentz</span></span>(<span>file)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Class that contains sitie information about a lorentz image.</p>
+<div class="desc"><p>Creates a <code>Lorentz</code> class instance for each image in a <code>.dm3</code> sequence.</p>
+<p>This function essentially acts as a wrapper for the <code>Lorentz</code> class, adding an extra handler
+for <code>.dm3</code> image sequences. When the <code>.dm3</code> file contains a sequence of images, it is split into
+individual <code>Lorentz</code> instances.</p>
 <p><strong>Parameters</strong></p>
 <ul>
 <li><strong>dm3file</strong> : <em>dictionary-like</em> <br />
@@ -506,13 +542,21 @@ An array carrying the electron counts. </li>
 (<em>string</em>, <em>string</em>) - the x and y pixel units. </li>
 <li> <strong>filename</strong> : <em>string</em> <br /></li>
 </ul></li>
-</ul></div>
+</ul>
+<p><strong>Returns</strong>
+* <strong>out</strong> : <em>list, Lorentz</em> <br />
+a list of <code>wsp-tools.sitie.Lorentz</code> instances, if the <code>.dm3</code> file is an image sequence.
+Otherwise, a single <code>wsp-tools.sitie.Lorentz</code> instance.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class lorentz:
-        &#34;&#34;&#34;Class that contains sitie information about a lorentz image.
+<pre><code class="python">def lorentz(file):
+        &#34;&#34;&#34;Creates a `Lorentz` class instance for each image in a `.dm3` sequence.
+
+        This function essentially acts as a wrapper for the `Lorentz` class, adding an extra handler
+        for `.dm3` image sequences. When the `.dm3` file contains a sequence of images, it is split into
+        individual `Lorentz` instances.
 
         **Parameters**
 
@@ -527,337 +571,29 @@ An array carrying the electron counts. </li>
                 (_string_, _string_) - the x and y pixel units. &lt;/li&gt;
                 &lt;li&gt; **filename** : _string_ &lt;br /&gt;&lt;/li&gt;
                 &lt;/ul&gt;
-        &#34;&#34;&#34;
-        def __init__(self, dm3file):
-                self.data = ip.ndap(dm3file[&#39;data&#39;])
-                self.dx = dm3file[&#39;pixelSize&#39;][0]
-                self.dy = dm3file[&#39;pixelSize&#39;][1]
-                self.xUnit = dm3file[&#39;pixelUnit&#39;][0]
-                self.yUnit = dm3file[&#39;pixelUnit&#39;][1]
-                self.x = np.arange(0,self.data.shape[1]) * self.dx
-                self.y = np.arange(0,self.data.shape[0]) * self.dy
-                self.metadata = {
-                                                        &#39;dx&#39;:float(dm3file[&#39;pixelSize&#39;][0]),
-                                                        &#39;dy&#39;:float(dm3file[&#39;pixelSize&#39;][1]),
-                                                        &#39;xUnit&#39;:dm3file[&#39;pixelUnit&#39;][0],
-                                                        &#39;yUnit&#39;:dm3file[&#39;pixelUnit&#39;][1],
-                                                        &#39;filename&#39;:dm3file[&#39;filename&#39;]
-                                                }
-                self.phase = None
-                self.Bx, self.By = None, None
-                self.fix_units()
-
-        def fix_units(self, xunit=None, yunit=None):
-                &#34;&#34;&#34;Change the pixel units to meters.
-
-                **Parameters**
-
-                * **unit** : _number, optional_ &lt;br /&gt;
-                The scale to multiply values by (i.e., going from &#39;µm&#39; to &#39;m&#39;, you would use `unit = 1e-6`). If none is given, `fix_units` will try to convert from `self.pixelUnit` to meters.
-
-                **Returns**
-
-                * **self** : _lorentz_
-                &#34;&#34;&#34;
-                if xunit is None:
-                        if self.xUnit == &#39;nm&#39;:
-                                xunit = 1e-9
-                        elif self.xUnit == &#39;mm&#39;:
-                                xunit = 1e-3
-                        elif self.xUnit == &#39;µm&#39;:
-                                xunit = 1e-6
-                        elif self.xUnit == &#39;m&#39;:
-                                xunit = 1
-                if yunit is None:
-                        if self.yUnit == &#39;nm&#39;:
-                                yunit = 1e-9
-                        elif self.yUnit == &#39;mm&#39;:
-                                yunit = 1e-3
-                        elif self.yUnit == &#39;µm&#39;:
-                                yunit = 1e-6
-                        elif self.yUnit == &#39;m&#39;:
-                                yunit = 1
-                self.dx *= xunit
-                self.dy *= yunit
-                self.xUnit = &#39;m&#39;
-                self.yUnit = &#39;m&#39;
-                self.x *= xunit
-                self.y *= yunit
-                self.metadata.update({
-                        &#39;dx&#39;: float(self.dx),
-                        &#39;dy&#39;: float(self.dy),
-                        &#39;xUnit&#39;: self.xUnit,
-                        &#39;yUnit&#39;: self.yUnit
-                })
-                return(None)
-
-        def sitie(self, defocus = 1, thickness = 60e-9, wavelength=1.97e-12):
-                &#34;&#34;&#34;Carries out phase and B-field reconstruction.
-
-                Assigns phase, Bx, and By attributes.
-
-                Updates metadata with the defocus and wavelength.
-
-                **Parameters**
-
-                * **defocus** : _number, optional_ &lt;br /&gt;
-                The defocus at which the images were taken. &lt;br /&gt;
-                Default is `defocus = 1`.
-
-                * **wavelength** : _number, optional_ &lt;br /&gt;
-                The electron wavelength. &lt;br /&gt;
-                Default is `wavelength = 1.96e-12` (relativistic wavelength of a 300kV electron).
-
-                **Returns**
-
-                * **self** : _lorentz_
-                &#34;&#34;&#34;
-                self.metadata.update({&#39;defocus&#39;: defocus, &#39;wavelength&#39;: wavelength, &#39;thickness&#39;: thickness})
-                self.phase = ip.ndap(phase_from_img(self.data, defocus, self.dx, self.dy, wavelength))
-                self.Bx, self.By = [ip.ndap(arr) for arr in ind_from_phase(self.phase, thickness)]
-                return(None)
-
-        def preview(self, window=None):
-                &#34;&#34;&#34;Preview the image.
-
-                Note that unlike `pyplotwrapper`, window is in units of pixels.
-
-                **Parameters**
-
-                * **window** : _array-like, optional_ &lt;br /&gt;
-                Format is `window = (xmin, xmax, ymin, ymax)`. &lt;br /&gt;
-                Default is `window = (0, -1, 0, -1)`
-                &#34;&#34;&#34;
-                fig, ax = subplots(11)
-                if not window is None:
-                        ax[0,0].setWindow(window)
-                data = ip.clip_data(self.data, sigma=10)
-                ax[0,0].setAxes(self.x, self.y)
-                ax[0,0].set_xlabel(&#34;x ({:})&#34;.format(self.dx))
-                ax[0,0].set_ylabel(&#34;y ({:})&#34;.format(self.dy))
-                ax[0,0].imshow(data)
-                plt.show()
-
-        def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
-                &#34;&#34;&#34;Save the metadata of the lorentz object to a file.
-
-                **Parameters**
-
-                * **outdir** : _string, optional_ &lt;br /&gt;
-                The directory where you&#39;d like to save the metadata. &lt;br /&gt;
-                Default is `outdir = &#39;&#39;`.
-
-                * **outname** : _string, optional_ &lt;br /&gt;
-                The name of the metadata file. &lt;br /&gt;
-                Default is `outname = &#39;metadata.json&#39;`.
-                &#34;&#34;&#34;
-                if not os.path.exists(outdir):
-                        os.makedirs(outdir)
-                with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
-                        json.dump(self.metadata, fp, indent=&#34;&#34;)</code></pre>
-</details>
-<h3>Methods</h3>
-<dl>
-<dt id="wsp_tools.sitie.lorentz.fix_units"><code class="name flex">
-<span>def <span class="ident">fix_units</span></span>(<span>self, xunit=None, yunit=None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Change the pixel units to meters.</p>
-<p><strong>Parameters</strong></p>
-<ul>
-<li><strong>unit</strong> : <em>number, optional</em> <br />
-The scale to multiply values by (i.e., going from 'µm' to 'm', you would use <code>unit = 1e-6</code>). If none is given, <code>fix_units</code> will try to convert from <code>self.pixelUnit</code> to meters.</li>
-</ul>
-<p><strong>Returns</strong></p>
-<ul>
-<li><strong>self</strong> : <em>lorentz</em></li>
-</ul></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def fix_units(self, xunit=None, yunit=None):
-        &#34;&#34;&#34;Change the pixel units to meters.
-
-        **Parameters**
-
-        * **unit** : _number, optional_ &lt;br /&gt;
-        The scale to multiply values by (i.e., going from &#39;µm&#39; to &#39;m&#39;, you would use `unit = 1e-6`). If none is given, `fix_units` will try to convert from `self.pixelUnit` to meters.
 
         **Returns**
-
-        * **self** : _lorentz_
+        * **out** : _list, Lorentz_ &lt;br /&gt;
+        a list of `wsp-tools.sitie.Lorentz` instances, if the `.dm3` file is an image sequence.
+        Otherwise, a single `wsp-tools.sitie.Lorentz` instance. 
         &#34;&#34;&#34;
-        if xunit is None:
-                if self.xUnit == &#39;nm&#39;:
-                        xunit = 1e-9
-                elif self.xUnit == &#39;mm&#39;:
-                        xunit = 1e-3
-                elif self.xUnit == &#39;µm&#39;:
-                        xunit = 1e-6
-                elif self.xUnit == &#39;m&#39;:
-                        xunit = 1
-        if yunit is None:
-                if self.yUnit == &#39;nm&#39;:
-                        yunit = 1e-9
-                elif self.yUnit == &#39;mm&#39;:
-                        yunit = 1e-3
-                elif self.yUnit == &#39;µm&#39;:
-                        yunit = 1e-6
-                elif self.yUnit == &#39;m&#39;:
-                        yunit = 1
-        self.dx *= xunit
-        self.dy *= yunit
-        self.xUnit = &#39;m&#39;
-        self.yUnit = &#39;m&#39;
-        self.x *= xunit
-        self.y *= yunit
-        self.metadata.update({
-                &#39;dx&#39;: float(self.dx),
-                &#39;dy&#39;: float(self.dy),
-                &#39;xUnit&#39;: self.xUnit,
-                &#39;yUnit&#39;: self.yUnit
-        })
-        return(None)</code></pre>
-</details>
-</dd>
-<dt id="wsp_tools.sitie.lorentz.preview"><code class="name flex">
-<span>def <span class="ident">preview</span></span>(<span>self, window=None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Preview the image.</p>
-<p>Note that unlike <code>pyplotwrapper</code>, window is in units of pixels.</p>
-<p><strong>Parameters</strong></p>
-<ul>
-<li><strong>window</strong> : <em>array-like, optional</em> <br />
-Format is <code>window = (xmin, xmax, ymin, ymax)</code>. <br />
-Default is <code>window = (0, -1, 0, -1)</code></li>
-</ul></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def preview(self, window=None):
-        &#34;&#34;&#34;Preview the image.
-
-        Note that unlike `pyplotwrapper`, window is in units of pixels.
-
-        **Parameters**
-
-        * **window** : _array-like, optional_ &lt;br /&gt;
-        Format is `window = (xmin, xmax, ymin, ymax)`. &lt;br /&gt;
-        Default is `window = (0, -1, 0, -1)`
-        &#34;&#34;&#34;
-        fig, ax = subplots(11)
-        if not window is None:
-                ax[0,0].setWindow(window)
-        data = ip.clip_data(self.data, sigma=10)
-        ax[0,0].setAxes(self.x, self.y)
-        ax[0,0].set_xlabel(&#34;x ({:})&#34;.format(self.dx))
-        ax[0,0].set_ylabel(&#34;y ({:})&#34;.format(self.dy))
-        ax[0,0].imshow(data)
-        plt.show()</code></pre>
-</details>
-</dd>
-<dt id="wsp_tools.sitie.lorentz.saveMeta"><code class="name flex">
-<span>def <span class="ident">saveMeta</span></span>(<span>self, outdir='', outname='metadata.json')</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Save the metadata of the lorentz object to a file.</p>
-<p><strong>Parameters</strong></p>
-<ul>
-<li>
-<p><strong>outdir</strong> : <em>string, optional</em> <br />
-The directory where you'd like to save the metadata. <br />
-Default is <code>outdir = ''</code>.</p>
-</li>
-<li>
-<p><strong>outname</strong> : <em>string, optional</em> <br />
-The name of the metadata file. <br />
-Default is <code>outname = 'metadata.json'</code>.</p>
-</li>
-</ul></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def saveMeta(self, outdir=&#39;&#39;, outname=&#39;metadata.json&#39;):
-        &#34;&#34;&#34;Save the metadata of the lorentz object to a file.
-
-        **Parameters**
-
-        * **outdir** : _string, optional_ &lt;br /&gt;
-        The directory where you&#39;d like to save the metadata. &lt;br /&gt;
-        Default is `outdir = &#39;&#39;`.
-
-        * **outname** : _string, optional_ &lt;br /&gt;
-        The name of the metadata file. &lt;br /&gt;
-        Default is `outname = &#39;metadata.json&#39;`.
-        &#34;&#34;&#34;
-        if not os.path.exists(outdir):
-                os.makedirs(outdir)
-        with open(os.path.join(outdir, outname), &#39;w&#39;) as fp:
-                json.dump(self.metadata, fp, indent=&#34;&#34;)</code></pre>
-</details>
-</dd>
-<dt id="wsp_tools.sitie.lorentz.sitie"><code class="name flex">
-<span>def <span class="ident">sitie</span></span>(<span>self, defocus=1, thickness=6e-08, wavelength=1.97e-12)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Carries out phase and B-field reconstruction.</p>
-<p>Assigns phase, Bx, and By attributes.</p>
-<p>Updates metadata with the defocus and wavelength.</p>
-<p><strong>Parameters</strong></p>
-<ul>
-<li>
-<p><strong>defocus</strong> : <em>number, optional</em> <br />
-The defocus at which the images were taken. <br />
-Default is <code>defocus = 1</code>.</p>
-</li>
-<li>
-<p><strong>wavelength</strong> : <em>number, optional</em> <br />
-The electron wavelength. <br />
-Default is <code>wavelength = 1.96e-12</code> (relativistic wavelength of a 300kV electron).</p>
-</li>
-</ul>
-<p><strong>Returns</strong></p>
-<ul>
-<li><strong>self</strong> : <em>lorentz</em></li>
-</ul></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def sitie(self, defocus = 1, thickness = 60e-9, wavelength=1.97e-12):
-        &#34;&#34;&#34;Carries out phase and B-field reconstruction.
-
-        Assigns phase, Bx, and By attributes.
-
-        Updates metadata with the defocus and wavelength.
-
-        **Parameters**
-
-        * **defocus** : _number, optional_ &lt;br /&gt;
-        The defocus at which the images were taken. &lt;br /&gt;
-        Default is `defocus = 1`.
-
-        * **wavelength** : _number, optional_ &lt;br /&gt;
-        The electron wavelength. &lt;br /&gt;
-        Default is `wavelength = 1.96e-12` (relativistic wavelength of a 300kV electron).
-
-        **Returns**
-
-        * **self** : _lorentz_
-        &#34;&#34;&#34;
-        self.metadata.update({&#39;defocus&#39;: defocus, &#39;wavelength&#39;: wavelength, &#39;thickness&#39;: thickness})
-        self.phase = ip.ndap(phase_from_img(self.data, defocus, self.dx, self.dy, wavelength))
-        self.Bx, self.By = [ip.ndap(arr) for arr in ind_from_phase(self.phase, thickness)]
-        return(None)</code></pre>
+        if len(file[&#39;data&#39;].shape) == 2:
+                return Lorentz(file)
+        else:
+                f1 = file.copy()
+                out = []
+                for dataset in file[&#39;data&#39;]:
+                        f1[&#39;data&#39;] = dataset
+                        f1[&#39;pixelSize&#39;] = [file[&#39;pixelSize&#39;][-2], file[&#39;pixelSize&#39;][-1]]
+                        f1[&#39;pixelUnit&#39;] = [file[&#39;pixelUnit&#39;][-2], file[&#39;pixelUnit&#39;][-1]]
+                        f1[&#39;coords&#39;] = [file[&#39;coords&#39;][-2], file[&#39;coords&#39;][-1]]
+                        out.append(Lorentz(f1))
+                return(out)</code></pre>
 </details>
 </dd>
 </dl>
-</dd>
-</dl>
+</section>
+<section>
 </section>
 </article>
 <nav id="sidebar">
@@ -875,19 +611,7 @@ Default is <code>wavelength = 1.96e-12</code> (relativistic wavelength of a 300k
 <ul class="">
 <li><code><a title="wsp_tools.sitie.B_from_phase" href="#wsp_tools.sitie.B_from_phase">B_from_phase</a></code></li>
 <li><code><a title="wsp_tools.sitie.SITIE" href="#wsp_tools.sitie.SITIE">SITIE</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-classes">Classes</a></h3>
-<ul>
-<li>
-<h4><code><a title="wsp_tools.sitie.lorentz" href="#wsp_tools.sitie.lorentz">lorentz</a></code></h4>
-<ul class="">
-<li><code><a title="wsp_tools.sitie.lorentz.fix_units" href="#wsp_tools.sitie.lorentz.fix_units">fix_units</a></code></li>
-<li><code><a title="wsp_tools.sitie.lorentz.preview" href="#wsp_tools.sitie.lorentz.preview">preview</a></code></li>
-<li><code><a title="wsp_tools.sitie.lorentz.saveMeta" href="#wsp_tools.sitie.lorentz.saveMeta">saveMeta</a></code></li>
-<li><code><a title="wsp_tools.sitie.lorentz.sitie" href="#wsp_tools.sitie.lorentz.sitie">sitie</a></code></li>
-</ul>
-</li>
+<li><code><a title="wsp_tools.sitie.lorentz" href="#wsp_tools.sitie.lorentz">lorentz</a></code></li>
 </ul>
 </li>
 </ul>
