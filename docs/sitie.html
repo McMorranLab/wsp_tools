@@ -257,6 +257,8 @@ class Lorentz:
                                 xunit = 1e-6
                         elif self.xUnit == &#39;m&#39;:
                                 xunit = 1
+                        else:
+                                xunit = 1
                 if yunit is None:
                         if self.yUnit == &#39;nm&#39;:
                                 yunit = 1e-9
@@ -265,6 +267,8 @@ class Lorentz:
                         elif self.yUnit == &#39;µm&#39;:
                                 yunit = 1e-6
                         elif self.yUnit == &#39;m&#39;:
+                                yunit = 1
+                        else:
                                 yunit = 1
                 self.dx *= xunit
                 self.dy *= yunit
@@ -677,6 +681,8 @@ An array carrying the electron counts. </li>
                                 xunit = 1e-6
                         elif self.xUnit == &#39;m&#39;:
                                 xunit = 1
+                        else:
+                                xunit = 1
                 if yunit is None:
                         if self.yUnit == &#39;nm&#39;:
                                 yunit = 1e-9
@@ -685,6 +691,8 @@ An array carrying the electron counts. </li>
                         elif self.yUnit == &#39;µm&#39;:
                                 yunit = 1e-6
                         elif self.yUnit == &#39;m&#39;:
+                                yunit = 1
+                        else:
                                 yunit = 1
                 self.dx *= xunit
                 self.dy *= yunit
@@ -806,6 +814,8 @@ The scale to multiply values by (i.e., going from 'µm' to 'm', you would use <c
                         xunit = 1e-6
                 elif self.xUnit == &#39;m&#39;:
                         xunit = 1
+                else:
+                        xunit = 1
         if yunit is None:
                 if self.yUnit == &#39;nm&#39;:
                         yunit = 1e-9
@@ -814,6 +824,8 @@ The scale to multiply values by (i.e., going from 'µm' to 'm', you would use <c
                 elif self.yUnit == &#39;µm&#39;:
                         yunit = 1e-6
                 elif self.yUnit == &#39;m&#39;:
+                        yunit = 1
+                else:
                         yunit = 1
         self.dx *= xunit
         self.dy *= yunit

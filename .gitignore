@@ -1,7 +1,6 @@
 __pycache__
 *.egg-info
 *.ser
-*.dm3
 dev
 dist
 build

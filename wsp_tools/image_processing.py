@@ -61,14 +61,14 @@ def low_pass(data, sigma = 10):
 
 	* **FFdata** : _complex ndarray_ <br />
 	"""
-	X = np.linspace(-data.shape[1]/2, data.shape[1]/2, data.shape[1])
-	Y = np.linspace(-data.shape[1]/2, data.shape[0]/2, data.shape[0])
+	X = np.fft.fftfreq(data.shape[1], 1/data.shape[1])
+	Y = np.fft.fftfreq(data.shape[0], 1/data.shape[0])
 	x, y = np.meshgrid(X, Y)
-	g = np.exp(-(x**2 + y**2)/2/sigma**2)
+
+	g = np.exp(-(x**2+y**2)/2/sigma**2)
+
 	Fdata = np.fft.fft2(data)
-	Fg = np.fft.fft2(np.fft.fftshift(g))
-	Fg = Fg/np.max(Fg)
-	FFdata = np.fft.ifft2(Fg * Fdata)
+	FFdata = np.fft.ifft2(g * Fdata)
 	return(FFdata)
 
 def clip_data(data, sigma = 5):

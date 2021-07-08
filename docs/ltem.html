@@ -541,7 +541,7 @@ def jchessmodel(x, y, z=0, **kwargs):
         mx = np.cos(p[&#39;n&#39;]*phi%(2*_.pi)-gamma_z) * np.sin(Theta_rz)
         my = np.sin(p[&#39;n&#39;]*phi%(2*_.pi)-gamma_z) * np.sin(Theta_rz)
         mz = np.cos(Theta_rz)
-        return(mx, my, mz)
+        return(np.array([mx, my, mz]))
 
 ######## Helper functions
 
@@ -1514,7 +1514,7 @@ The z-component of magnetization. Shape will be the same as x and y.</p>
         mx = np.cos(p[&#39;n&#39;]*phi%(2*_.pi)-gamma_z) * np.sin(Theta_rz)
         my = np.sin(p[&#39;n&#39;]*phi%(2*_.pi)-gamma_z) * np.sin(Theta_rz)
         mz = np.cos(Theta_rz)
-        return(mx, my, mz)</code></pre>
+        return(np.array([mx, my, mz]))</code></pre>
 </details>
 </dd>
 <dt id="wsp_tools.ltem.phase_from_img"><code class="name flex">
