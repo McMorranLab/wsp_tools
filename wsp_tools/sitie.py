@@ -209,6 +209,8 @@ class Lorentz:
 				xunit = 1e-6
 			elif self.xUnit == 'm':
 				xunit = 1
+			else:
+				xunit = 1
 		if yunit is None:
 			if self.yUnit == 'nm':
 				yunit = 1e-9
@@ -217,6 +219,8 @@ class Lorentz:
 			elif self.yUnit == 'µm':
 				yunit = 1e-6
 			elif self.yUnit == 'm':
+				yunit = 1
+			else:
 				yunit = 1
 		self.dx *= xunit
 		self.dy *= yunit
