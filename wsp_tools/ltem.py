@@ -513,7 +513,7 @@ def jchessmodel(x, y, z=0, **kwargs):
 	mx = np.cos(p['n']*phi%(2*_.pi)-gamma_z) * np.sin(Theta_rz)
 	my = np.sin(p['n']*phi%(2*_.pi)-gamma_z) * np.sin(Theta_rz)
 	mz = np.cos(Theta_rz)
-	return(mx, my, mz)
+	return(np.array(mx, my, mz))
 
 ######## Helper functions
 
