@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
 	name = 'wsp_tools',
 	packages = find_packages(),
-	version = '1.3.6',
+	version = '1.4.0',
 	author = 'William S. Parker',
 	author_email = 'wparker4@uoregon.edu',
 	description = 'Utilities for TEM data analysis and simulation.',

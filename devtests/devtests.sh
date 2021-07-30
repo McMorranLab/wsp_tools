@@ -4,3 +4,4 @@ python test_constants.py
 python test_docs.py
 python test_ltem.py
 python test_sitie.py
+python test_pyplot.py

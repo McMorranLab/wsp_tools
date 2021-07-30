@@ -24,7 +24,7 @@ plt.show()
 
 # %%
 fig, [[ax]] = wt.subplots()
-ax.setWindow(window=(40,60,40,60))
+ax.set_window(window=(40,60,40,60))
 ax.set_xytitle("x ({})".format(img.dx))
 ax.rgba(img.Bx + 1j*img.By)
 ax.quiver(img.Bx + 1j*img.By, step=8, color='white')
