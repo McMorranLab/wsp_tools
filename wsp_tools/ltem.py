@@ -121,7 +121,7 @@ def ab_phase(mx, my, mz, dx=1, dy=1, thickness=60e-9, p = np.array([0,0,1])):
 	p_x_p_M = np.cross(p, np.cross(p, M, axisa=0, axisb=0, axisc=0), axis=0, axisb=0, axisc=0)
 	weights = 2 * _.e / _.hbar / _.c * 1j * thickness / s_mag * Gp * np.einsum('i...,i...->...',sig_x_z, p_x_p_M)
 	weights[:,0,0,:] = 0
-	phase = np.fft.ifft2(weights, axes=(1,2), norm = 'forward')
+	phase = weights.shape[1] * weights.shape[2] * np.fft.ifft2(weights, axes=(1,2))
 	return(np.squeeze(phase.real))
 
 def B_from_mag(mx, my, mz, z = 0, dx = 1, dy = 1, thickness = 60e-9):
@@ -193,7 +193,7 @@ def B_from_mag(mx, my, mz, z = 0, dx = 1, dy = 1, thickness = 60e-9):
 	B_mn[0] = dyA_mn[2] - dzA_mn[1]
 	B_mn[1] = dzA_mn[0] - dxA_mn[2]
 	B_mn[2] = dxA_mn[1] - dyA_mn[0]
-	B = np.fft.ifft2(B_mn, axes=(1,2), norm='forward')
+	B = B_mn.shape[1] * B_mn.shape[2] * np.fft.ifft2(B_mn, axes=(1,2))
 	return(np.squeeze(B.real))
 
 def A_from_mag(mx, my, mz, z = 0, dx = 1, dy = 1, thickness = 60e-9):
@@ -248,8 +248,7 @@ def A_from_mag(mx, my, mz, z = 0, dx = 1, dy = 1, thickness = 60e-9):
 	A_mn = A_mn_components(
 				mx.shape[0], mx.shape[1], z.shape[-1], selz_m, selz_z,
 				selz_p, s_mag, z, sigm, sigp, sig, M, thickness, z_hat)
-
-	A = np.fft.ifft2(A_mn, axes=(1,2), norm='forward')
+	A = A_mn.shape[1] * A_mn.shape[2] * np.fft.ifft2(A_mn, axes=(1,2))
 	return(np.squeeze(A.real))
 
 def img_from_mag(mx, my, mz, dx = 1, dy = 1, defocus = 0, thickness = 60e-9, wavelength = 1.97e-12, p = np.array([0,0,1])):
@@ -297,7 +296,7 @@ def img_from_mag(mx, my, mz, dx = 1, dy = 1, defocus = 0, thickness = 60e-9, wav
 	weights = - 4 * _.pi **2 * 2 * _.e / _.hbar / _.c * 1j * thickness * s_mag * Gp * np.einsum('i...,i...->...',sig_x_z, p_x_p_M)
 	weights[:,0,0,:] = 0
 
-	out = wavelength * defocus / 2 / _.pi * np.fft.ifft2(weights, axes=(1,2), norm = 'forward')
+	out = weights.shape[1] * weights.shape[2] * wavelength * defocus / 2 / _.pi * np.fft.ifft2(weights, axes=(1,2))
 	if out.shape[-1] > 1:
 		out = np.sum(out, axis=-1)
 	out = 1 - np.squeeze(out)
@@ -337,8 +336,8 @@ def img_from_phase(phase, dx = 1, dy = 1, defocus = 0, wavelength = 1.97e-12):
 	Sx = np.fft.fftfreq(phase.shape[1], dx)
 	Sy = np.fft.fftfreq(phase.shape[0], dy)
 	sx, sy = np.meshgrid(Sx, Sy) ### (y-dim, x-dim, z-dim)
-	phase = - 4 * _.pi**2 * (sx**2 + sy**2) * np.fft.fft2(phase, norm = 'forward')
-	img = 1 - wavelength * defocus / 2 / _.pi * np.fft.ifft2(phase, norm = 'forward')
+	phase = - 4 * _.pi**2 * (sx**2 + sy**2) * np.fft.fft2(phase)
+	img = 1 - wavelength * defocus / 2 / _.pi * np.fft.ifft2(phase)
 	return(img.real)
 
 def ind_from_phase(phase, thickness = 60e-9):
@@ -403,9 +402,9 @@ def phase_from_img(img, defocus = 0, dx = 1, dy = 1, wavelength = 1.97e-12):
 	sx, sy = np.meshgrid(Sx, Sy)
 	rhs = np.nan_to_num(2 * _.pi / wavelength / defocus * (1 - img / np.mean(img)), posinf = 0, neginf = 0)
 	rhs = shift_pos(rhs)
-	rhs = np.fft.fft2(rhs, norm = 'forward') / -4 / _.pi**2 / (sx**2 + sy**2)
+	rhs = np.fft.fft2(rhs) / -4 / _.pi**2 / (sx**2 + sy**2)
 	rhs = np.nan_to_num(rhs, posinf = 0, neginf = 0)
-	phase = np.fft.ifft2(rhs, norm = 'forward')
+	phase = np.fft.ifft2(rhs)
 	return(phase.real)
 
 def ind_from_img(img, defocus = 0, dx = 1, dy = 1, thickness = 60e-9, wavelength = 1.97e-12):
@@ -533,9 +532,9 @@ def common_stuff(mx, my, mz, dx, dy):
 	mx = np.atleast_3d(mx) ### (y-dim, x-dim, z-dim)
 	my = np.atleast_3d(my)
 	mz = np.atleast_3d(mz)
-	Mx = np.fft.fft2(mx, axes=(0,1), norm = 'forward')
-	My = np.fft.fft2(my, axes=(0,1), norm = 'forward')
-	Mz = np.fft.fft2(mz, axes=(0,1), norm = 'forward')
+	Mx = mx.shape[0] * mx.shape[1] * np.fft.fft2(mx, axes=(0,1))
+	My = my.shape[0] * my.shape[1] * np.fft.fft2(my, axes=(0,1))
+	Mz = mz.shape[0] * mz.shape[1] * np.fft.fft2(mz, axes=(0,1))
 	M = np.array([Mx, My, Mz]) ### (vec, y-dim, x-dim, z-dim)
 
 	Sx = np.fft.fftfreq(mx.shape[1], dx)

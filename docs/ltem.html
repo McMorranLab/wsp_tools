@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>wsp_tools.ltem API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -149,7 +149,7 @@ def ab_phase(mx, my, mz, dx=1, dy=1, thickness=60e-9, p = np.array([0,0,1])):
         p_x_p_M = np.cross(p, np.cross(p, M, axisa=0, axisb=0, axisc=0), axis=0, axisb=0, axisc=0)
         weights = 2 * _.e / _.hbar / _.c * 1j * thickness / s_mag * Gp * np.einsum(&#39;i...,i...-&gt;...&#39;,sig_x_z, p_x_p_M)
         weights[:,0,0,:] = 0
-        phase = np.fft.ifft2(weights, axes=(1,2), norm = &#39;forward&#39;)
+        phase = weights.shape[1] * weights.shape[2] * np.fft.ifft2(weights, axes=(1,2))
         return(np.squeeze(phase.real))
 
 def B_from_mag(mx, my, mz, z = 0, dx = 1, dy = 1, thickness = 60e-9):
@@ -221,7 +221,7 @@ def B_from_mag(mx, my, mz, z = 0, dx = 1, dy = 1, thickness = 60e-9):
         B_mn[0] = dyA_mn[2] - dzA_mn[1]
         B_mn[1] = dzA_mn[0] - dxA_mn[2]
         B_mn[2] = dxA_mn[1] - dyA_mn[0]
-        B = np.fft.ifft2(B_mn, axes=(1,2), norm=&#39;forward&#39;)
+        B = B_mn.shape[1] * B_mn.shape[2] * np.fft.ifft2(B_mn, axes=(1,2))
         return(np.squeeze(B.real))
 
 def A_from_mag(mx, my, mz, z = 0, dx = 1, dy = 1, thickness = 60e-9):
@@ -276,8 +276,7 @@ def A_from_mag(mx, my, mz, z = 0, dx = 1, dy = 1, thickness = 60e-9):
         A_mn = A_mn_components(
                                 mx.shape[0], mx.shape[1], z.shape[-1], selz_m, selz_z,
                                 selz_p, s_mag, z, sigm, sigp, sig, M, thickness, z_hat)
-
-        A = np.fft.ifft2(A_mn, axes=(1,2), norm=&#39;forward&#39;)
+        A = A_mn.shape[1] * A_mn.shape[2] * np.fft.ifft2(A_mn, axes=(1,2))
         return(np.squeeze(A.real))
 
 def img_from_mag(mx, my, mz, dx = 1, dy = 1, defocus = 0, thickness = 60e-9, wavelength = 1.97e-12, p = np.array([0,0,1])):
@@ -325,7 +324,7 @@ def img_from_mag(mx, my, mz, dx = 1, dy = 1, defocus = 0, thickness = 60e-9, wav
         weights = - 4 * _.pi **2 * 2 * _.e / _.hbar / _.c * 1j * thickness * s_mag * Gp * np.einsum(&#39;i...,i...-&gt;...&#39;,sig_x_z, p_x_p_M)
         weights[:,0,0,:] = 0
 
-        out = wavelength * defocus / 2 / _.pi * np.fft.ifft2(weights, axes=(1,2), norm = &#39;forward&#39;)
+        out = weights.shape[1] * weights.shape[2] * wavelength * defocus / 2 / _.pi * np.fft.ifft2(weights, axes=(1,2))
         if out.shape[-1] &gt; 1:
                 out = np.sum(out, axis=-1)
         out = 1 - np.squeeze(out)
@@ -365,8 +364,8 @@ def img_from_phase(phase, dx = 1, dy = 1, defocus = 0, wavelength = 1.97e-12):
         Sx = np.fft.fftfreq(phase.shape[1], dx)
         Sy = np.fft.fftfreq(phase.shape[0], dy)
         sx, sy = np.meshgrid(Sx, Sy) ### (y-dim, x-dim, z-dim)
-        phase = - 4 * _.pi**2 * (sx**2 + sy**2) * np.fft.fft2(phase, norm = &#39;forward&#39;)
-        img = 1 - wavelength * defocus / 2 / _.pi * np.fft.ifft2(phase, norm = &#39;forward&#39;)
+        phase = - 4 * _.pi**2 * (sx**2 + sy**2) * np.fft.fft2(phase)
+        img = 1 - wavelength * defocus / 2 / _.pi * np.fft.ifft2(phase)
         return(img.real)
 
 def ind_from_phase(phase, thickness = 60e-9):
@@ -431,9 +430,9 @@ def phase_from_img(img, defocus = 0, dx = 1, dy = 1, wavelength = 1.97e-12):
         sx, sy = np.meshgrid(Sx, Sy)
         rhs = np.nan_to_num(2 * _.pi / wavelength / defocus * (1 - img / np.mean(img)), posinf = 0, neginf = 0)
         rhs = shift_pos(rhs)
-        rhs = np.fft.fft2(rhs, norm = &#39;forward&#39;) / -4 / _.pi**2 / (sx**2 + sy**2)
+        rhs = np.fft.fft2(rhs) / -4 / _.pi**2 / (sx**2 + sy**2)
         rhs = np.nan_to_num(rhs, posinf = 0, neginf = 0)
-        phase = np.fft.ifft2(rhs, norm = &#39;forward&#39;)
+        phase = np.fft.ifft2(rhs)
         return(phase.real)
 
 def ind_from_img(img, defocus = 0, dx = 1, dy = 1, thickness = 60e-9, wavelength = 1.97e-12):
@@ -561,9 +560,9 @@ def common_stuff(mx, my, mz, dx, dy):
         mx = np.atleast_3d(mx) ### (y-dim, x-dim, z-dim)
         my = np.atleast_3d(my)
         mz = np.atleast_3d(mz)
-        Mx = np.fft.fft2(mx, axes=(0,1), norm = &#39;forward&#39;)
-        My = np.fft.fft2(my, axes=(0,1), norm = &#39;forward&#39;)
-        Mz = np.fft.fft2(mz, axes=(0,1), norm = &#39;forward&#39;)
+        Mx = mx.shape[0] * mx.shape[1] * np.fft.fft2(mx, axes=(0,1))
+        My = my.shape[0] * my.shape[1] * np.fft.fft2(my, axes=(0,1))
+        Mz = mz.shape[0] * mz.shape[1] * np.fft.fft2(mz, axes=(0,1))
         M = np.array([Mx, My, Mz]) ### (vec, y-dim, x-dim, z-dim)
 
         Sx = np.fft.fftfreq(mx.shape[1], dx)
@@ -715,8 +714,7 @@ The magnetic vector potential resulting from the given 2d magnetization.</li>
         A_mn = A_mn_components(
                                 mx.shape[0], mx.shape[1], z.shape[-1], selz_m, selz_z,
                                 selz_p, s_mag, z, sigm, sigp, sig, M, thickness, z_hat)
-
-        A = np.fft.ifft2(A_mn, axes=(1,2), norm=&#39;forward&#39;)
+        A = A_mn.shape[1] * A_mn.shape[2] * np.fft.ifft2(A_mn, axes=(1,2))
         return(np.squeeze(A.real))</code></pre>
 </details>
 </dd>
@@ -840,7 +838,7 @@ The magnetic field resulting from the given 2d magnetization.</li>
         B_mn[0] = dyA_mn[2] - dzA_mn[1]
         B_mn[1] = dzA_mn[0] - dxA_mn[2]
         B_mn[2] = dxA_mn[1] - dyA_mn[0]
-        B = np.fft.ifft2(B_mn, axes=(1,2), norm=&#39;forward&#39;)
+        B = B_mn.shape[1] * B_mn.shape[2] * np.fft.ifft2(B_mn, axes=(1,2))
         return(np.squeeze(B.real))</code></pre>
 </details>
 </dd>
@@ -940,7 +938,7 @@ The Aharonov-Bohm phase imparted on the electron by the magnetization. Shape wil
         p_x_p_M = np.cross(p, np.cross(p, M, axisa=0, axisb=0, axisc=0), axis=0, axisb=0, axisc=0)
         weights = 2 * _.e / _.hbar / _.c * 1j * thickness / s_mag * Gp * np.einsum(&#39;i...,i...-&gt;...&#39;,sig_x_z, p_x_p_M)
         weights[:,0,0,:] = 0
-        phase = np.fft.ifft2(weights, axes=(1,2), norm = &#39;forward&#39;)
+        phase = weights.shape[1] * weights.shape[2] * np.fft.ifft2(weights, axes=(1,2))
         return(np.squeeze(phase.real))</code></pre>
 </details>
 </dd>
@@ -1039,7 +1037,7 @@ The intensity of the image plane.</li>
         weights = - 4 * _.pi **2 * 2 * _.e / _.hbar / _.c * 1j * thickness * s_mag * Gp * np.einsum(&#39;i...,i...-&gt;...&#39;,sig_x_z, p_x_p_M)
         weights[:,0,0,:] = 0
 
-        out = wavelength * defocus / 2 / _.pi * np.fft.ifft2(weights, axes=(1,2), norm = &#39;forward&#39;)
+        out = weights.shape[1] * weights.shape[2] * wavelength * defocus / 2 / _.pi * np.fft.ifft2(weights, axes=(1,2))
         if out.shape[-1] &gt; 1:
                 out = np.sum(out, axis=-1)
         out = 1 - np.squeeze(out)
@@ -1122,8 +1120,8 @@ The intensity of the image plane.</li>
         Sx = np.fft.fftfreq(phase.shape[1], dx)
         Sy = np.fft.fftfreq(phase.shape[0], dy)
         sx, sy = np.meshgrid(Sx, Sy) ### (y-dim, x-dim, z-dim)
-        phase = - 4 * _.pi**2 * (sx**2 + sy**2) * np.fft.fft2(phase, norm = &#39;forward&#39;)
-        img = 1 - wavelength * defocus / 2 / _.pi * np.fft.ifft2(phase, norm = &#39;forward&#39;)
+        phase = - 4 * _.pi**2 * (sx**2 + sy**2) * np.fft.fft2(phase)
+        img = 1 - wavelength * defocus / 2 / _.pi * np.fft.ifft2(phase)
         return(img.real)</code></pre>
 </details>
 </dd>
@@ -1593,9 +1591,9 @@ A 2d array containing the reconstructed Aharonov-Bohm phase shift.</li>
         sx, sy = np.meshgrid(Sx, Sy)
         rhs = np.nan_to_num(2 * _.pi / wavelength / defocus * (1 - img / np.mean(img)), posinf = 0, neginf = 0)
         rhs = shift_pos(rhs)
-        rhs = np.fft.fft2(rhs, norm = &#39;forward&#39;) / -4 / _.pi**2 / (sx**2 + sy**2)
+        rhs = np.fft.fft2(rhs) / -4 / _.pi**2 / (sx**2 + sy**2)
         rhs = np.nan_to_num(rhs, posinf = 0, neginf = 0)
-        phase = np.fft.ifft2(rhs, norm = &#39;forward&#39;)
+        phase = np.fft.ifft2(rhs)
         return(phase.real)</code></pre>
 </details>
 </dd>
@@ -1633,7 +1631,7 @@ A 2d array containing the reconstructed Aharonov-Bohm phase shift.</li>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>
