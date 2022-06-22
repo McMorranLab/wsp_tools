@@ -18,7 +18,7 @@ Markdown==3.3.4
 MarkupSafe==2.0.1
 matplotlib==3.4.2
 ncempy==1.8.1
-numpy==1.21.1
+numpy==1.22.0
 packaging==21.0
 pdoc3==0.9.2
 pep517==0.11.0
